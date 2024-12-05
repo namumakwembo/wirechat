@@ -28,16 +28,14 @@ class Chats extends Component
         ];
     }
 
+    public function refreshComponent($event)
+    {
 
-
-   public function refreshComponent($event)  {
-
-
-        if ($event['message']['conversation_id'] != $this->selectedConversationId ) {
+        if ($event['message']['conversation_id'] != $this->selectedConversationId) {
             $this->dispatch('refresh')->self();
 
         }
-        
+
     }
 
     /**

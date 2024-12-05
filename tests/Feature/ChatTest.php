@@ -1223,7 +1223,7 @@ describe('Sending messages ', function () {
             $request->set('body', 'New message')->call('sendMessage');
         }
 
-          // Move the time forward slightly for the 61st message
+        // Move the time forward slightly for the 61st message
         Carbon::setTestNow(Carbon::now()->addSeconds(4));
         //on 61 abort
         $request->set('body', 'New message')->call('sendMessage');

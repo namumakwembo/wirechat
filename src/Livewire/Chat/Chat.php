@@ -585,13 +585,12 @@ class Chat extends Component
             // sleep(3);
             broadcast(new MessageCreated($message))->toOthers();
 
-
             //if conversation is private then Notify particpant immediately
             if ($this->conversation->isPrivate() || $this->conversation->isSelf()) {
 
                 if ($this->conversation->isPrivate() && $this->receiverParticipant) {
 
-                 //   broadcast(new NotifyParticipant($this->receiverParticipant, $message))->toOthers();
+                    //   broadcast(new NotifyParticipant($this->receiverParticipant, $message))->toOthers();
 
                     NotifyParticipants::dispatch($this->conversation, $message);
                     //    Notification::send($this->receiver, new NewMessageNotification($message));

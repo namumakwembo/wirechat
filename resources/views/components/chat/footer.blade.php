@@ -1,5 +1,5 @@
 
-@use('Namu\WireChat\Helpers\helper')
+@use('Namu\WireChat\Helpers\Helper')
 @props(['media','files','replyMessage','',''])
 
 <div id="chat-footer" x-data="{ 'openEmojiPicker': false }"
@@ -19,7 +19,7 @@
         class=" py-2 sm:px-4 py-1.5    z-[50]  bg-gray-50 dark:bg-gray-800   flex flex-col gap-3 items-center  w-full mx-auto">
 
         {{-- Media preview section --}}
-        <section 
+        <section
         x-show="$wire.media.length>0 ||$wire.files.length>0"
         x-cloak
 
@@ -28,7 +28,7 @@
         wire:target="sendMessage"
         >
 
-       
+
 
         @if (count($media) > 0)
         <div  x-data="attachments('media')">
@@ -45,7 +45,7 @@
                 <progress class="w-full h-1 rounded-lg" max="100" x-bind:value="progress"></progress>
             </div> --}}
             <section
-                
+
                 class=" flex  overflow-x-scroll  ms-overflow-style-none items-center w-full col-span-12 py-2 gap-5 "
                 style=" scrollbar-width: none; -ms-overflow-style: none;">
 
@@ -88,13 +88,13 @@
                     @endif
                 @endforeach
 
-                
+
 
                 {{-- TODO @if"( count($media)< $MAXFILES )" to hide upload button when maz files exceeded --}} {{-- Add more media --}}
                 <label
-                    wire:loading.class="cursor-progress" 
+                    wire:loading.class="cursor-progress"
                     class="shrink-0 cursor-pointer relative w-16 h-14 rounded-lg bg-gray-100 dark:bg-gray-700 flex text-center justify-center border dark:border-gray-700 border-gray-50">
-                    <input 
+                    <input
                     wire:loading.attr="disabled"
                     @change="handleFileSelect(event,{{ count($media) }})" type="file" multiple
                         accept="{{ Helper::formattedMediaMimesForAcceptAttribute() }}" class="sr-only">
@@ -159,9 +159,9 @@
                 {{-- Add more files --}}
                 {{-- TODO @if "( count($media)< $MAXFILES )" to hide upload button when maz files exceeded --}}
                 <label
-                    wire:loading.class="cursor-progress" 
+                    wire:loading.class="cursor-progress"
                     class="cursor-pointer shrink-0 relative w-16 h-14 rounded-lg bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors   flex text-center justify-center border dark:border-gray-800 border-gray-50">
-                    <input 
+                    <input
                         wire:loading.attr="disabled"
                         @change="handleFileSelect(event,{{ count($files) }})" type="file" multiple
                         accept="{{ Helper::formattedFileMimesForAcceptAttribute() }}" class="sr-only" hidden>
@@ -216,41 +216,41 @@
                 {{-- Get the current cursor position --}}
                 var startPos = textarea.selectionStart;
                 var endPos = textarea.selectionEnd;
-        
+
                 {{-- Insert a line break character at the cursor position --}}
                 var text = textarea.value;
                 var newText = text.substring(0, startPos) + '\n' + text.substring(endPos, text.length);
-        
+
                 {{-- Update the textarea value and cursor position --}}
                 textarea.value = newText;
                 textarea.selectionStart = startPos + 1; // Set cursor position after the inserted newline
                 textarea.selectionEnd = startPos + 1;
-        
+
                 {{-- update height of element smoothly --}}
                 textarea.style.height = 'auto';
                 textarea.style.height = textarea.scrollHeight + 'px';
-        
+
             }
         }" x-init="{{-- Emoji picture click event listener --}}
              document.querySelector('emoji-picker')
             .addEventListener('emoji-click', event => {
                 // Get the emoji unicode from the event
                 const emoji = event.detail['unicode'];
-        
+
                 // Get the current value and cursor position
                 const inputField = $refs.body;
                 const inputFieldValue = inputField._x_model.get() ?? '';
-        
+
                 const startPos = inputField.selectionStart;
                 const endPos = inputField.selectionEnd;
-        
+
                 // Insert the emoji at the current cursor position
                 const newValue = inputFieldValue.substring(0, startPos) + emoji + inputFieldValue.substring(endPos);
-        
+
                 // Update the value and move cursor after the emoji
                 inputField._x_model.set(newValue);
-        
-        
+
+
                 inputField.setSelectionRange(startPos + emoji.length, startPos + emoji.length);
             });"
             @submit.prevent="((body && body?.trim().length > 0) || ($wire.media && $wire.media.length > 0)|| ($wire.files && $wire.files.length > 0)) ? $wire.sendMessage() : null"
@@ -316,10 +316,10 @@
 
                         {{-- Upload Files --}}
                         @if (config('wirechat.allow_file_attachments', true))
-                            <label 
-                              wire:loading.class="cursor-progress" 
+                            <label
+                              wire:loading.class="cursor-progress"
                                x-data="attachments('files')" class="cursor-pointer">
-                                <input 
+                                <input
                                     wire:loading.attr="disabled"
                                     dusk="file-upload-input"
                                     @change="handleFileSelect(event, {{ count($files) }})" type="file" multiple
@@ -348,8 +348,8 @@
 
                         {{-- Upload Media --}}
                         @if (config('wirechat.allow_media_attachments', true))
-                            <label  
-                            wire:loading.class="cursor-progress" 
+                            <label
+                            wire:loading.class="cursor-progress"
                             w x-data="attachments('media')" class="cursor-pointer">
 
                                 {{-- Trigger image upload --}}
@@ -389,7 +389,7 @@
 
             <div @class(['flex gap-2 sm:px-2 w-full'])>
                 <textarea @focus-input-field.window="$el.focus()" autocomplete="off" x-model='body' x-ref="body"
- 
+
                      wire:loading.delay.longest.attr="disabled"
                     id="chat-input-field" autofocus type="text" name="message" placeholder="Message" maxlength="1700"
                     rows="1" @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px';"
@@ -401,28 +401,28 @@
                         .addEventListener('emoji-click', event => {
                             const emoji = event.detail['unicode'];
                             const inputField = $refs.body;
-                    
+
                             // Get the current cursor position (start and end)
                             const startPos = inputField.selectionStart;
                             const endPos = inputField.selectionEnd;
-                    
+
                             // Get current value of the input field
                             const currentValue = inputField.value;
-                    
+
                             // Insert the emoji at the cursor position, preserving line breaks and spaces
                             const newValue = currentValue.substring(0, startPos) + emoji + currentValue.substring(endPos);
-                    
+
                             // Update Alpine.js model (x-model='body') with the new value
                             inputField._x_model.set(newValue);
-                    
+
                             // Set the cursor position after the inserted emoji
                             inputField.setSelectionRange(startPos + emoji.length, startPos + emoji.length);
-                    
+
                             // Ensure the textarea resizes correctly after adding the emoji
                             inputField.style.height = 'auto';
                             inputField.style.height = inputField.scrollHeight + 'px';
                         });"></textarea>
-               
+
 
             </div>
 
@@ -443,10 +443,10 @@
                             <path
                                 d="M9.912 12H4L2.023 4.135A.662.662 0 0 1 2 3.995c-.022-.721.772-1.221 1.46-.891L22 12 3.46 20.896c-.68.327-1.464-.159-1.46-.867a.66.66 0 0 1 .033-.186L3.5 15" />
                         </svg>
-    
+
                     </button>
 
-               
+
 
                 {{-- send Like button--}}
                     <button  x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
@@ -469,10 +469,10 @@
                                     d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
                             </svg>
                         </span>
-    
+
                     </button>
 
-               
+
             </div>
 
         </form>
@@ -492,12 +492,12 @@
             allowedFileTypes: type === 'media' ? @json(config('wirechat.attachments.media_mimes')) : @json(config('wirechat.attachments.file_mimes')), // Allowed MIME types based on type
             progress: 0, // Progress of the current upload (0-100)
             wireModel: type, // The Livewire model to bind to
-    
+
             // Handle file selection from the input field
             handleFileSelect(event, count) {
                 if (event.target.files.length) {
                     const files = event.target.files;
-    
+
                     // Validate selected files and upload if valid
                     this.validateFiles(files, count)
                         .then((validFiles) => {
@@ -512,7 +512,7 @@
                         });
                 }
             },
-    
+
             // Upload files using Livewire's upload
             // uploadFiles(files) {
             //     this.isUploading = true;
@@ -572,16 +572,16 @@
             },
 
 
-    
+
             // Remove an uploaded file from Livewire
             removeUpload(filename) {
                 $wire.removeUpload(this.wireModel, filename);
             },
-    
+
             // Validate selected files against constraints
             validateFiles(files, count) {
                 const totalFiles = count + files.length; // Total file count including existing uploads
-    
+
                 // Check if total file count exceeds the maximum allowed
                 if (totalFiles > this.MAXFILES) {
                     files = Array.from(files).slice(0, this.MAXFILES - count); // Limit files to the allowed number
@@ -590,19 +590,19 @@
                         message: `File limit exceeded, allowed ${this.MAXFILES}`
                     });
                 }
-    
+
                 // Filter invalid files based on size and type
                 const invalidFiles = Array.from(files).filter((file) => {
                     const fileType = file.type.split('/')[1].toLowerCase(); // Extract file extension
                     return file.size > this.maxSize || !this.allowedFileTypes.includes(fileType); // Check size and type
                 });
-    
+
                 // Filter valid files
                 const validFiles = Array.from(files).filter((file) => {
                     const fileType = file.type.split('/')[1].toLowerCase();
                     return file.size <= this.maxSize && this.allowedFileTypes.includes(fileType);
                 });
-    
+
                 // Handle invalid files by showing appropriate error messages
                 if (invalidFiles.length > 0) {
                     invalidFiles.forEach((file) => {
@@ -621,12 +621,12 @@
                         }
                     });
                 }
-    
+
                 return Promise.resolve(validFiles); // Return valid files for further processing
             }
         }));
     </script>
-    
-    
+
+
     @endscript
 </div>

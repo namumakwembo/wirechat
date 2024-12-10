@@ -732,10 +732,8 @@ class Chat extends Component
 
     private function finalizeConversationState()
     {
-        /**
-         * todo:enable mark as read in here if embeding enabled
-         */
-        //$this->conversation->markAsRead();
+
+        $this->conversation->markAsRead();
 
         if ($this->authParticipant) {
             $this->authParticipant->update(['last_active_at' => now()]);

@@ -455,7 +455,7 @@ class Conversation extends Model
             // code...
         }
 
-        $this->participant($user)->update(['conversation_read_at' => now()]);
+        $this->participant($user)?->update(['conversation_read_at' => now()]);
     }
 
     /**
@@ -492,8 +492,7 @@ class Conversation extends Model
                 // If lastReadAt is null, consider all messages as unread
                 // Also, exclude messages that belong to the user
                 return (! $lastReadAt || $message->created_at > $lastReadAt) &&
-                    $message->sendable_id != $user->id &&
-                    $message->sendable_type != get_class($user);
+                    $message->sendable_id != $user->id && $message->sendable_type == get_class($user);
             });
         }
 

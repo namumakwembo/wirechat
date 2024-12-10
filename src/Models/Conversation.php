@@ -111,26 +111,17 @@ class Conversation extends Model
      */
     public function participant(Model|Authenticatable $user, bool $withoutGlobalScopes = false)
     {
-
-        $query = $this->participants()->withoutGlobalScope('withoutExited');
+        $query = Participant::where('participantable_id', $user->id)
+            ->where('participantable_type', get_class($user))
+            ->where('conversation_id', $this->id); // Ensures you're querying for the correct conversation
 
         if ($withoutGlobalScopes) {
-            $query->withoutGlobalScopes();
-            // code...
+            $query->withoutGlobalScopes(); // Apply this condition if necessary
         }
 
-        if ($this->relationLoaded('participants')) {
-            $participant = $query->where('participantable_id', $user->id)
-                ->where('participantable_type', get_class($user))
-                ->first();
-        } else {
+        // Retrieve the participant directly
+        $participant = $query->first();
 
-            $participant = $query->where('participantable_id', $user->id)
-                ->where('participantable_type', get_class($user))
-                ->first();
-        }
-
-        //dd($participant);
         return $participant;
     }
 

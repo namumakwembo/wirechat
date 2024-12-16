@@ -1,6 +1,6 @@
 name: Bug report
 description: Report a problem you're experiencing
-labels: bug
+labels: bug, unconfirmed, medium priority
 body:
   - type: markdown
     attributes:
@@ -27,12 +27,11 @@ body:
     attributes:
       label: Laravel Version
       description: Please provide the full Laravel version of your project.
-      placeholder: v11.x.x
+      placeholder: v10.x.x
     validations:
       required: true
   - type: input
-    id: livewire-ver
-    sion
+    id: livewire-version
     attributes:
       label: Livewire Version
       description: Please provide the full Livewire version of your project, if applicable.

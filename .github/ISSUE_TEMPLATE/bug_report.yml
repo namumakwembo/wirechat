@@ -1,6 +1,6 @@
 name: Bug report
 description: Report a problem you're experiencing
-labels: bug, unconfirmed, medium priority
+labels: bug
 body:
   - type: markdown
     attributes:
@@ -27,11 +27,12 @@ body:
     attributes:
       label: Laravel Version
       description: Please provide the full Laravel version of your project.
-      placeholder: v10.x.x
+      placeholder: v11.x.x
     validations:
       required: true
   - type: input
-    id: livewire-version
+    id: livewire-ver
+    sion
     attributes:
       label: Livewire Version
       description: Please provide the full Livewire version of your project, if applicable.
@@ -45,13 +46,13 @@ body:
     validations:
       required: true
   - type: input
-  id: tailwind-version
-  attributes:
-    label: Tailwind CSS Version
-    description: Please provide the full Tailwind CSS version you are using.
-    placeholder: v3.3.0
-  validations:
-    required: true
+    id: tailwind-version
+    attributes:
+      label: Tailwind CSS Version
+      description: Please provide the full Tailwind CSS version you are using.
+      placeholder: v3.3.0
+    validations:
+      required: true
   - type: textarea
     id: environment
     attributes:

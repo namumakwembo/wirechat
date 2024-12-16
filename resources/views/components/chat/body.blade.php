@@ -14,7 +14,7 @@
     updateScrollPosition: function() {
         // Calculate the difference in height
 
-        newHeight = document.getElementById('conversation').scrollHeight;
+        newHeight = $el.scrollHeight;
 
         {{-- console.log('old height' + height);
         console.log('new height' + document.getElementById('conversation').scrollHeight); --}}
@@ -31,10 +31,18 @@
 
     }"  
         x-init="
-            requestAnimationFrame(() => {
-                this.height = $el.scrollHeight;
-                $el.scrollTop = this.height;
-            });
+
+        setTimeout(() => {
+
+                requestAnimationFrame(() => {
+                    
+                    this.height = $el.scrollHeight;
+                    $el.scrollTop = this.height;
+                });
+
+            }, 300); //! Add delay so height can be update at right time 
+
+     
         "
     @scroll ="
         scrollTop= $el.scrollTop;
@@ -45,14 +53,33 @@
         }
      "
     @update-height.window="
-
         requestAnimationFrame(() => {
             updateScrollPosition();
-        });"
-  
-    id="conversation" x-ref="chatbox"
+          });
+        "
+
+        @scroll-bottom.window="
+        requestAnimationFrame(() => {
+            {{-- overflow-y: hidden; is used to hide the vertical scrollbar initially. --}}
+            $el.style.overflowY='hidden';
+
+
+
+            {{-- scroll the element down --}}
+            $el.scrollTop = $el.scrollHeight;
+
+            {{-- After updating the chat height, overflowY is set back to 'auto', 
+                which allows the browser to determine whether to display the scrollbar 
+                based on the content height.  --}}
+               $el.style.overflowY='auto';
+        });
+    "
+    
+
+
+
     x-cloak
-    {{$attributes->merge(['class'=>'flex flex-col h-full relative gap-2 gap-y-4 p-4 md:p-5 lg:p-8  flex-grow  overscroll-contain overflow-x-hidden w-full my-auto'])}}
+    {{$attributes->merge(['class'=>'flex flex-col h-full  relative gap-2 gap-y-4 p-4 md:p-5 lg:p-8  flex-grow  overscroll-contain overflow-x-hidden w-full my-auto'])}}
     style="contain: content" >
 
 

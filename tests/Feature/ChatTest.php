@@ -27,7 +27,7 @@ use Workbench\App\Models\User;
 
 ///Auth checks
 it('checks if users is authenticated before loading chatbox', function () {
-    Livewire::test(ChatBox::class)
+    Livewire::test(ChatBox::class,['conversation'=>1])
         ->assertStatus(401);
 });
 
@@ -253,6 +253,13 @@ describe('Presense', function () {
         //Assert both conversations visible before typing
         $request->assertSeeHtml('dusk="emoji-trigger-button"');
     });
+
+    describe('IsWidget', function () {
+
+        
+
+});
+
 });
 
 describe('mount()', function () {

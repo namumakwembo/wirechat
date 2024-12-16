@@ -1,12 +1,12 @@
-<div >
+<div>
 
     @script
         <script>
-            window.ChatDrawer = () => {
+            window.ChatWidget = () => {
                 return {
                     show: false,
                     showActiveComponent: true,
-                    activeDrawerComponent: false,
+                    activeWidgetComponent: false,
                     componentHistory: [],
                     listeners: [],
                     //current component attributes
@@ -15,11 +15,10 @@
                     dispatchCloseEvent: false,
                     destroyOnClose: false,
                     closeModalOnClickAway:false,
-
-                    closeChatDrawerOnEscape(trigger) {
+                    closeChatWidgetOnEscape(trigger) {
 
                         ///Only proceed if the trigger is for ChatDrawer
-                        if (trigger.modalType !== 'ChatDrawer') {
+                        if (trigger.modalType !== 'ChatWidget') {
                             return;
                         }
 
@@ -35,13 +34,13 @@
 
                         //check if should also close all children modal when this current on is closed
                         const force = this.closeOnEscapeIsForceful === true;
-                        this.closeDrawer(force);
+                        this.closeWidget(force);
                     },
                     closingModal(eventName) {
-                        const componentName = this.$wire.get('drawerComponents')[this.activeDrawerComponent].name;
+                        const componentName = this.$wire.get('widgetComponents')[this.activeWidgetComponent].name;
 
                         var params = {
-                            id: this.activeDrawerComponent,
+                            id: this.activeWidgetComponent,
                             closing: true,
                         };
 
@@ -50,15 +49,16 @@
                         return params.closing;
                     },
 
-                    closeDrawer(force = false, skipPreviousModals = 0, destroySkipped = false) {
+                    closeWidget(force = false, skipPreviousModals = 0, destroySkipped = false) {
+
                         if (this.show === false) {
                             return;
                         }
 
                         //Check if should dispatch events
                         if (this.dispatchCloseEvent === true) {
-                            const componentName = this.$wire.get('drawerComponents')[this.activeDrawerComponent].name;
-                            Livewire.dispatch('chatDrawerClosed', {
+                            const componentName = this.$wire.get('widgetComponents')[this.activeWidgetComponent].name;
+                            Livewire.dispatch('chatWidgetClosed', {
                                 name: componentName
                             });
                         }
@@ -66,15 +66,16 @@
                         //Check if should completley destroy component on close 
                         //Meaning state won't be retained if component is opened again
                         if (this.destroyOnClose === true) {
-                            Livewire.dispatch('destroyChatDrawer', {
-                                id: this.activeDrawerComponent
+
+                            Livewire.dispatch('destroyChatWidget', {
+                                id: this.activeWidgetComponent
                             });
                         }
 
                         const id = this.componentHistory.pop();
                         if (id && !force) {
                             if (id) {
-                                this.setActiveDrawerComponent(id, true);
+                                this.setActiveWidgetComponent(id, true);
                             } else {
                                 this.setShowPropertyTo(false);
                             }
@@ -82,24 +83,26 @@
                             this.setShowPropertyTo(false);
                         }
 
-
                     },
 
-                    setActiveDrawerComponent(id, skip = false) {
-                        this.setShowPropertyTo(true);
+                    setActiveWidgetComponent(id, skip = false) {
 
-                        if (this.activeDrawerComponent === id) {
+                        this.setShowPropertyTo(true);
+                      //  this.closeWidget(true);
+
+                        
+                        if (this.activeWidgetComponent === id) {
                             return;
                         }
 
-                        if (this.activeDrawerComponent !== false && skip === false) {
-                            this.componentHistory.push(this.activeDrawerComponent);
+                        if (this.activeWidgetComponent !== false && skip === false) {
+                            this.componentHistory.push(this.activeWidgetComponent);
                         }
 
                         let focusableTimeout = 50;
 
-                        if (this.activeDrawerComponent === false) {
-                            this.activeDrawerComponent = id
+                        if (this.activeWidgetComponent === false) {
+                            this.activeWidgetComponent = id
                             this.showActiveComponent = true;
                         } else {
 
@@ -107,20 +110,19 @@
                             focusableTimeout = 400;
 
                             setTimeout(() => {
-                                this.activeDrawerComponent = id;
+                                this.activeWidgetComponent = id;
                                 this.showActiveComponent = true;
                             }, 300);
                         }
-
+                        
                         
                         // Fetch modal attributes and set Alpine properties 
-                        const attributes = this.$wire.get('drawerComponents')[id]?.modalAttributes || {};
+                        const attributes = this.$wire.get('widgetComponents')[id]?.modalAttributes || {};
                         this.closeOnEscape = attributes.closeOnEscape ?? false;
                         this.closeOnEscapeIsForceful = attributes.closeOnEscapeIsForceful ?? false;
                         this.dispatchCloseEvent = attributes.dispatchCloseEvent ?? false;
                         this.destroyOnClose = attributes.destroyOnClose ?? false; 
                         this.closeModalOnClickAway = attributes.closeModalOnClickAway ?? false; 
-
 
                         this.$nextTick(() => {
                             let focusable = this.$refs[id]?.querySelector('[autofocus]');
@@ -130,8 +132,6 @@
                                 }, focusableTimeout);
                             }
                         });
-
-         
                     },
 
                     setShowPropertyTo(show) {
@@ -142,19 +142,20 @@
                             document.body.classList.remove('overflow-y-hidden');
 
                             setTimeout(() => {
-                                this.activeDrawerComponent = false;
+                                this.activeWidgetComponent = false;
                                 this.$wire.resetState();
                             }, 300);
                         }
                     },
                     init() {
 
-                        /*! Changed the event to closeChatDrawer in order to not interfere with the main modal */
-                        this.listeners.push(Livewire.on('closeChatDrawer', (data) => { this.closeDrawer(data?.force ?? false, data?.skipPreviousModals ?? 0, data ?.destroySkipped ?? false); }));
+    
+                        /*! Changed the event to closeChatWidget in order to not interfere with the main modal */
+                        this.listeners.push(Livewire.on('closeChatWidget', (data) => { this.closeWidget(data?.force ?? false, data?.skipPreviousModals ?? 0, data ?.destroySkipped ?? false); }));
 
-                        /*! Changed listener name to activeChatDrawerComponentChanged to not interfer with main modal*/
-                        this.listeners.push(Livewire.on('activeChatDrawerComponentChanged', ({id}) => {
-                            this.setActiveDrawerComponent(id);
+                        /*! Changed listener name to activeChatWidgetComponentChanged to not interfer with main modal*/
+                        this.listeners.push(Livewire.on('activeChatWidgetComponentChanged', ({id}) => {
+                            this.setActiveWidgetComponent(id);
                         }));
                     },
                     destroy() {
@@ -166,34 +167,56 @@
             }
         </script>
     @endscript
+
+
     <div 
-    data-modal-type="ChatDrawer"
-    id="chat-drawer"
-    x-data="ChatDrawer()" x-on:close.stop="setShowPropertyTo(false)"
-         x-on:keydown.escape.stop="closeChatDrawerOnEscape({ modalType: 'ChatDrawer', event: $event }); "
-         x-show="show"
-         class="fixed dark:bg-gray-900  dark:text-white opacity-100 inset-0 z-50 overflow-y-auto" style="display: none;"
-         aria-modal="true"
-         tabindex="0"
-    
-        >
-        <div class="justify-center text-center overflow-y-auto">
-            <div x-show="show && showActiveComponent" x-transition:enter="ease-out duration-300"
+    x-data="{
+        selectedConversationId:null,
+    }"
+     class ='w-full h-[calc(100vh_-_10.0rem)] bg-white dark:bg-gray-900 border dark:border-gray-700 flex overflow-hidden rounded-lg'>
+      <div class="relative  w-full h-full   md:w-[360px] lg:w-[400px] xl:w-[450px] shrink-0 overflow-y-auto  ">
+          <livewire:chats :isWidget="true" />
+      </div>
+      <main
+           x-on:open-chat-widget.camel="
+           this.selectedConversationId= $event.detail.conversation;"
+           x-data="ChatWidget()" 
+           x-on:close-chat-widget.camel.stop="setShowPropertyTo(false)"
+           x-on:keydown.escape.stop.window="closeChatWidgetOnEscape({ modalType: 'ChatWidget', event: $event });"
+           aria-modal="true"
+           tabindex="0"
+           class=" hidden md:grid grid  w-full  grow"
+           style="contain:content;">
+            <div 
+                x-cloak
+                x-show="show && showActiveComponent" x-transition:enter="ease-out duration-100"
                 x-transition:enter-start="opacity-0 -translate-x-full" x-transition:enter-end="opacity-100 translate-x-0"
-                x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-x-0"
+                x-transition:leave="ease-in duration-100 " x-transition:leave-start="opacity-100 translate-x-0"
                 x-transition:leave-end="opacity-0 -translate-x-full"
-                class="w-auto  transition-all max-h-screen relative" id="chatmodal-container"
+                class="fixed inset-0" id="chatwidget-container"
                 x-trap.noscroll.inert="show && showActiveComponent" aria-modal="true">
-                @forelse($drawerComponents as $id => $component)
-                    <div x-show.immediate="activeDrawerComponent == '{{ $id }}'" x-ref="{{ $id }}"
-                        wire:key="{{ $id }}">
-                        @livewire($component['name'], $component['arguments'], key($id))
+                @forelse($widgetComponents as $id => $component)
+                    <div  x-show.immediate="activeWidgetComponent == '{{ $id }}'" x-ref="{{ $id }}"
+                         wire:key="key-{{$id }}" class="h-full">
+                        @livewire($component['name'], ['conversation'=> $component['conversationId']], key($id))
                     </div>
                 @empty
                 @endforelse
             </div>
-        </div>
-    </div>
+
+            <div  x-show="!show" class="m-auto  justify-center flex gap-3 flex-col  items-center ">
+
+                <h4
+                    class="font-medium p-2 px-3 rounded-full font-semibold bg-gray-50 dark:bg-gray-800 dark:text-white dark:font-normal">
+                    Select a conversation to start messaging</h4>
+  
+            </div>
+
+
+
+      </main>
+  </div>
+   
 
 
 

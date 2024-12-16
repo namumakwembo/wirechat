@@ -71,7 +71,7 @@
     @endphp
 
     {{-- Import header --}}
-    <x-wirechat::chats.header />
+    <x-wirechat::chats.header isWidget="{{$isWidget}}" />
 
 
     <main x-data {{-- Detect when scrolled to the bottom --}}
@@ -128,7 +128,14 @@
                                 $selectedConversationId == $conversation?->id,
                         ])>
 
-                        <a href="{{ route(WireChat::viewRouteName(), $conversation->id) }}" class="shrink-0">
+                        <a 
+                        @if($isWidget)
+                         @click="$dispatch('openChatWidget',{conversationId:'@json($conversation->id)'})"
+                        @else
+                         href="{{ route(WireChat::viewRouteName(), $conversation->id) }}" class="shrink-0"
+                            
+                        @endif
+                         >
                             <x-wirechat::avatar disappearing="{{ $conversation->hasDisappearingTurnedOn() }}"
                                 group="{{ $conversation->isGroup() }}"
                                 src="{{ $group ? $group?->cover_url : $receiver?->cover_url ?? null }}"
@@ -138,7 +145,19 @@
                         <aside class="grid  grid-cols-12 w-full">
 
 
-                            <a wire:navigate href="{{ route(WireChat::viewRouteName(), $conversation->id) }}"
+                            <a 
+
+                            @if($isWidget)
+                            tabindex="0" 
+                            role="button" 
+                            dusk="openChatWidgetButton"
+                            @click="$dispatch('openChatWidget',{conversationId:'@json($conversation->id)'})"
+                            @keydown.enter="$dispatch('openChatWidget',{conversationId:'@json($conversation->id)'})"
+                            @else
+                            wire:navigate href="{{ route(WireChat::viewRouteName(), $conversation->id) }}"
+                            @endif
+                            
+                            
                                 class="col-span-10 border-b pb-2 border-gray-100 dark:border-gray-700 relative overflow-hidden truncate leading-5 w-full flex-nowrap p-1">
 
                                 {{-- name --}}

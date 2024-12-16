@@ -3,6 +3,7 @@
 namespace Namu\WireChat\Livewire\Chat;
 
 use Illuminate\Support\Facades\Schema;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Models\Conversation;
@@ -15,6 +16,9 @@ class Chats extends Component
     public $conversations = [];
 
     public bool $canLoadMore = false;
+
+    #[Locked]
+    public $isWidget =false;
 
     public $page = 1;
 

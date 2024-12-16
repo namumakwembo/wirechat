@@ -32,7 +32,8 @@ class Chat extends Component
     use WithFileUploads;
     use WithPagination;
 
-    public $conversation;
+  //  public Conversation $conversation;
+  public $conversation;
 
     public $conversationId;
 
@@ -681,21 +682,21 @@ class Chat extends Component
         return view('wirechat::components.placeholders.chat');
     }
 
-    public function mount()
+    public function mount($conversation)
     {
-        $this->initializeConversation();
+        
+
+
+        $this->initializeConversation($conversation);
         $this->initializeParticipants();
         $this->finalizeConversationState();
         $this->loadMessages();
     }
 
-    private function initializeConversation()
+    private function initializeConversation($conversation)
     {
         abort_unless(auth()->check(), 401);
-
-        $this->conversation = Conversation::where('id', $this->conversation)
-            ->firstOr(fn () => abort(404));
-
+        $this->conversation = Conversation::where('id', $this->conversation)->firstOr(fn () => abort(404));
         $this->totalMessageCount = Message::where('conversation_id', $this->conversation->id)->count();
         abort_unless(auth()->user()->belongsToConversation($this->conversation), 403);
 

@@ -8,7 +8,15 @@
 ])
 
 
-<img @class([ 
+<div  x-data="{ open: false, imageUrl: '' }">
+    <div
+            x-show="open"
+            x-transition
+            class="fixed inset-0 bg-black/20 backdrop-blur-[4px] bg-opacity-75 flex justify-center items-center z-50 py-10"
+    >
+        <img x-bind:src="imageUrl" class="max-w-full max-h-full rounded" alt="Full View">
+    </div>
+    <img  @click.outside="open = false" @class([
 
         'max-w-max  h-[200px] min-h-[210px] bg-gray-50/60 dark:bg-gray-700/20   object-scale-down  grow-0 shrink  overflow-hidden  rounded-3xl',
 
@@ -40,4 +48,5 @@
 
         //last message on LEFT
         'rounded-bl-2xl'=>($message?->sender_id!=$nextMessage?->sender_id ) && !$belongsToAuth,
-        ]) loading="lazy" src="{{$attachment?->url}}" alt="attachment">
+        ]) loading="lazy" src="{{$attachment?->url}}" @click="imageUrl = '<?php echo e($attachment?->url); ?>'; open = true" alt="attachment">
+</div>

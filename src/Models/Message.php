@@ -11,9 +11,11 @@ use Illuminate\Support\Facades\Storage;
 use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Facades\WireChat;
+use Namu\WireChat\Traits\Actionable;
 
 class Message extends Model
 {
+    use Actionable;
     use HasFactory;
     use SoftDeletes;
 
@@ -181,18 +183,6 @@ class Message extends Model
     public function hasParent(): bool
     {
         return $this->parent()->exists();
-    }
-
-    /**
-     * ----------------------------------------
-     * ----------------------------------------
-     * Actions
-     * A message can have many actions by different users)
-     * --------------------------------------------
-     */
-    public function actions()
-    {
-        return $this->morphMany(Action::class, 'actionable', 'actionable_type', 'actionable_id', 'id');
     }
 
     /**

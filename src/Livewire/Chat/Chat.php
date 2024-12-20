@@ -726,7 +726,7 @@ class Chat extends Component
                 ? $this->receiverParticipant->participantable
                 : null;
         } else {
-            $this->authParticipant = Participant::whereParticipantable(auth()->user())->first();
+            $this->authParticipant = Participant::where('conversation_id', $this->conversation->id)->whereParticipantable(auth()->user())->first();
             $this->receiver = null;
         }
     }

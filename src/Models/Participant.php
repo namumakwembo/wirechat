@@ -10,9 +10,11 @@ use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Models\Scopes\WithoutRemovedActionScope;
+use Namu\WireChat\Traits\Actionable;
 
 class Participant extends Model
 {
+    use Actionable;
     use HasFactory;
 
     protected $fillable = [
@@ -166,12 +168,6 @@ class Participant extends Model
         return $this->exited_at != null;
     }
 
-    // Relationship with actions table (to track the removal actions)
-    public function actions()
-    {
-        return $this->morphMany(Action::class, 'actionable');
-    }
-
     /**
      * check if participant was removed by admin
      */
@@ -205,7 +201,6 @@ class Participant extends Model
                 'type' => Actions::REMOVED_BY_ADMIN,  // Type of action
             ]);
         }
-
         //update Role to Participant
         $this->role = ParticipantRole::PARTICIPANT;
         $this->save();
@@ -244,11 +239,4 @@ class Participant extends Model
         // Otherwise, return true if deletion is recent compared to updated timestamp
         return true;
     }
-
-    // public function ConversationDeletionIsValid(): bool
-    // {
-
-    //     return   $this->conversation_deleted_at!=null&&;
-
-    // }
 }

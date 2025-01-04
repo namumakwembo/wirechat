@@ -509,7 +509,7 @@ trait Chatable
     {
 
         //check if is not Conversation model
-        if (! ($entity instanceof Conversation)) {
+        if (!($entity instanceof Conversation)) {
 
             $conversation = $entity->conversation;
         }
@@ -521,7 +521,8 @@ trait Chatable
         // If not loaded, perform the query
         $pariticipant = $conversation->participant($this);
 
-        return $pariticipant->isOwner();
+
+        return (bool) $pariticipant?->isOwner();
     }
 
     /**

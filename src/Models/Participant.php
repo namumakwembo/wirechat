@@ -120,7 +120,7 @@ class Participant extends Model
     /**
      * Check if participant is admin
      **/
-    public function isAdmin()
+    public function isAdmin():bool
     {
         return $this->role == ParticipantRole::OWNER || $this->role == ParticipantRole::ADMIN;
     }
@@ -128,7 +128,7 @@ class Participant extends Model
     /**
      * Check if participant is owner of conversation
      **/
-    public function isOwner()
+    public function isOwner():bool
     {
 
         return $this->role == ParticipantRole::OWNER;

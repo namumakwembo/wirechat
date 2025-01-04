@@ -175,13 +175,12 @@
     }"
      class ='w-full h-[calc(100vh_-_10.0rem)] bg-white dark:bg-gray-900 border dark:border-gray-700 flex overflow-hidden rounded-lg'>
       <div class="relative  w-full h-full   md:w-[360px] lg:w-[400px] xl:w-[450px] shrink-0 overflow-y-auto  ">
-          <livewire:chats :isWidget="true" />
+          <livewire:chats :widget="true" />
       </div>
       <main
-           x-on:open-chat-widget.camel="
-           this.selectedConversationId= $event.detail.conversation;"
            x-data="ChatWidget()" 
-           x-on:close-chat-widget.camel.stop="setShowPropertyTo(false)"
+           x-on:open-chat="this.selectedConversationId= $event.detail.conversation;"
+           x-on:close-chat.stop="setShowPropertyTo(false)"
            x-on:keydown.escape.stop.window="closeChatWidgetOnEscape({ modalType: 'ChatWidget', event: $event });"
            aria-modal="true"
            tabindex="0"
@@ -198,7 +197,7 @@
                 @forelse($widgetComponents as $id => $component)
                     <div  x-show.immediate="activeWidgetComponent == '{{ $id }}'" x-ref="{{ $id }}"
                          wire:key="key-{{$id }}" class="h-full">
-                        @livewire($component['name'], ['conversation'=> $component['conversationId']], key($id))
+                        @livewire($component['name'], ['conversation'=> $component['conversationId'] ,'widget'=>true], key($id))
                     </div>
                 @empty
                 @endforelse

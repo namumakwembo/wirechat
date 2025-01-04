@@ -8,17 +8,19 @@ use Livewire\Component;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Scopes\WithoutDeletedScope;
+use Namu\WireChat\Traits\Widget;
 
 class Chats extends Component
 {
+
+    use Widget;
     public $search;
 
     public $conversations = [];
 
     public bool $canLoadMore = false;
 
-    #[Locked]
-    public $isWidget = false;
+
 
     public $page = 1;
 

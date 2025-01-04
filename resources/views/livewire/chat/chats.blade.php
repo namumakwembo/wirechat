@@ -71,7 +71,7 @@
     @endphp
 
     {{-- Import header --}}
-    <x-wirechat::chats.header isWidget="{{$isWidget}}" />
+    <x-wirechat::chats.header widget="{{$widget}}" />
 
 
     <main x-data {{-- Detect when scrolled to the bottom --}}
@@ -129,8 +129,8 @@
                         ])>
 
                         <a 
-                        @if($isWidget)
-                         @click="$dispatch('openChatWidget',{conversationId:'@json($conversation->id)'})"
+                        @if($widget)
+                         @click="$dispatch('open-chat',{conversationId:'@json($conversation->id)'})"
                         @else
                          href="{{ route(WireChat::viewRouteName(), $conversation->id) }}" class="shrink-0"
                             
@@ -147,12 +147,12 @@
 
                             <a 
 
-                            @if($isWidget)
+                            @if($widget)
                             tabindex="0" 
                             role="button" 
                             dusk="openChatWidgetButton"
-                            @click="$dispatch('openChatWidget',{conversationId:'@json($conversation->id)'})"
-                            @keydown.enter="$dispatch('openChatWidget',{conversationId:'@json($conversation->id)'})"
+                            @click="$dispatch('open-chat',{conversationId:'@json($conversation->id)'})"
+                            @keydown.enter="$dispatch('open-chat',{conversationId:'@json($conversation->id)'})"
                             @else
                             wire:navigate href="{{ route(WireChat::viewRouteName(), $conversation->id) }}"
                             @endif

@@ -153,7 +153,7 @@ describe('IsWidget', function () {
         $auth->sendMessageTo($conversation, 'hi');
 
         // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'isWidget' => false])
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => false])
             ->assertDontSeeHtml('dusk="openChatWidgetButton"');
     });
 
@@ -165,7 +165,7 @@ describe('IsWidget', function () {
         $auth->sendMessageTo($conversation, 'hi');
 
         // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'isWidget' => true])
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => true])
             ->assertSeeHtml('dusk="openChatWidgetButton"');
     });
 
@@ -177,7 +177,7 @@ describe('IsWidget', function () {
         $auth->sendMessageTo($conversation, 'hi');
 
         // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'isWidget' => false])
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => false])
             ->assertSeeHtml('id="redirect-button"');
     });
 
@@ -189,7 +189,7 @@ describe('IsWidget', function () {
         $auth->sendMessageTo($conversation, 'hi');
 
         // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'isWidget' => true])
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => true])
             ->assertDontSeeHtml('id="redirect-button"');
     });
 

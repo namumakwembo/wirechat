@@ -253,9 +253,6 @@ describe('Presense', function () {
         //Assert both conversations visible before typing
         $request->assertSeeHtml('dusk="emoji-trigger-button"');
     });
-
-    describe('IsWidget', function () {});
-
 });
 
 describe('mount()', function () {
@@ -513,6 +510,46 @@ describe('Box presence test: ', function () {
         Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
             ->assertDontSeeHtml('dusk="disappearing_messages_icon"');
     });
+
+
+    describe('IsWidget:', function () {
+
+
+
+        test('it renders $dispatch("close-chat") BUT not redirect to chats index', function () {
+
+            $auth = User::factory()->create(['name' => 'Namu']);
+            $conversation = $auth->createGroup('My Group');
+    
+            //turn on disappearing
+            $conversation->turnOffDisappearing();
+    
+            // dd($conversation);
+            Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id,'widget'=>true])
+                ->assertDontSeeHtml('href="'.route(WireChat::indexRouteName()).'"')
+                ->assertSeeHtml('@click="$dispatch(\'close-chat\')"');
+        });
+
+
+        test('it doesnt render $dispatch("close-chat") BUT Renders redirect to chats index', function () {
+
+            $auth = User::factory()->create(['name' => 'Namu']);
+            $conversation = $auth->createGroup('My Group');
+    
+            //turn on disappearing
+            $conversation->turnOffDisappearing();
+    
+            // dd($conversation);
+            Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id,'widget'=>false])
+                ->assertSeeHtml('href="'.route(WireChat::indexRouteName()).'"')
+                ->assertDontSeeHtml('@click="$dispatch(\'close-chat\')"');
+        });
+
+
+
+
+    })->only();
+
 
     // test('it shows message time', function () {
     //     $auth = User::factory()->create();
@@ -1135,65 +1172,6 @@ describe('Sending messages ', function () {
         Event::assertDispatchedTimes(NotifyParticipant::class, 20);
     });
 
-    test('user cannot access conversation after exiting', function () {
-        Event::fake();
-        // Queue::fake();
-
-        $auth = User::factory()->create();
-
-        //create group
-        $conversation = $auth->createGroup(name: 'New group', description: 'description');
-
-        //add user and exit conversation
-        $user = User::factory()->create();
-        $conversation->addParticipant($user);
-        $user->sendMessageTo($conversation, 'hi');
-        $user->exitConversation($conversation); //exit here
-
-        Livewire::actingAs($user)->test(ChatBox::class, ['conversation' => $conversation->id])
-            ->assertStatus(403);
-    });
-
-    test('it redirects after exiting conversation to chats', function () {
-        Event::fake();
-        // Queue::fake();
-
-        $auth = User::factory()->create();
-
-        //create group
-        $conversation = $auth->createGroup(name: 'New group', description: 'description');
-
-        //add user and exit conversation
-        $user = User::factory()->create();
-        $conversation->addParticipant($user);
-        $user->sendMessageTo($conversation, 'hi');
-
-        Livewire::actingAs($user)->test(ChatBox::class, ['conversation' => $conversation->id])
-            ->call('exitConversation')
-            ->assertRedirect(route(WireChat::indexRouteName()));
-    });
-
-    test('owner cannot exit conversation', function () {
-        //    Event::fake();
-        // Queue::fake();
-
-        $auth = User::factory()->create();
-
-        //create group
-        $conversation = $auth->createGroup(name: 'New group', description: 'description');
-        $auth->sendMessageTo($conversation, 'hi');
-
-        //add user and exit conversation
-        $user = User::factory()->create();
-        $conversation->addParticipant($user);
-        $user->sendMessageTo($conversation, 'hi');
-
-        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
-            ->call('exitConversation')
-            ->assertStatus(403, 'Owner cannot exit conversation');
-
-        expect($auth->belongsToConversation($conversation))->toBe(true);
-    });
 
     test('it does not broadcasts event "MessageCreated" if it is SelfConversation', function () {
         Event::fake();
@@ -1953,6 +1931,60 @@ describe('Deleting Conversation', function () {
         expect($authParticipant->conversation_deleted_at)->toBe(null);
     });
 
+
+    describe('IsWidget:', function () {
+
+
+        test('it does not redirects to chats route after deleting conversation', function () {
+            $auth = User::factory()->create();
+            $receiver = User::factory()->create(['name' => 'John']);
+
+            $conversation = $auth->createConversationWith($receiver);
+
+            //auth -> receiver
+            $auth->sendMessageTo($receiver, message: '1');
+            $auth->sendMessageTo($receiver, message: '2');
+            $auth->sendMessageTo($receiver, message: '3');
+
+            //receiver -> auth
+            $receiver->sendMessageTo($auth, message: '4');
+            $receiver->sendMessageTo($auth, message: '5');
+            $receiver->sendMessageTo($auth, message: '5');
+
+            $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
+
+            $request
+                ->call('deleteConversation')
+                ->assertStatus(200)
+                ->assertNoRedirect();
+        });
+
+
+
+        test('it dispatches "close-chat" evnt after deleting conversation', function () {
+            $auth = User::factory()->create();
+            $receiver = User::factory()->create(['name' => 'John']);
+
+            $conversation = $auth->createConversationWith($receiver);
+
+            //auth -> receiver
+            $auth->sendMessageTo($receiver, message: '1');
+            $auth->sendMessageTo($receiver, message: '2');
+            $auth->sendMessageTo($receiver, message: '3');
+
+            //receiver -> auth
+            $receiver->sendMessageTo($auth, message: '4');
+            $receiver->sendMessageTo($auth, message: '5');
+            $receiver->sendMessageTo($auth, message: '5');
+
+            $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
+
+            $request
+                ->call('deleteConversation')
+                ->assertDispatched('close-chat');
+        });
+    });
+
     // test('it does not also resets conversation_deleted_at value of auth-particiapant they send new message from Chat within component to conversation themselves ', function () {
 
     //     $auth = User::factory()->create();
@@ -2108,6 +2140,190 @@ describe('Clearing Conversation', function () {
 
         //assert
         Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])->assertOk();
+    });
+
+
+    describe('IsWidget:', function () {
+
+
+        test('it does not redirects to chats route after deleting conversation', function () {
+            $auth = User::factory()->create();
+            $receiver = User::factory()->create(['name' => 'John']);
+
+            $conversation = $auth->createConversationWith($receiver);
+
+            //auth -> receiver
+            $auth->sendMessageTo($receiver, message: '1');
+            $auth->sendMessageTo($receiver, message: '2');
+            $auth->sendMessageTo($receiver, message: '3');
+
+            //receiver -> auth
+            $receiver->sendMessageTo($auth, message: '4');
+            $receiver->sendMessageTo($auth, message: '5');
+            $receiver->sendMessageTo($auth, message: '5');
+
+            $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
+
+            $request
+                ->call('clearConversation')
+                ->assertStatus(200)
+                ->assertNoRedirect();
+        });
+
+
+
+        test('it dispatches "close-chat" evnt after deleting conversation', function () {
+            $auth = User::factory()->create();
+            $receiver = User::factory()->create(['name' => 'John']);
+
+            $conversation = $auth->createConversationWith($receiver);
+
+            //auth -> receiver
+            $auth->sendMessageTo($receiver, message: '1');
+            $auth->sendMessageTo($receiver, message: '2');
+            $auth->sendMessageTo($receiver, message: '3');
+
+            //receiver -> auth
+            $receiver->sendMessageTo($auth, message: '4');
+            $receiver->sendMessageTo($auth, message: '5');
+            $receiver->sendMessageTo($auth, message: '5');
+
+            $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
+
+            $request
+                ->call('clearConversation')
+                ->assertDispatched('close-chat');
+        });
+    });
+});
+
+describe('Exiting Conversation', function () {
+
+
+
+    test('user cannot access conversation after exiting', function () {
+        Event::fake();
+        // Queue::fake();
+
+        $auth = User::factory()->create();
+
+        //create group
+        $conversation = $auth->createGroup(name: 'New group', description: 'description');
+
+        //add user and exit conversation
+        $user = User::factory()->create();
+        $conversation->addParticipant($user);
+        $user->sendMessageTo($conversation, 'hi');
+        $user->exitConversation($conversation); //exit here
+
+        Livewire::actingAs($user)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertStatus(403);
+    });
+
+    test('it redirects after exiting conversation to chats', function () {
+        Event::fake();
+        // Queue::fake();
+
+        $auth = User::factory()->create();
+
+        //create group
+        $conversation = $auth->createGroup(name: 'New group', description: 'description');
+
+        //add user and exit conversation
+        $user = User::factory()->create();
+        $conversation->addParticipant($user);
+        $user->sendMessageTo($conversation, 'hi');
+
+        Livewire::actingAs($user)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->call('exitConversation')
+            ->assertRedirect(route(WireChat::indexRouteName()));
+    });
+
+    test('owner cannot exit conversation', function () {
+        //    Event::fake();
+        // Queue::fake();
+
+        $auth = User::factory()->create();
+
+        //create group
+        $conversation = $auth->createGroup(name: 'New group', description: 'description');
+        $auth->sendMessageTo($conversation, 'hi');
+
+        //add user and exit conversation
+        $user = User::factory()->create();
+        $conversation->addParticipant($user);
+        $user->sendMessageTo($conversation, 'hi');
+
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->call('exitConversation')
+            ->assertStatus(403, 'Owner cannot exit conversation');
+
+        expect($auth->belongsToConversation($conversation))->toBe(true);
+    });
+
+
+
+    test('Throws error if user tries to exit priveat or self conversation', function () {
+        $auth = User::factory()->create();
+        $receiver = User::factory()->create(['name' => 'John']);
+        $conversation = $auth->createConversationWith($receiver, 'hello');
+
+        //login as user not auth (Owner)
+        Livewire::actingAs($receiver)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->call('exitConversation')
+            ->assertStatus(403, 'Cannot exit self or private conversation');
+
+        expect($auth->belongsToConversation($conversation))->toBe(true);
+    });
+
+
+
+    describe('IsWidget:', function () {
+
+
+        test('it does not redirects to chats route after Exiting Group conversation', function () {
+            $auth = User::factory()->create();
+
+            //create group
+            $conversation = $auth->createGroup(name: 'New group', description: 'description');
+            $auth->sendMessageTo($conversation, 'hi');
+
+            //add user and exit conversation
+            $user = User::factory()->create();
+            $conversation->addParticipant($user);
+            $user->sendMessageTo($conversation, 'hi');
+
+            //login as user not auth (Owner)
+            $request = Livewire::actingAs($user)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
+
+            $request
+                ->call('exitConversation')
+                ->assertStatus(200)
+                ->assertNoRedirect();
+        });
+
+
+
+        test('it dispatches "close-chat" evnt after Exiting Group conversation', function () {
+            $auth = User::factory()->create();
+
+            //create group
+            $conversation = $auth->createGroup(name: 'New group', description: 'description');
+            $auth->sendMessageTo($conversation, 'hi');
+
+            //add user and exit conversation
+            $user = User::factory()->create();
+            $conversation->addParticipant($user);
+            $user->sendMessageTo($conversation, 'hi');
+
+            //login as user not auth (Owner)
+            $request = Livewire::actingAs($user)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
+
+            $request
+                ->call('exitConversation')
+                ->assertStatus(200)
+                ->assertDispatched('close-chat');
+        });
     });
 });
 

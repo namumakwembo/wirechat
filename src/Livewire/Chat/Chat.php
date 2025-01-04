@@ -26,11 +26,13 @@ use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message;
 use Namu\WireChat\Models\Participant;
 use Namu\WireChat\Notifications\NewMessageNotification;
+use Namu\WireChat\Traits\Widget;
 
 class Chat extends Component
 {
     use WithFileUploads;
     use WithPagination;
+    use Widget;
 
     //  public Conversation $conversation;
     public $conversation;
@@ -238,8 +240,13 @@ class Chat extends Component
         //delete conversation
         $this->conversation->deleteFor(auth()->user());
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+        //Dispatach event instead if isWidget
+        if ($this->isWidget()) {
+            $this->dispatch('close-chat');
+        } else {
+            //redirect to chats page
+            $this->redirectRoute(WireChat::indexRouteName());
+        }
     }
 
     /**
@@ -253,8 +260,13 @@ class Chat extends Component
 
         $this->reset('loadedMessages', 'media', 'files', 'body');
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+        //Dispatach event instead if isWidget
+        if ($this->isWidget()) {
+            $this->dispatch('close-chat');
+        } else {
+            //redirect to chats page
+            $this->redirectRoute(WireChat::indexRouteName());
+        }
     }
 
     public function exitConversation()
@@ -263,14 +275,23 @@ class Chat extends Component
 
         $auth = auth()->user();
 
+        //make sure conversation is neigher self nor private
+
+        abort_unless($this->conversation->isGroup(), 403, 'Cannot exit self or private conversation');
+
         //make sure owner if group cannot be removed from chat
         abort_if($auth->isOwnerOf($this->conversation), 403, 'Owner cannot exit conversation');
 
         //delete conversation
         $auth->exitConversation($this->conversation);
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+          //Dispatach event instead if isWidget
+        if ($this->isWidget()) {
+            $this->dispatch('close-chat');
+        } else {
+            //redirect to chats page
+            $this->redirectRoute(WireChat::indexRouteName());
+        }
     }
 
     protected function rateLimit()

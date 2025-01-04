@@ -3,6 +3,7 @@
 @props([
     'receiver' => $receiver,
     'conversation' => $conversation,
+    'widget' => false
 ])
 
 @php
@@ -15,7 +16,14 @@
     <div class="  flex  w-full items-center   px-2 py-2   lg:px-4 gap-2 md:gap-5 ">
 
         {{-- Return --}}
-        <a href="{{route(WireChat::indexRouteName())}}" class=" shrink-0 lg:hidden  dark:text-white" id="chatReturn">
+        <a 
+        @if($widget)
+            @click="$dispatch('close-chat')"
+        @else
+            href="{{ route(WireChat::indexRouteName(), $conversation->id) }}"
+        @endif
+        
+        class=" shrink-0 lg:hidden  dark:text-white" id="chatReturn">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -71,9 +79,11 @@
                         </button>
 
 
-                        <x-wirechat::dropdown-link href='{{ route(WireChat::indexRouteName()) }}'>
-                            Close Chat
-                        </x-wirechat::dropdown-link>
+                        @if($this->isWidget())
+                        <x-wirechat::dropdown-link  @click="$dispatch('close-chat')" > Close Chat </x-wirechat::dropdown-link>
+                       @else
+                       <x-wirechat::dropdown-link  href="{{route(WireChat::indexRouteName()) }}" class="shrink-0" > Close Chat </x-wirechat::dropdown-link>
+                       @endif
 
 
                     {{-- Only show delete and clear if conversation is NOT group --}}

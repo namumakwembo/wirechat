@@ -192,7 +192,7 @@ class Info extends ModalComponent
             ->where('participantable_id', '!=', auth()->id())
             //->where('participantable_type','!=',get_class(auth()->user()))
             ->where('type', '!=', ParticipantRole::OWNER)
-
+            ->where('participantable_type', auth()->user()->getMorphClass())
             ->count();
 
         abort_unless($participantCount == 0, 403, 'Cannot delete group: Please remove all members before attempting to delete the group.');

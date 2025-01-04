@@ -89,7 +89,7 @@ class Chat extends Component
 
             //Make sure message does not belong to auth
             // Make sure message does not belong to auth
-            if ($event['message']['sendable_id'] == auth()->id() && $event['message']['sendable_type'] === get_class(auth()->user())) {
+            if ($event['message']['sendable_id'] == auth()->id() && $event['message']['sendable_type'] === auth()->user()->getMorphClass()) {
                 return null;
             }
 
@@ -128,7 +128,7 @@ class Chat extends Component
 
             //Make sure message does not belong to auth
             // Make sure message does not belong to auth
-            if ($newMessage->sendable_id == auth()->id() && $newMessage->sendable_type == get_class(auth()->user())) {
+            if ($newMessage->sendable_id == auth()->id() && $newMessage->sendable_type == auth()->user()->getMorphClass()) {
                 return null;
             }
 
@@ -356,7 +356,7 @@ class Chat extends Component
                 $message = Message::create([
                     'reply_id' => $replyId,
                     'conversation_id' => $this->conversation->id,
-                    'sendable_type' => get_class(auth()->user()), // Polymorphic sender type
+                    'sendable_type' => auth()->user()->getMorphClass(), // Polymorphic sender type
                     'sendable_id' => auth()->id(), // Polymorphic sender ID
                     'type' => MessageType::ATTACHMENT,
                     // 'body' => $this->body, // Add body if required
@@ -401,7 +401,7 @@ class Chat extends Component
             $createdMessage = Message::create([
                 'reply_id' => $this->replyMessage?->id,
                 'conversation_id' => $this->conversation->id,
-                'sendable_type' => get_class(auth()->user()), // Polymorphic sender type
+                'sendable_type' => auth()->user()->getMorphClass(), // Polymorphic sender type
                 'sendable_id' => auth()->id(), // Polymorphic sender ID
                 'body' => $this->body,
                 'type' => MessageType::TEXT,
@@ -618,7 +618,7 @@ class Chat extends Component
 
         $message = Message::create([
             'conversation_id' => $this->conversation->id,
-            'sendable_type' => get_class(auth()->user()), // Polymorphic sender type
+            'sendable_type' => auth()->user()->getMorphClass(), // Polymorphic sender type
             'sendable_id' => auth()->id(), // Polymorphic sender ID
             'body' => '❤️',
             'type' => MessageType::TEXT,

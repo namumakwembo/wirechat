@@ -32,8 +32,8 @@ class Chat extends Component
     use WithFileUploads;
     use WithPagination;
 
-  //  public Conversation $conversation;
-  public $conversation;
+    //  public Conversation $conversation;
+    public $conversation;
 
     public $conversationId;
 
@@ -684,8 +684,6 @@ class Chat extends Component
 
     public function mount($conversation)
     {
-        
-
 
         $this->initializeConversation($conversation);
         $this->initializeParticipants();

@@ -18,7 +18,7 @@ class Chats extends Component
     public bool $canLoadMore = false;
 
     #[Locked]
-    public $isWidget =false;
+    public $isWidget = false;
 
     public $page = 1;
 

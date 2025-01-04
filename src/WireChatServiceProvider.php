@@ -84,7 +84,6 @@ class WireChatServiceProvider extends ServiceProvider
         //Widgets
         Livewire::component('wirechat', WireChat::class);
 
-
     }
 
     public function register()

@@ -12,7 +12,7 @@ use Namu\WireChat\Models\Conversation;
 
 class WireChat extends Component
 {
-    public ?string $activeWireChatWidgetComponent=null;
+    public ?string $activeWireChatWidgetComponent = null;
 
     public array $widgetComponents = [];
 
@@ -34,13 +34,12 @@ class WireChat extends Component
 
     public function openChatWidget($conversationId, $arguments = [], $modalAttributes = []): void
     {
-        $component = "chat";
+        $component = 'chat';
         // $componentClass = app(ComponentRegistry::class)->getClass($component);
 
-    
         // Generate a unique ID using the conversationId and arguments
-        $id = md5($component . $conversationId . serialize($arguments));
-    
+        $id = md5($component.$conversationId.serialize($arguments));
+
         // Merge modal attributes with defaults
         $defaultModalAttributes = [
             'closeOnEscape' => true,
@@ -56,13 +55,12 @@ class WireChat extends Component
                 'modalAttributes' => $modalAttributes,
             ],
         ];
-       
+
         $this->activeWireChatWidgetComponent = $id;
-    
+
         /*! Changed listener name to activeChatWidgetComponentChanged to not interfere with main modal */
         $this->dispatch('activeChatWidgetComponentChanged', id: $id);
     }
-    
 
     public function resolveComponentProps(array $attributes, Component $component): Collection
     {
@@ -123,7 +121,7 @@ class WireChat extends Component
         return [
             'openChatWidget',
             'destroyChatWidget',
-            'closeChatWidget'
+            'closeChatWidget',
         ];
     }
 

@@ -145,7 +145,6 @@ test('it doesnt shows dusk="disappearing_messages_icon" if disappearingTurnedOFF
 
 describe('IsWidget', function () {
 
-
     test('it doesnt  have dispatch "openChatWidget" when chats is not widget', function () {
 
         $auth = User::factory()->create(['name' => 'Namu']);
@@ -154,7 +153,7 @@ describe('IsWidget', function () {
         $auth->sendMessageTo($conversation, 'hi');
 
         // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id,'isWidget'=>false])
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'isWidget' => false])
             ->assertDontSeeHtml('dusk="openChatWidgetButton"');
     });
 
@@ -166,10 +165,9 @@ describe('IsWidget', function () {
         $auth->sendMessageTo($conversation, 'hi');
 
         // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id,'isWidget'=>true])
-        ->assertSeeHtml('dusk="openChatWidgetButton"');
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'isWidget' => true])
+            ->assertSeeHtml('dusk="openChatWidgetButton"');
     });
-
 
     test('it shows redirect home button when chats is NOT widget', function () {
 
@@ -179,7 +177,7 @@ describe('IsWidget', function () {
         $auth->sendMessageTo($conversation, 'hi');
 
         // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id,'isWidget'=>false])
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'isWidget' => false])
             ->assertSeeHtml('id="redirect-button"');
     });
 
@@ -191,12 +189,11 @@ describe('IsWidget', function () {
         $auth->sendMessageTo($conversation, 'hi');
 
         // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id,'isWidget'=>true])
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'isWidget' => true])
             ->assertDontSeeHtml('id="redirect-button"');
     });
 
 });
-
 
 describe('List', function () {
 

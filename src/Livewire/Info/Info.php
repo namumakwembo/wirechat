@@ -4,15 +4,11 @@ namespace Namu\WireChat\Livewire\Info;
 
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Locked;
-use Livewire\Attributes\Validate;
-//use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
-use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Conversation;
-use Namu\WireChat\Models\Message;
 
 class Info extends ModalComponent
 {

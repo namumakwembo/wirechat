@@ -9,9 +9,9 @@ use Livewire\Attributes\Locked;
  */
 trait Widget
 {
-
     #[Locked]
     public bool $widget = false;
+
     /**
      * ----------------------------------------
      * ----------------------------------------

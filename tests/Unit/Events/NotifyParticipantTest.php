@@ -67,6 +67,22 @@ describe(' Data verifiction ', function () {
         });
     });
 
+    it(' participant is correctly set ', function () {
+        Event::fake();
+        $auth = User::factory()->create();
+        $receiver = User::factory()->create(['name' => 'John']);
+
+        $message = $auth->sendMessageTo($receiver, 'hello');
+
+        $participant = $message->conversation->participant($receiver);
+        NotifyParticipant::dispatch($participant, $message);
+
+        Event::assertDispatched(NotifyParticipant::class, function ($event) use ($participant) {
+
+            return $event->participant->participantable_id == $participant->participantable_id && $event->participant->participantable_type == $participant->participantable_type;
+        });
+    });
+
     it(' broadcasts only on correct 1  private channnel', function () {
         Event::fake();
         $auth = User::factory()->create();

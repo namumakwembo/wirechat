@@ -511,45 +511,37 @@ describe('Box presence test: ', function () {
             ->assertDontSeeHtml('dusk="disappearing_messages_icon"');
     });
 
-
     describe('IsWidget:', function () {
-
-
 
         test('it renders $dispatch("close-chat") BUT not redirect to chats index', function () {
 
             $auth = User::factory()->create(['name' => 'Namu']);
             $conversation = $auth->createGroup('My Group');
-    
+
             //turn on disappearing
             $conversation->turnOffDisappearing();
-    
+
             // dd($conversation);
-            Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id,'widget'=>true])
+            Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true])
                 ->assertDontSeeHtml('href="'.route(WireChat::indexRouteName()).'"')
                 ->assertSeeHtml('@click="$dispatch(\'close-chat\')"');
         });
-
 
         test('it doesnt render $dispatch("close-chat") BUT Renders redirect to chats index', function () {
 
             $auth = User::factory()->create(['name' => 'Namu']);
             $conversation = $auth->createGroup('My Group');
-    
+
             //turn on disappearing
             $conversation->turnOffDisappearing();
-    
+
             // dd($conversation);
-            Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id,'widget'=>false])
+            Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => false])
                 ->assertSeeHtml('href="'.route(WireChat::indexRouteName()).'"')
                 ->assertDontSeeHtml('@click="$dispatch(\'close-chat\')"');
         });
 
-
-
-
-    })->only();
-
+    });
 
     // test('it shows message time', function () {
     //     $auth = User::factory()->create();
@@ -1171,7 +1163,6 @@ describe('Sending messages ', function () {
 
         Event::assertDispatchedTimes(NotifyParticipant::class, 20);
     });
-
 
     test('it does not broadcasts event "MessageCreated" if it is SelfConversation', function () {
         Event::fake();
@@ -1931,9 +1922,7 @@ describe('Deleting Conversation', function () {
         expect($authParticipant->conversation_deleted_at)->toBe(null);
     });
 
-
     describe('IsWidget:', function () {
-
 
         test('it does not redirects to chats route after deleting conversation', function () {
             $auth = User::factory()->create();
@@ -1958,8 +1947,6 @@ describe('Deleting Conversation', function () {
                 ->assertStatus(200)
                 ->assertNoRedirect();
         });
-
-
 
         test('it dispatches "close-chat" evnt after deleting conversation', function () {
             $auth = User::factory()->create();
@@ -2142,9 +2129,7 @@ describe('Clearing Conversation', function () {
         Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])->assertOk();
     });
 
-
     describe('IsWidget:', function () {
-
 
         test('it does not redirects to chats route after deleting conversation', function () {
             $auth = User::factory()->create();
@@ -2169,8 +2154,6 @@ describe('Clearing Conversation', function () {
                 ->assertStatus(200)
                 ->assertNoRedirect();
         });
-
-
 
         test('it dispatches "close-chat" evnt after deleting conversation', function () {
             $auth = User::factory()->create();
@@ -2198,8 +2181,6 @@ describe('Clearing Conversation', function () {
 });
 
 describe('Exiting Conversation', function () {
-
-
 
     test('user cannot access conversation after exiting', function () {
         Event::fake();
@@ -2261,8 +2242,6 @@ describe('Exiting Conversation', function () {
         expect($auth->belongsToConversation($conversation))->toBe(true);
     });
 
-
-
     test('Throws error if user tries to exit priveat or self conversation', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create(['name' => 'John']);
@@ -2276,10 +2255,7 @@ describe('Exiting Conversation', function () {
         expect($auth->belongsToConversation($conversation))->toBe(true);
     });
 
-
-
     describe('IsWidget:', function () {
-
 
         test('it does not redirects to chats route after Exiting Group conversation', function () {
             $auth = User::factory()->create();
@@ -2301,8 +2277,6 @@ describe('Exiting Conversation', function () {
                 ->assertStatus(200)
                 ->assertNoRedirect();
         });
-
-
 
         test('it dispatches "close-chat" evnt after Exiting Group conversation', function () {
             $auth = User::factory()->create();

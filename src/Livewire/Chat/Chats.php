@@ -3,7 +3,6 @@
 namespace Namu\WireChat\Livewire\Chat;
 
 use Illuminate\Support\Facades\Schema;
-use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Models\Conversation;
@@ -12,15 +11,13 @@ use Namu\WireChat\Traits\Widget;
 
 class Chats extends Component
 {
-
     use Widget;
+
     public $search;
 
     public $conversations = [];
 
     public bool $canLoadMore = false;
-
-
 
     public $page = 1;
 
@@ -28,9 +25,11 @@ class Chats extends Component
 
     public function getListeners()
     {
+        $userId = auth()->id(); // Adjust guard as needed
+
         return [
             'refresh' => '$refresh',
-            'echo-private:participant.'.auth()->id().',.Namu\\WireChat\\Events\\NotifyParticipant' => 'refreshComponent',
+            'echo-private:participant.'.$userId.',.Namu\\WireChat\\Events\\NotifyParticipant' => 'refreshComponent',
         ];
     }
 

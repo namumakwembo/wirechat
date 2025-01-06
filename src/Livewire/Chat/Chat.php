@@ -30,9 +30,9 @@ use Namu\WireChat\Traits\Widget;
 
 class Chat extends Component
 {
+    use Widget;
     use WithFileUploads;
     use WithPagination;
-    use Widget;
 
     //  public Conversation $conversation;
     public $conversation;
@@ -62,7 +62,7 @@ class Chat extends Component
     public ?Participant $authParticipant;
 
     // #[Locked]
-    public ?Participant $receiverParticipant;
+    public ?Participant $receiverParticipant = null;
 
     //Theme
     public $replyMessage = null;
@@ -127,8 +127,8 @@ class Chat extends Component
             $this->dispatch('scroll-bottom');
 
             $newMessage = Message::find($event['message']['id']);
+            // dd($newMessage);
 
-            //Make sure message does not belong to auth
             // Make sure message does not belong to auth
             if ($newMessage->sendable_id == auth()->id() && $newMessage->sendable_type == auth()->user()->getMorphClass()) {
                 return null;
@@ -285,7 +285,7 @@ class Chat extends Component
         //delete conversation
         $auth->exitConversation($this->conversation);
 
-          //Dispatach event instead if isWidget
+        //Dispatach event instead if isWidget
         if ($this->isWidget()) {
             $this->dispatch('close-chat');
         } else {
@@ -611,6 +611,7 @@ class Chat extends Component
 
                     //   broadcast(new NotifyParticipant($this->receiverParticipant, $message))->toOthers();
 
+                    // dd('broadcasting');
                     NotifyParticipants::dispatch($this->conversation, $message);
                     //    Notification::send($this->receiver, new NewMessageNotification($message));
 

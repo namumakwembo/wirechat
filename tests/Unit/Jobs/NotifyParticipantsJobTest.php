@@ -106,4 +106,35 @@ describe('Actions', function () {
         Event::assertDispatchedTimes(NotifyParticipant::class, 0);
 
     });
+
+    test('it dispatches NotifyParticipant to the right number of participnats  except the Auth', function () {
+
+        // Bus::fake();
+        Bus::fake();
+        Event::fake();
+        $auth = User::factory()->create();
+
+        $conversation = $auth->createGroup(name: 'New group', description: 'description');
+
+        //add user and exit conversation
+        for ($i = 0; $i < 20; $i++) {
+            $conversation->addParticipant(User::factory()->create());
+        }
+
+        $message = $auth->sendMessageTo($conversation, 'hello');
+
+        //Create Job in database
+        $job = (new NotifyParticipants($conversation, $message));
+
+        $job->handle();
+
+        Event::assertDispatchedTimes(NotifyParticipant::class, 20);
+
+        Event::assertNotDispatched(NotifyParticipant::class, function ($event) use ($auth) {
+
+            return $event->participant->participantable_id == $auth->id && $event->participant->participantable_type == $auth->getMorphClass();
+        });
+
+    });
+
 });

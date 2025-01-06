@@ -122,7 +122,7 @@ class WireChat extends Component
             'openChatWidget',
             'destroyChatWidget',
             'closeChatWidget',
-            'open-chat'=>"openChatWidget"
+            'open-chat' => 'openChatWidget',
 
         ];
     }

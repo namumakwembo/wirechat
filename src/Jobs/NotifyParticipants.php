@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Namu\WireChat\Events\NotifyParticipant;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Models\Message;
@@ -81,19 +82,22 @@ class NotifyParticipants implements ShouldQueue
             return;
         }
 
+        Log::info('Here');
+
         /**
          * Fetch participants, ordered by `last_active_at` in descending order,
          * so that the most recently active participants are notified first. */
         Participant::where('conversation_id', $this->conversation->id)
-        //exclude current user
-        // ->with('participantable')
             ->where(function ($query) {
-                $query->where('participantable_id', '!=', $this->auth->id)
-                    ->where('participantable_type', get_class($this->auth));
+                return $query->where('participantable_id', '!=', $this->auth->id)
+                    ->orWhere('participantable_type', '==', $this->auth->getMorphClass());
             })
             ->latest('last_active_at') // Prioritize active participants
             ->chunk(50, function ($participants) {
+                Log::info(['participants count' => $participants->count()]);
                 foreach ($participants as $key => $participant) {
+                    Log::info(['participant' => ['participantable_id' => $participant->id, 'participantable_type' => $participant->participantable_type]]);
+
                     broadcast(new NotifyParticipant($participant, $this->message));
                 }
             });

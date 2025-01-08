@@ -2,6 +2,7 @@
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Message;
 use Workbench\App\Models\User;
@@ -49,73 +50,7 @@ it('returns correct attachment ', function () {
 
 });
 
-it('deletes attachment from database when message is deleted', function () {
-    $auth = User::factory()->create();
 
-    Storage::fake(config('wirechat.attachments.storage_disk', 'public'));
-    $attachment = UploadedFile::fake()->image('file.png');
-
-    //save photo to disk
-    $path = $attachment->store(config('wirechat.attachments.storage_folder', 'attachments'), config('wirechat.attachments.storage_disk', 'public'));
-
-    //create attachment
-
-    //create message
-    $message = Message::factory()->sender($auth)->create();
-    $attachment = Attachment::factory()->for($message, 'attachable')->create([
-
-        'file_path' => $path,
-        'file_name' => basename($path),
-        'original_name' => $attachment->getClientOriginalName(),
-        'mime_type' => $attachment->getMimeType(),
-        'url' => url($path),
-
-    ]);
-    //assert
-    expect($message->attachment->id)->toBe($attachment->id);
-
-    //delete message
-    $message->delete();
-
-    //assert
-    expect(Attachment::find($attachment->id))->toBe(null);
-
-});
-
-it('deletes attachment from storage when message is deleted', function () {
-    $auth = User::factory()->create();
-
-    Storage::fake(config('wirechat.attachments.storage_disk', 'public'));
-    $attachment = UploadedFile::fake()->image('file.png');
-
-    //save photo to disk
-    $path = $attachment->store(config('wirechat.attachments.storage_folder', 'attachments'), config('wirechat.attachments.storage_disk', 'public'));
-
-    //create attachment
-
-    //create message
-    $message = Message::factory()->sender($auth)->create();
-
-    $attachment = Attachment::factory()->for($message, 'attachable')->create([
-
-        'file_path' => $path,
-        'file_name' => basename($path),
-        'original_name' => $attachment->getClientOriginalName(),
-        'mime_type' => $attachment->getMimeType(),
-        'url' => url($path),
-
-    ]);
-
-    //assert
-    expect($message->attachment->id)->toBe($attachment->id);
-
-    //delete message
-    $message->delete();
-
-    //assert
-    Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->assertMissing($attachment->file_name);
-
-});
 
 // it('returns reads count', function () {
 //     $auth = User::factory()->create();
@@ -215,6 +150,151 @@ describe('Delete Permanently', function () {
         expect($message1->actions()->count())->toBe(0);
 
     });
+
+    it('deletes attachment from database when message is deleted', function () {
+        $auth = User::factory()->create();
+    
+        Storage::fake(config('wirechat.attachments.storage_disk', 'public'));
+        $attachment = UploadedFile::fake()->image('file.png');
+    
+        //save photo to disk
+        $path = $attachment->store(config('wirechat.attachments.storage_folder', 'attachments'), config('wirechat.attachments.storage_disk', 'public'));
+    
+        //create attachment
+    
+        //create message
+        $message = Message::factory()->sender($auth)->create();
+        $attachment = Attachment::factory()->for($message, 'attachable')->create([
+    
+            'file_path' => $path,
+            'file_name' => basename($path),
+            'original_name' => $attachment->getClientOriginalName(),
+            'mime_type' => $attachment->getMimeType(),
+            'url' => url($path),
+    
+        ]);
+        //assert
+        expect($message->attachment->id)->toBe($attachment->id);
+    
+        //delete message
+        $message->delete();
+    
+        //assert
+        expect(Attachment::find($attachment->id))->toBe(null);
+    
+    });
+    
+    it('deletes attachment from storage when message is deleted', function () {
+        $auth = User::factory()->create();
+    
+        Storage::fake(config('wirechat.attachments.storage_disk', 'public'));
+        $attachment = UploadedFile::fake()->image('file.png');
+    
+        //save photo to disk
+        $path = $attachment->store(config('wirechat.attachments.storage_folder', 'attachments'), config('wirechat.attachments.storage_disk', 'public'));
+    
+
+        $this->actingAs($auth);
+        //create attachment
+    
+        //create message
+        $message = Message::factory()->sender($auth)->create();
+    
+        $attachment = Attachment::factory()->for($message, 'attachable')->create([
+    
+            'file_path' => $path,
+            'file_name' => basename($path),
+            'original_name' => $attachment->getClientOriginalName(),
+            'mime_type' => $attachment->getMimeType(),
+            'url' => url($path),
+    
+        ]);
+
+              // Assert the file was stored...
+        Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->assertExists($attachment->file_path);
+        
+    
+        //assert
+        expect($message->attachment->id)->toBe($attachment->id);
+
+
+        expect(Message::where('conversation_id',$message->conversation_id)->withoutGlobalScopes()->count())->toBe(1);
+        expect($message->attachment()->count())->toBe(1);
+        //delete message
+        $message->forceDelete();
+    
+
+        expect(Message::where('conversation_id',$message->conversation_id)->withoutGlobalScopes()->count())->toBe(0);
+        expect($message->attachment()->count())->toBe(0);
+        //assert
+        Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->assertMissing($attachment->file_path);
+    
+    });
+
+    // it('deletes attachments when message is deleted ', function () {
+
+    //     Storage::fake( config('wirechat.attachments.storage_disk', 'public'));
+    //     $auth = User::factory()->create();
+    //     $receiver = User::factory()->create();
+
+    //     $conversation = $auth->createConversationWith($receiver);
+
+
+    //     //authenticate
+    //     $this->actingAs($auth);
+
+    //     $attachment= UploadedFile::fake()->image('avatar.jpg');
+    //     $path = $attachment->store(config('wirechat.attachments.storage_folder', 'attachments'), config('wirechat.attachments.storage_disk', 'public'));
+
+    //     // Determine the reply ID based on conditions
+    //     // Create the message
+    //     $message1 = Message::create([
+    //         'conversation_id' => $conversation->id,
+    //         'sendable_type' =>  $auth->getMorphClass(), // Polymorphic sender type
+    //         'sendable_id' => $auth->id, // Polymorphic sender ID
+    //         'type' => MessageType::ATTACHMENT,
+    //         // 'body' => $this->body, // Add body if required
+    //     ]);
+
+    //     // Create and associate the attachment with the message
+    //     $attachmentModel= $message1->attachment()->create([
+    //         'file_path' => $path,
+    //         'file_name' => basename($path),
+    //         'original_name' => $attachment->getClientOriginalName(),
+    //         'mime_type' => $attachment->getMimeType(),
+    //         'url' => Storage::url($path),
+    //     ]);
+
+
+    //     // Assert the file was stored...
+    //     Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->assertExists($attachmentModel->file_path);
+        
+
+    //     //assert count is 1
+    //     expect($conversation->messages()->count())->toBe(1);
+    //     expect($message1->attachment()->count())->toBe(1);
+
+
+    //     //delete message
+    //     $message1->deleteFor($auth);
+
+    //     //Wirechat message soft delete
+    //     expect($conversation->messages()->withoutGlobalScopes()->count())->toBe(1);
+    //     expect($message1->attachment()->count())->toBe(1);
+
+    //     //Permantly Delete message
+    //     $message1->delete();
+
+    //     //assert count
+        
+    //     expect($conversation->messages()->count())->toBe(0);
+    //     expect($message1->attachment()->count())->toBe(0);
+
+    //     // Assert the file was stored...
+    //     Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->assertMissing($attachmentModel->file_path);
+    
+
+    // });
 
 });
 

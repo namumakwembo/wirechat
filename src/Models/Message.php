@@ -21,8 +21,8 @@ class Message extends Model
 
     protected $fillable = [
         'body',
-        'sendable_type', // Now includes sendable_type for polymorphism
-        'sendable_id',   // Now includes sendable_id for polymorphis
+        'sendable_type', 
+        'sendable_id',  
         'conversation_id',
         'reply_id',
         'type',
@@ -34,7 +34,6 @@ class Message extends Model
         'kept_at' => 'datetime',
     ];
 
-    //  protected $dates=['read_at','receiver_deleted_at','sender_deleted_at'];
     public function __construct(array $attributes = [])
     {
         $this->table = WireChat::formatTableName('messages');
@@ -106,7 +105,7 @@ class Message extends Model
                 $message->attachment?->delete();
 
                 //also delete from storage
-                if (file_exists(Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->exists($message->attachment->file_path))) {
+                if (Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->exists($message->attachment->file_path)) {
                     Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->delete($message->attachment->file_path);
                 }
             }

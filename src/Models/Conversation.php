@@ -232,7 +232,7 @@ class Conversation extends Model
             abort_if(
                 $participant->hasExited(),
                 403,
-                'Cannot add '.$user->display_name.' because they left the group.'
+                'Cannot add ' . $user->display_name . ' because they left the group.'
             );
 
             // Check if the participant was removed by an admin or owner
@@ -241,7 +241,7 @@ class Conversation extends Model
                 abort_if(
                     ! $undoAdminRemovalAction,
                     403,
-                    'Cannot add '.$user->display_name.' because they were removed from the group by an Admin.'
+                    'Cannot add ' . $user->display_name . ' because they were removed from the group by an Admin.'
                 );
 
                 // If undoAdminRemovalAction is true, remove admin removal actions and return the participant
@@ -341,7 +341,6 @@ class Conversation extends Model
                 $query->where('participantable_id', $user->id)
                     ->whereRaw(" (conversation_cleared_at IS NULL OR conversation_cleared_at < {$conversationsTableName}.updated_at) ");
             });
-
         }
     }
 
@@ -462,21 +461,69 @@ class Conversation extends Model
             return $this->messages->filter(function ($message) use ($lastReadAt, $user) {
                 // If lastReadAt is null, consider all messages as unread
                 // Also, exclude messages that belong to the user
-                return (! $lastReadAt || $message->created_at > $lastReadAt) &&
-                    $message->sendable_id != $user->id && $message->sendable_type == $user->getMorphClass();
+                return (! $lastReadAt || $message->created_at > $lastReadAt) && !$message->ownedBy($user);
             });
         }
 
+        //dd($this->messages()->get());
+
         // Query builder for unread messages
         $query = $this->messages();
-        if ($lastReadAt) {
-            $query->where('created_at', '>', $lastReadAt);
-        }
+
+
+        //  dd($query->get());
 
         // Exclude messages that belong to the user
-        return $query->where('sendable_id', '!=', $user->id)
-            ->where('sendable_type', $user->getMorphClass())
-            ->get(); // Return the collection of unread messages
+        //return 
+
+        //   $messages =$query->whereDoesntHaveMorph(
+        //     'sendable',
+        //    $user->getMorphClass(),
+        //     function (Builder $query) use($user){
+        //         //dd($user);
+        //         $query->where('id','!=' ,$user->id);
+        //     }
+        // )->get();
+
+
+        // Exclude messages that belong to the user
+        // $messages= $query->where('sendable_id', '!=', $user->id)
+        // ->where('sendable_type', $user->getMorphClass())
+        // ->get(); // Return the collection of unread messages
+
+        //WORKING
+        $messages = $query->whereIsNotOwnedBy($user)->when($lastReadAt, function ($query) use ($lastReadAt) {
+
+            $query->where('created_at', '>', $lastReadAt);
+        })->get();
+
+        
+
+
+        //  $messages= $query->whereDoesntBelongTo( 'sendable',function ($query) use ($user) {
+        //     $query->where('id',  $user->id)
+        //           ->where('id',$user->getMorphClass());
+        // })->get();
+        //  $messages= $query->where(function ($query) use ($user) {
+        //     $query->where('sendable_id', "==", $user->id)
+        //           ->orWhere('sendable_type', "<=>", $user->getMorphClass());
+        // })->get();
+        //$messages= $query->whereMorphedTo('sendable',  $user->getMorphClass())->get();
+        /// $messages= $query->whereNotMorphedTo('sendable', $user)->get();
+
+        // $messages= $query->whereDoesntHaveMorph('sendable',  $user->getMorphClass())->get();
+        //whereDoesntHaveMorph
+
+        // $messages = $query->whereHasMorph('sendable', $user->getMorphClass(), function (Builder $query,$type) use($user) {
+        //     $query->where('id','!=',$user->id);
+        // })->when($lastReadAt,function($query) use($lastReadAt){
+
+        //         $query->where('created_at', '>', $lastReadAt);
+
+        // })->get();
+
+        // dd($messages);
+        return $messages;
     }
 
     /**

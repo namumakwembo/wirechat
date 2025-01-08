@@ -185,6 +185,20 @@ class Message extends Model
         return $this->parent()->exists();
     }
 
+    function scopeWhereIsNotOwnedBy($query,$user)  {
+
+        $query->where(function ($query) use ($user) {
+            $query->where('sendable_id', "<>", $user->id)
+                  ->orWhere('sendable_type', "<>", $user->getMorphClass());
+           });
+
+        // $query->where(function ($query) use ($user) {
+        //     $query->whereNot('sendable_id', $user->id)
+        //           ->orWhereNot('sendable_type', $user->getMorphClass());
+        // });
+        
+    }
+
     /**
      * Delete for
      * This will delete the message only for the auth user meaning other participants will be able to see it

@@ -223,9 +223,9 @@
                             {{-- Only show if AUTH is NOT onwer of message --}}
 
                             {{-- {{'read by auth ?' . $isReadByAuth}} --}}
-                            @if ($lastMessage != null && ($lastMessage?->sendable_id != $authUser?->id && $lastMessage?->sendable_type == $authUser->getMorphClass()) && !$isReadByAuth)
+                            @if ($lastMessage != null && !($lastMessage?->ownedBy($authUser)) && !$isReadByAuth)
 
-                            <div class=" col-span-2 flex flex-col text-center my-auto">
+                            <div dusk="unreadMessagesDot" class=" col-span-2 flex flex-col text-center my-auto">
                                 {{-- Dots icon --}}
                                 <svg @style(['color:' . $primaryColor]) xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                     fill="currentColor" class="bi bi-dot w-10 h-10 text-blue-500" viewBox="0 0 16 16">

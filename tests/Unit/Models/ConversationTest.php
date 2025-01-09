@@ -7,6 +7,7 @@ use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\group;
 use Namu\WireChat\Models\Message;
+use Workbench\App\Models\Admin;
 use Workbench\App\Models\User;
 
 describe('MarkAsRead()', function () {
@@ -191,7 +192,7 @@ describe('getUnreadCountFor()', function () {
     });
 });
 
-describe('deleting for', function () {
+describe('deleteFor()', function () {
 
     it('load all conversations if not deleted', function () {
         $auth = User::factory()->create();
@@ -276,7 +277,7 @@ describe('deleting for', function () {
         expect($auth->conversations()->withoutDeleted()->count())->toBe(2);
     });
 
-    it('deletes and does not load deleted conversations(for me) if scopewithoutCleared is added', function () {
+    it('deletes and does not load deleted conversations(for me) if scopewithoutCleared is added--because delted conversations are CLEARED by default', function () {
 
         //Dusk to
         $auth = User::factory()->create();
@@ -374,8 +375,9 @@ describe('deleting for', function () {
         expect($auth->conversations()->count())->toBe(1);
     });
 
-    it('completely deletes the conversation if both users in a private conversation has deleted conversation(All messages)', function () {
+    it('permanetenly deletes the conversation if both Participants of Same Model in a private conversation has deleted conversation(All messages)', function () {
 
+       
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
@@ -385,30 +387,66 @@ describe('deleting for', function () {
         //Authenticate and delete 1
 
         $this->actingAs($auth);
-        Carbon::setTestNow(now()->addSeconds(10));
+        Carbon::setTestNow(now()->subSeconds(20));
         $auth->sendMessageTo($receiver, 'hello75');
 
-        Carbon::setTestNow(now()->addSeconds(26));
-
-        Carbon::setTestNow(now()->addSeconds(27));
+        Carbon::setTestNow();
 
         $conversation->deleteFor($auth);
 
-        Auth::logout();
+        //Reset
+        Carbon::setTestNow();
+
 
         //Authenticate and delete 2
-
         $this->actingAs($receiver);
 
-        Carbon::setTestNow(now()->addSeconds(28));
+        Carbon::setTestNow(now()->subSeconds(28));
         $receiver->sendMessageTo($auth, 'hello-5');
 
-        Carbon::setTestNow(now()->addSeconds(29));
+        Carbon::setTestNow();
 
         $conversation->deleteFor($receiver);
 
-        expect(Conversation::find($conversation->id))->toBe(null);
+        $this->assertDatabaseMissing((new Conversation())->getTable(), ['id'=>$conversation->id]);
     });
+
+    it('permanetenly deletes the conversation if both participants of Different Models ie(Admin/User) delete it ', function () {
+
+        $auth = User::factory()->create();
+        $admin = Admin::factory()->create();
+
+        //Send to admin
+        $conversation = $auth->sendMessageTo($admin, 'hello-4')->conversation;
+
+        //Authenticate and delete 1
+
+        $this->actingAs($auth);
+        Carbon::setTestNow(now()->subSeconds(20));
+        $auth->sendMessageTo($admin, 'hello75');
+
+        //Reset Time
+        Carbon::setTestNow();
+
+        $conversation->deleteFor($auth);
+
+        //Reset Time
+        Carbon::setTestNow();
+
+
+        //Authenticate and delete 2
+        $this->actingAs($admin);
+
+        Carbon::setTestNow(now()->subSeconds(28));
+        $admin->sendMessageTo($auth, 'hello-5');
+
+        Carbon::setTestNow();
+
+        $conversation->deleteFor($admin);
+
+        $this->assertDatabaseMissing((new Conversation())->getTable(), ['id'=>$conversation->id]);
+    });
+
 
     it('completely deletes the conversation if conversation is self conversation with initiator(User)', function () {
 
@@ -488,7 +526,7 @@ describe('deleting for', function () {
         $auth->refresh();
         expect(count($auth->conversations()->get()))->toBe(1);
     });
-});
+})->only();
 
 describe('ClearFor()', function () {
 

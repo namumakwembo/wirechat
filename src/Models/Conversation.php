@@ -602,31 +602,32 @@ class Conversation extends Model
         $participant->conversation_deleted_at = Carbon::now();
         $participant->save();
 
+
+        //Then force delete it
+        if ($this->isSelfConversation($user)) {
+           return $this->forceDelete();
+        }
+
         // Check if the conversation is private or self
-        if ($this->isPrivate() || $this->isSelf()) {
-            //check if conversatin is Self conversation
-            //Then force delete it
-            if ($this->isSelfConversation($user)) {
-                $this->forceDelete();
-            } else {
+        if ($this->isPrivate()) {
 
-                // Retrieve the other participant in the private conversation
-                $otherParticipant = $this->participants
-                    ->where('participantable_id', '!=', $user->id)
-                    ->where('participantable_type', $user->getMorphClass())
-                    ->first();
+            //set variable and default value
+            $deletedByBothParticipants = true;
 
-                // Return null if the other participant cannot be found
-                if (! $otherParticipant) {
-                    return null;
-                }
-
-                // If both participants have deleted all their messages, delete the conversation permanently
-                if ($participant->hasDeletedConversation() && $otherParticipant->hasDeletedConversation()) {
-                    // dd("deleted");
-                    $this->forceDelete();
-                }
+            // Get Participants
+            //!use make sure to get new query() otherwise participants wont be retrieved correctly
+            $participant=  $this->participants()->get();
+            
+            //Iterate over participants to find out if both have deleted
+            foreach ($participant as $key => $participant) {
+                $deletedByBothParticipants = $deletedByBothParticipants && $participant->hasDeletedConversation();
             }
+
+            //If true then delete conversation permanently 
+            if ($deletedByBothParticipants) {
+                $this->forceDelete();
+            }
+
         }
     }
 
@@ -637,7 +638,7 @@ class Conversation extends Model
     {
         $participant = $this->participant($user);
 
-        return $participant->hasDeletedConversation(true);
+        return $participant->hasDeletedConversation(checkDeletionExpired:true);
     }
 
     public function clearFor(Model $user)

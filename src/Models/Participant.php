@@ -239,4 +239,16 @@ class Participant extends Model
         // Otherwise, return true if deletion is recent compared to updated timestamp
         return true;
     }
+
+
+    /**
+     * Exclude participant passed as parameter
+     */
+    public function  scopeWithoutParticipantable(Builder $query, Model $user): Builder
+    {
+        return   $query->where(function ($query) use ($user) {
+            $query->where('participantable_id', '<>', $user->id)
+                ->orWhere('participantable_type', '<>', $user->getMorphClass());
+        });
+    }
 }

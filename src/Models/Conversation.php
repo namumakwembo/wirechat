@@ -214,7 +214,7 @@ class Conversation extends Model
 
     /**
      * Add a new participant to the conversation.
-     *
+     * @param Model user the creator of group 
      * @param ParticipantRole  a ParticipanRole enum to assign to member
      * @param  bool  $undoAdminRemovalAction  If the user was recently removed by admin, allow re-adding.
      */

@@ -242,4 +242,29 @@ class Message extends Model
             }
         }
     }
+
+
+    /**
+     * Deleting message for everyone   */
+     function deleteForEveryone(Model $user)  {
+
+        $conversation = $this->conversation;
+        $participant = $conversation->participant($user);
+        $message= $this;
+
+        // Make sure auth belongs to conversation for this message
+        abort_unless($user->belongsToConversation($conversation), 403,'You do not belong to this conversation');
+
+        //make sure user owns message OR allow if is admin in group
+        abort_unless($message->ownedBy($user) || ($participant->isAdmin() && $message->conversation->isGroup()), 403,'You do not have permission to delete this message');
+
+         //if message has reply then only-soft delete it
+         if ($message->hasReply()) {
+            $message->delete();
+        } else {
+
+            $message->forceDelete();
+        }
+        
+     }
 }

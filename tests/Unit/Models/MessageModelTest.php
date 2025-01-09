@@ -3,8 +3,10 @@
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Namu\WireChat\Enums\MessageType;
+use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Message;
+use Workbench\App\Models\Admin;
 use Workbench\App\Models\User;
 
 it('returns conversation', function () {
@@ -71,7 +73,7 @@ it('returns correct attachment ', function () {
 
 // });
 
-describe('Delete Permanently', function () {
+describe('DeleteFor Everyone', function () {
 
     it('deletes actions when message is deleted ', function () {
 
@@ -191,6 +193,102 @@ describe('Delete Permanently', function () {
         Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->assertMissing($attachment->file_path);
     
     });
+
+
+
+    it('aborts 403 AND does not delete message if user does not belong to conversation  before deletingForEveryone', function () {
+
+        $auth = User::factory()->create();
+
+        $receiver = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($auth);
+
+        //send to receiver
+        $message1= $auth->sendMessageTo($conversation, 'hello-1');
+
+        //assert exists in database
+        $this->assertDatabaseHas((new Message())->getTable(), ['id'=>$message1->id]);
+
+        $message1->deleteForEveryone(User::factory()->create());
+
+        $this->assertDatabaseHas((new Message())->getTable(), ['id'=>$message1->id]);
+
+    })->throws(Exception::class);
+
+
+    it('aborts 403 AND does not delete message if user does not own message  before deletingForEveryone', function () {
+
+        $auth = User::factory()->create();
+
+        $receiver = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($receiver);
+
+        //send to receiver
+        $message1= $auth->sendMessageTo($conversation, 'hello-1');
+
+        //assert exists in database
+        $this->assertDatabaseHas((new Message())->getTable(), ['id'=>$message1->id]);
+
+        $message1->deleteForEveryone($receiver);
+
+        $this->assertDatabaseHas((new Message())->getTable(), ['id'=>$message1->id]);
+
+    })->throws(Exception::class,'You do not have permission to delete this message');
+
+
+    it('deletes if User owns messag when deletingForEveryone', function () {
+
+        $auth = User::factory()->create();
+
+        $receiver = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($receiver);
+
+        //send to receiver
+        $message1= $auth->sendMessageTo($conversation, 'hello-1');
+
+        //assert exists in database
+        $this->assertDatabaseHas((new Message())->getTable(), ['id'=>$message1->id]);
+
+        $message1->deleteForEveryone($auth);
+
+        $this->assertDatabaseMissing((new Message())->getTable(), ['id'=>$message1->id]);
+
+    });
+
+
+
+    it('still deletes if User does not own message but is Admin and Conversation is Group', function () {
+
+         $auth = User::factory()->create();
+
+         $receiver = User::factory()->create();
+         $randomUser = User::factory()->create();
+
+        //create group
+        $conversation = $receiver->createGroup('Text');
+
+        //add participants 
+        $conversation->addParticipant($auth,ParticipantRole::ADMIN);
+        $conversation->addParticipant($randomUser);
+
+        //send message by random user
+        $message1= $randomUser->sendMessageTo($conversation, 'hello-1');
+
+        //assert exists in database
+        $this->assertDatabaseHas((new Message())->getTable(), ['id'=>$message1->id]);
+
+
+        //Atempf for admin to delete
+        $message1->deleteForEveryone($auth);
+
+        $this->assertDatabaseMissing((new Message())->getTable(), ['id'=>$message1->id]);
+
+    });
+
+
 
 });
 
@@ -335,7 +433,7 @@ describe('DeleteForMe', function () {
     });
 
 
-    test('Other Logged in users can still see messages even if Auth deletes For me', function () {
+    test('Other Logged in users of Same Model  can still see messages even if Auth deletes For me', function () {
         $auth = User::factory()->create();
 
         $receiver = User::factory()->create();
@@ -356,7 +454,36 @@ describe('DeleteForMe', function () {
         expect($conversation->messages()->count())->toBe(0);
 
         
+        //authenticate as receiver
+        $this->actingAs($receiver);
 
+        //assert receiever can see messages
+        expect($conversation->messages()->count())->toBe(1);
+
+
+    });
+
+    test('Other Logged in users of Different Model can still see messages even if Auth deletes For me', function () {
+        $auth = User::factory()->create();
+
+        $receiver = Admin::factory()->create();
+
+        $conversation = $auth->createConversationWith($receiver);
+
+        //send to receiver
+        $message1= $auth->sendMessageTo($receiver, 'hello-1');
+
+        //delete message
+        $message1->deleteFor($auth);
+
+
+        //authenticate as auth
+        $this->actingAs($auth);
+
+        //assert auth can see message
+        expect($conversation->messages()->count())->toBe(0);
+
+        
         //authenticate as receiver
         $this->actingAs($receiver);
 
@@ -417,6 +544,6 @@ describe('DeleteForMe', function () {
     });
 
 
-    
 
-})->only();
+
+});

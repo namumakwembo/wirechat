@@ -73,45 +73,6 @@ it('returns correct attachment ', function () {
 
 describe('Delete Permanently', function () {
 
-    // it('deletes actions when message is deleted ', function () {
-
-    //     $auth = User::factory()->create();
-
-    //     $receiver = User::factory()->create();
-
-    //     $conversation = $auth->createConversationWith($receiver);
-
-    //     //send to receiver
-    //     $auth->sendMessageTo($receiver,'hello-1');
-    //     $message1=  $auth->sendMessageTo($receiver,'hello-2');
-    //     $auth->sendMessageTo($receiver,'hello-3');
-
-    //     //authenticate
-    //     $this->actingAs($auth);
-
-    //     //send to auth
-    //     $receiver->sendMessageTo($auth,'hello-4');
-    //     $receiver->sendMessageTo($auth,'hello-5');
-    //     $receiver->sendMessageTo($auth,'hello-6');
-
-    //     //assert count is 6
-    //     expect($conversation->messages()->count())->toBe(6);
-
-    //     //delete messages
-    //     $message1->deleteFor($auth);
-
-    //     //assert actions
-
-    //     expect($message1->actions()->count())->toBe(1);
-
-    //     //Permantly Delete message
-    //     $message1->delete();
-
-    //     //assert count
-    //     expect($message1->actions()->count())->toBe(0);
-
-    // });
-
     it('deletes actions when message is deleted ', function () {
 
         $auth = User::factory()->create();
@@ -231,71 +192,6 @@ describe('Delete Permanently', function () {
     
     });
 
-    // it('deletes attachments when message is deleted ', function () {
-
-    //     Storage::fake( config('wirechat.attachments.storage_disk', 'public'));
-    //     $auth = User::factory()->create();
-    //     $receiver = User::factory()->create();
-
-    //     $conversation = $auth->createConversationWith($receiver);
-
-
-    //     //authenticate
-    //     $this->actingAs($auth);
-
-    //     $attachment= UploadedFile::fake()->image('avatar.jpg');
-    //     $path = $attachment->store(config('wirechat.attachments.storage_folder', 'attachments'), config('wirechat.attachments.storage_disk', 'public'));
-
-    //     // Determine the reply ID based on conditions
-    //     // Create the message
-    //     $message1 = Message::create([
-    //         'conversation_id' => $conversation->id,
-    //         'sendable_type' =>  $auth->getMorphClass(), // Polymorphic sender type
-    //         'sendable_id' => $auth->id, // Polymorphic sender ID
-    //         'type' => MessageType::ATTACHMENT,
-    //         // 'body' => $this->body, // Add body if required
-    //     ]);
-
-    //     // Create and associate the attachment with the message
-    //     $attachmentModel= $message1->attachment()->create([
-    //         'file_path' => $path,
-    //         'file_name' => basename($path),
-    //         'original_name' => $attachment->getClientOriginalName(),
-    //         'mime_type' => $attachment->getMimeType(),
-    //         'url' => Storage::url($path),
-    //     ]);
-
-
-    //     // Assert the file was stored...
-    //     Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->assertExists($attachmentModel->file_path);
-        
-
-    //     //assert count is 1
-    //     expect($conversation->messages()->count())->toBe(1);
-    //     expect($message1->attachment()->count())->toBe(1);
-
-
-    //     //delete message
-    //     $message1->deleteFor($auth);
-
-    //     //Wirechat message soft delete
-    //     expect($conversation->messages()->withoutGlobalScopes()->count())->toBe(1);
-    //     expect($message1->attachment()->count())->toBe(1);
-
-    //     //Permantly Delete message
-    //     $message1->delete();
-
-    //     //assert count
-        
-    //     expect($conversation->messages()->count())->toBe(0);
-    //     expect($message1->attachment()->count())->toBe(0);
-
-    //     // Assert the file was stored...
-    //     Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->assertMissing($attachmentModel->file_path);
-    
-
-    // });
-
 });
 
 describe('DeleteForMe', function () {
@@ -386,7 +282,7 @@ describe('DeleteForMe', function () {
 
         //send to receiver
         $auth->sendMessageTo($receiver, 'hello-1');
-        $message1 = $auth->sendMessageTo($receiver, 'hello-2');
+     $message1 = $auth->sendMessageTo($receiver, 'hello-2');
         $auth->sendMessageTo($receiver, 'hello-3');
 
         //authenticate
@@ -395,7 +291,7 @@ describe('DeleteForMe', function () {
         //send to auth
         $receiver->sendMessageTo($auth, 'hello-4');
         $receiver->sendMessageTo($auth, 'hello-5');
-        $message2 = $receiver->sendMessageTo($auth, 'hello-6');
+     $message2 = $receiver->sendMessageTo($auth, 'hello-6');
 
         //assert count is 6
         expect($conversation->messages()->count())->toBe(6);
@@ -409,4 +305,118 @@ describe('DeleteForMe', function () {
 
     });
 
-});
+    it('Does Not delete message from database when deleted for me', function () {
+        $auth = User::factory()->create();
+
+        $receiver = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($receiver);
+
+             //authenticate
+             $this->actingAs($auth);
+        //send to receiver
+        $message1= $auth->sendMessageTo($receiver, 'hello-1');
+
+        //assert the message count for auth user is 1 Before Delete
+        expect($conversation->messages()->count())->toBe(1);
+
+        //delete message
+        $message1->deleteFor($auth);
+
+
+        //assert the message count for auth user is 0 After Delete
+        expect($conversation->messages()->count())->toBe(0);
+
+
+        //assert message exists in database
+        $this->assertDatabaseCount((new Message())->getTable(), $message1->id);
+        expect($conversation->messages()->withoutGlobalScopes()->count())->toBe(1);
+
+    });
+
+
+    test('Other Logged in users can still see messages even if Auth deletes For me', function () {
+        $auth = User::factory()->create();
+
+        $receiver = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($receiver);
+
+        //send to receiver
+        $message1= $auth->sendMessageTo($receiver, 'hello-1');
+
+        //delete message
+        $message1->deleteFor($auth);
+
+
+        //authenticate as auth
+        $this->actingAs($auth);
+
+        //assert auth can see message
+        expect($conversation->messages()->count())->toBe(0);
+
+        
+
+        //authenticate as receiver
+        $this->actingAs($receiver);
+
+        //assert receiever can see messages
+        expect($conversation->messages()->count())->toBe(1);
+
+
+    });
+
+    test('Message is permanently deleted when both users in a private conversation delete IT', function () {
+        $auth = User::factory()->create();
+
+        $receiver = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($receiver);
+
+        //send to receiver
+        $message1= $auth->sendMessageTo($receiver, 'hello-1');
+
+    
+
+
+        //authenticate as auth
+        $this->actingAs($auth);
+        $message1->deleteFor($auth);
+
+        //assert exists in database
+        $this->assertDatabaseHas((new Message())->getTable(), ['id'=>$message1->id]);
+
+
+        //authenticate as receiver
+        $this->actingAs($receiver);
+        $message1->deleteFor($receiver);
+
+        $this->assertDatabaseMissing((new Message())->getTable(), ['id'=>$message1->id]);
+
+
+    });
+
+    it('It deletes message permanetly if conversation is Self', function () {
+        $auth = User::factory()->create();
+
+        $receiver = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($auth);
+
+        //send to receiver
+        $message1= $auth->sendMessageTo($conversation, 'hello-1');
+
+        //assert exists in database
+        $this->assertDatabaseHas((new Message())->getTable(), ['id'=>$message1->id]);
+
+        $message1->deleteFor($auth);
+
+        $this->assertDatabaseMissing((new Message())->getTable(), ['id'=>$message1->id]);
+
+
+    });
+
+
+    
+
+})->only();

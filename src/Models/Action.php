@@ -2,6 +2,7 @@
 
 namespace Namu\WireChat\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Namu\WireChat\Enums\Actions;
@@ -52,5 +53,16 @@ class Action extends Model
     public function actor()
     {
         return $this->morphTo('actor', 'actor_type', 'actor_id', 'id');
+    }
+
+
+    //scope by Actor 
+    function scopeWhereActor(Builder $query,Model $actor)  {
+
+        $query->where('actor_id',$actor->id,)->where('actor_type',$actor->getMorphClass());
+
+
+
+        
     }
 }

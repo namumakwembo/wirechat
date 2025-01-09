@@ -21,8 +21,8 @@ class Message extends Model
 
     protected $fillable = [
         'body',
-        'sendable_type', 
-        'sendable_id',  
+        'sendable_type',
+        'sendable_id',
         'conversation_id',
         'reply_id',
         'type',
@@ -138,7 +138,6 @@ class Message extends Model
         }
 
         return $this->conversation->getUnreadCountFor($user) <= 0;
-
     }
 
     /**
@@ -184,20 +183,20 @@ class Message extends Model
         return $this->parent()->exists();
     }
 
-    function scopeWhereIsNotOwnedBy($query,$user)  {
+    function scopeWhereIsNotOwnedBy($query, $user)
+    {
 
         $query->where(function ($query) use ($user) {
             $query->where('sendable_id', "<>", $user->id)
-                  ->orWhere('sendable_type', "<>", $user->getMorphClass());
-           });
+                ->orWhere('sendable_type', "<>", $user->getMorphClass());
+        });
 
         // $query->where(function ($query) use ($user) {
         //     $query->whereNot('sendable_id', $user->id)
         //           ->orWhereNot('sendable_type', $user->getMorphClass());
         // });
-        
-    }
 
+    }
     /**
      * Delete for
      * This will delete the message only for the auth user meaning other participants will be able to see it
@@ -208,8 +207,16 @@ class Message extends Model
             return false;
         }
 
-        //make sure auth belongs to conversation for this message
-        abort_unless($user->belongsToConversation($this->conversation), 403);
+        $conversation = $this->conversation;
+
+        // Make sure auth belongs to conversation for this message
+        abort_unless($user->belongsToConversation($conversation), 403);
+
+        // If conversation is self, then delete permanently directly
+        if ($conversation->isSelf()) {
+            $this->forceDelete();
+            return;
+        }
 
         // Try to create an action
         $this->actions()->create([
@@ -217,5 +224,22 @@ class Message extends Model
             'actor_type' => $user->getMorphClass(),
             'type' => Actions::DELETE,
         ]);
+
+        // If it's a private conversation (only 2 users), then check if both users have deleted the message
+        if ($conversation->isPrivate()) {
+            $deletedByBothParticipants = true;
+
+            foreach ($conversation->participants as $participant) {
+                $deletedByBothParticipants = $deletedByBothParticipants &&
+                    $this->actions()
+                    ->whereActor($participant->participantable)
+                    ->where('type', Actions::DELETE)
+                    ->exists();
+            }
+
+            if ($deletedByBothParticipants) {
+                $this->forceDelete();
+            }
+        }
     }
 }

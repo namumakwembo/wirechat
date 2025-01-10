@@ -190,18 +190,9 @@
 
                                         <p @class([
                                             'truncate text-sm dark:text-white  gap-2 items-center',
-                                            'font-semibold text-black' =>
-                                                !$isReadByAuth &&
-                                                $lastMessage?->sendable_id != $authUser?->id &&
-                                                $lastMessage?->sendable_type == $authUser->getMorphClass(),
-                                            'font-normal text-gray-600' =>
-                                                $isReadByAuth &&
-                                                $lastMessage?->sendable_id != $authUser?->id &&
-                                                $lastMessage?->sendable_type == $authUser->getMorphClass(),
-                                            'font-normal text-gray-600' =>
-                                                $isReadByAuth &&
-                                                $lastMessage?->sendable_id == $authUser?->id &&
-                                                $lastMessage?->sendable_type == $authUser->getMorphClass(),
+                                            'font-semibold text-black' => !$isReadByAuth && !$lastMessage?->ownedBy($authUser),
+                                            'font-normal text-gray-600' =>$isReadByAuth && !$lastMessage?->ownedBy($authUser),
+                                            'font-normal text-gray-600' => $isReadByAuth && $lastMessage?->ownedBy($authUser),
                                         ])>
                                             {{ $lastMessage->body != '' ? $lastMessage->body : ($lastMessage->hasAttachment() ? '📎 Attachment' : '') }}
                                         </p>

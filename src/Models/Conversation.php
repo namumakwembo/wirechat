@@ -314,8 +314,7 @@ class Conversation extends Model
 
             $builder->whereHas('messages', function ($q) use ($user) {
                 $q->withoutGlobalScopes()->whereDoesntHave('actions', function ($q) use ($user) {
-                    $q->where('actor_id', '!=', $user->id)
-                        ->where('actor_type', $user->getMorphClass()) // Safe since $user is authenticated
+                    $q->withoutActor($user) 
                         ->where('type', Actions::DELETE);
                 });
             });
@@ -338,7 +337,7 @@ class Conversation extends Model
 
             // Apply the "without deleted conversations" scope
             $builder->whereHas('participants', function ($query) use ($user, $conversationsTableName) {
-                $query->where('participantable_id', $user->id)
+                $query->whereParticipantable($user)
                     ->whereRaw(" (conversation_cleared_at IS NULL OR conversation_cleared_at < {$conversationsTableName}.updated_at) ");
             });
         }
@@ -359,8 +358,8 @@ class Conversation extends Model
 
             // Apply the "without deleted conversations" scope
             $builder->whereHas('participants', function ($query) use ($user, $conversationsTableName) {
-                $query->where('participantable_id', $user->id)
-                    ->whereRaw(" (conversation_deleted_at IS NULL OR conversation_deleted_at < {$conversationsTableName}.updated_at) ");
+                $query->whereParticipantable($user)
+                      ->whereRaw(" (conversation_deleted_at IS NULL OR conversation_deleted_at < {$conversationsTableName}.updated_at) ");
             });
         }
     }
@@ -382,8 +381,8 @@ class Conversation extends Model
     }
 
     /**
-     * Get receiver Participant for Private Conversation
-     * will return null for Self Conversation
+     * Get Auth Participant for Private Conversation
+     * will return Auth for Self Conversation
      */
     public function authParticipant(): HasOne
     {

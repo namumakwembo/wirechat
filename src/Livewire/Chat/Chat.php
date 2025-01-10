@@ -731,7 +731,7 @@ class Chat extends Component
 
             $this->authParticipant = $participants->whereParticipantable(auth()->user())->first();
 
-            $this->receiverParticipant = $this->conversation->receiver;
+            $this->receiverParticipant = $this->conversation->receiverParticipant;
 
             //If conversation is self then receiver is auth;
             if ($this->conversation->type == ConversationType::SELF) {

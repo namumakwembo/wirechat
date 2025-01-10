@@ -369,7 +369,7 @@ class Conversation extends Model
      * Get receiver Participant for Private Conversation
      * will return null for Self Conversation
      */
-    public function receiver(): HasOne
+    public function receiverParticipant(): HasOne
     {
         $user = auth()->user();
 
@@ -378,6 +378,22 @@ class Conversation extends Model
             ->where('role', ParticipantRole::OWNER)
             ->whereHas('conversation', function ($query) {
                 $query->whereIn('type', [ConversationType::PRIVATE]);
+            });
+    }
+
+    /**
+     * Get receiver Participant for Private Conversation
+     * will return null for Self Conversation
+     */
+    public function authParticipant(): HasOne
+    {
+        $user = auth()->user();
+
+        return $this->hasOne(Participant::class)
+            ->whereParticipantable($user)
+            ->where('role', ParticipantRole::OWNER)
+            ->whereHas('conversation', function ($query) {
+                $query->whereIn('type', [ConversationType::PRIVATE,ConversationType::SELF]);
             });
     }
 

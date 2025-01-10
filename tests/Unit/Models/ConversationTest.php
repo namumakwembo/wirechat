@@ -842,7 +842,7 @@ describe('recieverParticipant()', function () {
         $this->actingAs($auth);
 
          //get receiver 
-         $receiver= $conversation->receiver;
+         $receiver= $conversation->receiverParticipant;
 
 
       //   dd($receiver->participantable,$otherUser);
@@ -867,7 +867,7 @@ describe('recieverParticipant()', function () {
         $this->actingAs($auth);
 
          //get receiver 
-         $receiver= $conversation->receiver;
+         $receiver= $conversation->receiverParticipant;
 
 
       //   dd($receiver->participantable,$otherUser);
@@ -892,10 +892,76 @@ describe('recieverParticipant()', function () {
         $this->actingAs($auth);
 
          //get receiver 
-         $receiver= $conversation->receiver;
+         $receiver= $conversation->receiverParticipant;
 
 
         expect($receiver)->toBe(null);
+
+
+    });
+
+});
+
+describe('authParticipant()', function () {
+
+    it('it gets correct authParticipant in a private conversation ', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($otherUser);
+
+        //log in as $auth
+        $this->actingAs($auth);
+
+         //get receiver 
+         $authParticipant= $conversation->authParticipant;
+
+        expect($authParticipant->participantable->id)->toBe($auth->id);
+        expect($authParticipant->participantable->getMorphClass())->toBe($auth->getMorphClass());
+        expect($authParticipant->participantable->name)->toBe($auth->name);
+
+
+    });
+
+    it('it gets correct receiverParticipant in a private conversation of Mixed Participant Models  ', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = Admin::factory()->create();
+
+        $conversation = $auth->createConversationWith($otherUser);
+
+        //log in as $auth
+        $this->actingAs($auth);
+
+         //get receiver 
+         $authParticipant= $conversation->authParticipant;
+
+        expect($authParticipant->participantable->id)->toBe($auth->id);
+        expect($authParticipant->participantable->getMorphClass())->toBe($auth->getMorphClass());
+        expect($authParticipant->participantable->name)->toBe($auth->name);
+
+
+    });
+
+    it('it gets correct authParticipant in a Self conversation', function () {
+
+        $auth = User::factory()->create();
+
+
+
+        $conversation = $auth->createConversationWith($auth);
+
+        //log in as $auth
+        $this->actingAs($auth);
+
+
+         $authParticipant= $conversation->authParticipant;
+
+        expect($authParticipant->participantable->id)->toBe($auth->id);
+        expect($authParticipant->participantable->getMorphClass())->toBe($auth->getMorphClass());
+        expect($authParticipant->participantable->name)->toBe($auth->name);
+
 
 
     });

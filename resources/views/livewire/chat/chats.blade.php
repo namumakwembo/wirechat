@@ -108,7 +108,7 @@
                     @php
                         //$receiver =$conversation->getReceiver();
                         $group = $conversation->isGroup() ? $conversation->group : null;
-                        $receiver = $conversation->isGroup() ? null :($conversation->isPrivate()?$conversation->receiver?->participantable:auth()->user()) ;
+                        $receiver = $conversation->isGroup() ? null :($conversation->isPrivate()?$conversation->receiverParticipant?->participantable:auth()->user()) ;
                         $lastMessage = $conversation->lastMessage;
                         //mark isReadByAuth true if user has chat opened
                         $isReadByAuth = $conversation?->readBy(auth()?->user()) || $selectedConversationId ==$conversation->id;

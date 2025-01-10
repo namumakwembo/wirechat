@@ -244,11 +244,17 @@ class Participant extends Model
     /**
      * Exclude participant passed as parameter
      */
-    public function  scopeWithoutParticipantable(Builder $query, Model $user): Builder
+    public function  scopeWithoutParticipantable( $query, Model $user): Builder
     {
-        return   $query->where(function ($query) use ($user) {
-            $query->where('participantable_id', '<>', $user->id)
-                ->orWhere('participantable_type', '<>', $user->getMorphClass());
+
+     return   $query->where(function ($query) use ($user) {
+                 $query->where('participantable_id', '<>', $user->id)
+                      ->orWhere('participantable_type', '<>', $user->getMorphClass());
         });
+
+    //  return $query->where(function ($query) use ($user) {
+    //      $query->whereNot('participantable_id', $user->id)
+    //            ->orWhereNot('participantable_type', $user->getMorphClass());
+    //  });
     }
 }

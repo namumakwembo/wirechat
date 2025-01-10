@@ -27,7 +27,7 @@ test('aborts if user doest not belog to conversation', function () {
 });
 
 test('authenticaed user can access info ', function () {
-    $auth = User::factory()->create(['id' => '345678']);
+    $auth = User::factory()->create();
 
     $conversation = Conversation::factory()->withParticipants([$auth])->create();
 

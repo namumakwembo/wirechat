@@ -104,10 +104,11 @@
             <ul wire:loading.delay.long.remove wire:target="search" class="p-2 grid w-full spacey-y-2">
 
                 @foreach ($conversations as $conversation)
+                
                     @php
                         //$receiver =$conversation->getReceiver();
                         $group = $conversation->isGroup() ? $conversation->group : null;
-                        $receiver = $conversation->isGroup() ? null : $conversation->receiver?->participantable;
+                        $receiver = $conversation->isGroup() ? null :($conversation->isPrivate()?$conversation->receiver?->participantable:auth()->user()) ;
                         $lastMessage = $conversation->lastMessage;
                         //mark isReadByAuth true if user has chat opened
                         $isReadByAuth = $conversation?->readBy(auth()?->user()) || $selectedConversationId ==$conversation->id;

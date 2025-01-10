@@ -7,6 +7,7 @@ use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\group;
 use Namu\WireChat\Models\Message;
+use Symfony\Component\Console\Output\NullOutput;
 use Workbench\App\Models\Admin;
 use Workbench\App\Models\User;
 
@@ -526,7 +527,7 @@ describe('deleteFor()', function () {
         $auth->refresh();
         expect(count($auth->conversations()->get()))->toBe(1);
     });
-})->only();
+});
 
 describe('ClearFor()', function () {
 
@@ -824,4 +825,155 @@ describe('deleting permanently()', function () {
 
         expect(Message::withoutGlobalScopes()->count())->toBe(0);
     });
+});
+
+
+describe('recieverParticipant()', function () {
+
+    it('it gets correct receiverParticipant in a private conversation ', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+
+        $conversation = $auth->createConversationWith($otherUser);
+
+        //log in as $auth
+        $this->actingAs($auth);
+
+         //get receiver 
+         $receiver= $conversation->receiver;
+
+
+      //   dd($receiver->participantable,$otherUser);
+
+
+        expect($receiver->participantable->id)->toBe($otherUser->id);
+        expect($receiver->participantable->getMorphClass())->toBe($otherUser->getMorphClass());
+        expect($receiver->participantable->name)->toBe($otherUser->name);
+
+
+    });
+
+    it('it gets correct receiverParticipant in a private conversation of Mixed Participant Models  ', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = Admin::factory()->create();
+
+
+        $conversation = $auth->createConversationWith($otherUser);
+
+        //log in as $auth
+        $this->actingAs($auth);
+
+         //get receiver 
+         $receiver= $conversation->receiver;
+
+
+      //   dd($receiver->participantable,$otherUser);
+
+
+        expect($receiver->participantable->id)->toBe($otherUser->id);
+        expect($receiver->participantable->getMorphClass())->toBe($otherUser->getMorphClass());
+        expect($receiver->participantable->name)->toBe($otherUser->name);
+
+
+    });
+
+    it('returns NULL for self conversation ', function () {
+
+        $auth = User::factory()->create();
+
+
+
+        $conversation = $auth->createConversationWith($auth);
+
+        //log in as $auth
+        $this->actingAs($auth);
+
+         //get receiver 
+         $receiver= $conversation->receiver;
+
+
+        expect($receiver)->toBe(null);
+
+
+    });
+
+});
+
+describe('getReciever()', function () {
+
+    it('it gets correct receiverParticipant in a private conversation ', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+
+        $conversation = $auth->createConversationWith($otherUser);
+
+        //log in as $auth
+        $this->actingAs($auth);
+
+         //get receiver 
+         $receiver= $conversation->getReceiver();
+
+
+      //   dd($receiver->participantable,$otherUser);
+
+        expect($receiver->id)->toBe($otherUser->id);
+        expect($receiver->getMorphClass())->toBe($otherUser->getMorphClass());
+        expect($receiver->name)->toBe($otherUser->name);
+
+
+    });
+
+
+    it('it gets correct receiverParticipant in a private conversation of Mixed Participant Models ', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = Admin::factory()->create();
+
+
+        $conversation = $auth->createConversationWith($otherUser);
+
+        //log in as $auth
+        $this->actingAs($auth);
+
+         //get receiver 
+         $receiver= $conversation->getReceiver();
+
+
+      //   dd($receiver->participantable,$otherUser);
+
+        expect($receiver->id)->toBe($otherUser->id);
+        expect($receiver->getMorphClass())->toBe($otherUser->getMorphClass());
+        expect($receiver->name)->toBe($otherUser->name);
+
+
+    });
+
+    it('it gets correct receiverParticipant in a Self conversation', function () {
+        $auth = User::factory()->create();
+
+
+        $conversation = $auth->createConversationWith($auth);
+
+        //log in as $auth
+        $this->actingAs($auth);
+
+         //get receiver 
+         $receiver= $conversation->getReceiver();
+
+
+      //   dd($receiver,$otherUser);
+
+        expect($receiver->id)->toBe($auth->id);
+        expect($receiver->getMorphClass())->toBe($auth->getMorphClass());
+        expect($receiver->name)->toBe($auth->name);
+
+
+
+    });
+
 });

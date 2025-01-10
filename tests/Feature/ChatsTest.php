@@ -220,11 +220,46 @@ describe('List', function () {
         $auth->createConversationWith($user2, 'new message');
 
         Livewire::actingAs($auth)->test(Chatlist::class)
-            ->assertSee('iam user 1')
-            ->assertSee('iam user 2')
             ->assertViewHas('conversations', function ($conversations) {
                 return count($conversations) == 2;
             });
+    });
+
+    it("shows chats names when conversations are loaded to Chats component ", function () {
+
+        $auth = User::factory()->create();
+
+        $user1 = User::factory()->create(['name' => 'iam user 1']);
+        $user2 = User::factory()->create(['name' => 'iam user 2']);
+
+        //create conversation with user1
+        $auth->createConversationWith($user1, 'hello');
+
+        //create conversation with user2
+        $auth->createConversationWith($user2, 'new message');
+
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertSee('iam user 1')
+            ->assertSee('iam user 2');
+    });
+
+
+    it("shows chats names when conversations of Mixed Participant Models are loaded to Chats component ", function () {
+
+        $auth = User::factory()->create();
+
+        $user1 = User::factory()->create(['name' => 'iam user 1']);
+        $user2 = Admin::factory()->create(['name' => 'iam Admin']);
+
+        //create conversation with user1
+        $auth->createConversationWith($user1, 'hello');
+
+        //create conversation with user2
+        $auth->createConversationWith($user2, 'new message');
+
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertSee('iam user 1')
+            ->assertSee('iam Admin');
     });
 
     it('shows suffix (sender name ) if conversation is group and message does not belong to auth', function () {
@@ -263,7 +298,7 @@ describe('List', function () {
             ->assertSee('My Group');
     });
 
-    it('shows suffix (You) if user has a self conversation', function () {
+    it('shows suffix Name (You) if user has a self conversation', function () {
 
         $auth = User::factory()->create(['name' => 'Test']);
 
@@ -271,6 +306,7 @@ describe('List', function () {
         $auth->createConversationWith($auth, 'hello');
 
         Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertSee('Test')
             ->assertSee('(You)')
             ->assertViewHas('conversations', function ($conversations) {
                 return count($conversations) == 1;

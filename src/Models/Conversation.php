@@ -365,49 +365,52 @@ class Conversation extends Model
         }
     }
 
+    /**
+     * Get receiver Participant for Private Conversation
+     * will return null for Self Conversation
+     */
     public function receiver(): HasOne
     {
+        $user = auth()->user();
+
         return $this->hasOne(Participant::class)
-            ->where('participantable_id', '!=', auth()->id())
-            ->where('role', 'owner')->whereHas('conversation', function ($query) {
-                $query->whereIn('type', [ConversationType::PRIVATE, ConversationType::SELF]);
+            ->withoutParticipantable($user)
+            ->where('role', ParticipantRole::OWNER)
+            ->whereHas('conversation', function ($query) {
+                $query->whereIn('type', [ConversationType::PRIVATE]);
             });
     }
 
+
     /**
      * Get the receiver of the private conversation
-     *
+     * @param null
      * */
     public function getReceiver()
     {
-
-        // Check if the conversation is private
-        //  dd($this->type);
-        if (! in_array($this->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
+        // Check if the conversation is private or self
+        if (!in_array($this->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
             return null;
         }
 
-        // Ensure participants are already loaded (use the loaded relationship, not fresh queries)
-        $participants = $this->participants->where('conversation_id', $this->id);
+        // If it's a self conversation, return the authenticated user
+        if ($this->isSelf()) {
+            return auth()->user();
+        }
 
-        $receiverParticipant = $participants->where('participantable_id', '!=', auth()->id())
-            ->where('participantable_type', auth()->user()->getMorphClass())
-            ->first();
+        // Get participants for the current conversation
+        $participants = $this->participants()->where('conversation_id', $this->id);
 
+        // Try to find the receiver excluding the authenticated user
+        $receiverParticipant = $participants->withoutParticipantable(auth()->user())->first();
         if ($receiverParticipant) {
-            // Return the associated model via the participant's relationship
-
-            //  dd('reacch',$receiverParticipant->participantable);
             return $receiverParticipant->participantable;
         }
 
-        // Check the number of times the user appears as participant (fallback case)
-        $authReceiver = $participants->where('participantable_id', auth()->id())
-            ->where('participantable_type', auth()->user()->getMorphClass())
-            ->first();
-
-        return $authReceiver?->participantable;
+        // If no other participant is found, return the authenticated user as the receiver
+        return auth()->user();
     }
+
 
     /**
      * Mark the conversation as read for the current authenticated user.
@@ -497,7 +500,7 @@ class Conversation extends Model
             $query->where('created_at', '>', $lastReadAt);
         })->get();
 
-        
+
 
 
         //  $messages= $query->whereDoesntBelongTo( 'sendable',function ($query) use ($user) {
@@ -605,7 +608,7 @@ class Conversation extends Model
 
         //Then force delete it
         if ($this->isSelfConversation($user)) {
-           return $this->forceDelete();
+            return $this->forceDelete();
         }
 
         // Check if the conversation is private or self
@@ -616,8 +619,8 @@ class Conversation extends Model
 
             // Get Participants
             //!use make sure to get new query() otherwise participants wont be retrieved correctly
-            $participant=  $this->participants()->get();
-            
+            $participant =  $this->participants()->get();
+
             //Iterate over participants to find out if both have deleted
             foreach ($participant as $key => $participant) {
                 $deletedByBothParticipants = $deletedByBothParticipants && $participant->hasDeletedConversation();
@@ -627,7 +630,6 @@ class Conversation extends Model
             if ($deletedByBothParticipants) {
                 $this->forceDelete();
             }
-
         }
     }
 
@@ -638,7 +640,7 @@ class Conversation extends Model
     {
         $participant = $this->participant($user);
 
-        return $participant->hasDeletedConversation(checkDeletionExpired:true);
+        return $participant->hasDeletedConversation(checkDeletionExpired: true);
     }
 
     public function clearFor(Model $user)

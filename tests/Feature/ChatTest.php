@@ -23,6 +23,7 @@ use Namu\WireChat\Livewire\Chat\Chats as Chatlist;
 use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message;
+use Workbench\App\Models\Admin;
 use Workbench\App\Models\User;
 
 ///Auth checks
@@ -284,6 +285,20 @@ describe('Box presence test: ', function () {
     test('it shows receiver name when conversation is loaded in chatbox', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create(['name' => 'John']);
+
+        $conversation = Conversation::factory()
+            ->withParticipants([$auth, $receiver])
+            ->create();
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertSee('John');
+    });
+
+
+
+    test('it still shows receiver name  when Conversation has Mixed Model Participants', function () {
+        $auth = User::factory()->create();
+        $receiver = Admin::factory()->create(['name' => 'John']);
 
         $conversation = Conversation::factory()
             ->withParticipants([$auth, $receiver])

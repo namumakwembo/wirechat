@@ -727,15 +727,11 @@ class Chat extends Component
     {
         if (in_array($this->conversation->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
             $this->conversation->load('participants');
-            $participants = $this->conversation->participants;
+            $participants = $this->conversation->participants();
 
-            $this->authParticipant = $participants
-                ->where('participantable_id', auth()->id())
-                ->first();
+            $this->authParticipant = $participants->whereParticipantable(auth()->user())->first();
 
-            $this->receiverParticipant = $participants
-                ->where('participantable_id', '!=', auth()->id())
-                ->first();
+            $this->receiverParticipant = $this->conversation->receiver;
 
             //If conversation is self then receiver is auth;
             if ($this->conversation->type == ConversationType::SELF) {

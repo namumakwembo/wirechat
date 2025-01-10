@@ -184,10 +184,8 @@ class Info extends ModalComponent
         abort_unless(auth()->user()->isOwnerOf($this->conversation), 403, 'Forbidden: You do not have permission to delete this group.');
 
         // Ensure all participants are removed before deleting the group
-        $participantCount = $this->conversation->participants
-            ->where('participantable_id', '!=', auth()->id())
-            ->where('participantable_type', auth()->user()->getMorphClass())
-            //->where('participantable_type','!=',get_class(auth()->user()))
+        $participantCount = $this->conversation->participants()
+            ->withoutParticipantable(auth()->user())
             ->where('type', '!=', ParticipantRole::OWNER)
             ->count();
 

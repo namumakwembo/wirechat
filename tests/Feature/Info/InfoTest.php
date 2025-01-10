@@ -8,6 +8,7 @@ use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Info\Info;
 use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Conversation;
+use Workbench\App\Models\Admin;
 use Workbench\App\Models\User;
 
 test('user must be authenticated', function () {
@@ -800,6 +801,9 @@ describe('Deleting Group', function () {
         expect(Conversation::withoutGlobalScopes()->count())->toBe(0);
     });
 
+ 
+
+
     test('it redirects to index route after deleting Group conversation', function () {
 
         $auth = User::factory()->create();
@@ -842,6 +846,23 @@ describe('Deleting Group', function () {
             ->assertStatus(403, 'Cannot delete group: Please remove all members before attempting to delete the group.');
     });
 
+
+    test('it aborts if group of Mixed Model members is not 0 excluding owner', function () {
+
+        $auth = Admin::factory()->create();
+
+        $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
+
+        //add members
+        $conversation->addParticipant(User::factory()->create());
+        $conversation->addParticipant(User::factory()->create());
+        $conversation->addParticipant(User::factory()->create());
+
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
+            ->call('deleteGroup')
+            ->assertStatus(403, 'Cannot delete group: Please remove all members before attempting to delete the group.');
+    });
+
     test('group can be deleted after removing all members or when if they all remove themselves', function () {
 
         $auth = User::factory()->create();
@@ -850,6 +871,24 @@ describe('Deleting Group', function () {
 
         //add members
         $conversation->addParticipant(User::factory()->create())->exitConversation();
+        $conversation->addParticipant(User::factory()->create())->exitConversation();
+        $conversation->addParticipant(User::factory()->create())->removeByAdmin($auth);
+
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
+            ->call('deleteGroup')
+            ->assertStatus(200);
+
+        expect(Conversation::withoutGlobalScopes()->count())->toBe(0);
+    });
+
+    test('group can be deleted after removing all members of Mixed Models or when if they all remove themselves', function () {
+
+        $auth = Admin::factory()->create();
+
+        $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
+
+        //add members
+        $conversation->addParticipant(Admin::factory()->create())->exitConversation();
         $conversation->addParticipant(User::factory()->create())->exitConversation();
         $conversation->addParticipant(User::factory()->create())->removeByAdmin($auth);
 
@@ -913,3 +952,4 @@ describe('Exiting Chat', function () {
     });
 
 });
+ 

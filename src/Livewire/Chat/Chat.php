@@ -263,7 +263,7 @@ class Chat extends Component
         $auth = auth()->user();
 
         //make sure owner if group cannot be removed from chat
-        abort_if($auth->isOwnerOf($this->conversation), 403, 'Owner cannot exit conversation');
+        abort_if($auth->isOwnerOf($this->conversation), 403, __('Owner cannot exit conversation'));
 
         //delete conversation
         $auth->exitConversation($this->conversation);
@@ -278,7 +278,7 @@ class Chat extends Component
 
         if (RateLimiter::tooManyAttempts('send-message:'.auth()->id(), $perMinute)) {
 
-            return abort(429, 'Too many attempts!, Please slow down');
+            return abort(429, __('Too many attempts!, Please slow down'));
         }
 
         RateLimiter::increment('send-message:'.auth()->id());
@@ -514,9 +514,9 @@ class Chat extends Component
         $messageDate = $message->created_at;
         $groupKey = '';
         if ($messageDate->isToday()) {
-            $groupKey = 'Today';
+            $groupKey = __('Today');
         } elseif ($messageDate->isYesterday()) {
-            $groupKey = 'Yesterday';
+            $groupKey = __('Yesterday');
         } elseif ($messageDate->greaterThanOrEqualTo(now()->subDays(7))) {
             $groupKey = $messageDate->format('l'); // Day name
         } else {

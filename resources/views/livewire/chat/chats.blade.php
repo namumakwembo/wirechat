@@ -148,7 +148,7 @@
                                     </h6>
 
                                     @if ($conversation->isSelfConversation())
-                                        <span class="font-medium dark:text-white">(You)</span>
+                                        <span class="font-medium dark:text-white">(@lang('You'))</span>
                                     @endif
 
                                 </div>
@@ -160,7 +160,7 @@
                                         {{-- Only show if AUTH is onwer of message --}}
                                         @if ($belongsToAuth)
                                             <span class="font-bold text-xs dark:text-white/90 dark:font-normal">
-                                                You:
+                                                @lang('You'):
                                             </span>
                                         @elseif(!$belongsToAuth && $group !== null)
                                             <span class="font-bold text-xs dark:text-white/80 dark:font-normal">
@@ -183,12 +183,12 @@
                                                 $lastMessage?->sendable_id == $authUser?->id &&
                                                 $lastMessage?->sendable_type == $authUser->getMorphClass(),
                                         ])>
-                                            {{ $lastMessage->body != '' ? $lastMessage->body : ($lastMessage->hasAttachment() ? '📎 Attachment' : '') }}
+                                            {{ $lastMessage->body != '' ? $lastMessage->body : ($lastMessage->hasAttachment() ? __('📎 Attachment') : '') }}
                                         </p>
 
                                     <span class="font-medium px-1 text-xs shrink-0 text-gray-800 dark:text-gray-50">
                                         @if ($lastMessage->created_at->diffInMinutes(now()) < 1)
-                                            now
+                                            @lang('now')
                                         @else
                                             {{ $lastMessage->created_at->shortAbsoluteDiffForHumans() }}
                                         @endif
@@ -230,7 +230,7 @@
                     <button wire:loading.remove wire:target="loadMore" wire:loading.attr="disabled"
                         dusk="loadMoreButton" @click="$wire.loadMore()"
                         class="  text-sm dark:text-white disabled:hover:cursor-not-allowed hover:text-gray-700 transition-colors dark:hover:text-gray-500 dark:gray-200">
-                        Load more
+                        @lang('Load more')
                     </button>
 
                     <div wire:loading wire:target="loadMore">
@@ -240,7 +240,7 @@
             @endif
         @else
             <div class="w-full flex items-center h-full justify-center">
-                <h6 class=" font-bold text-gray-700 dark:text-white">No conversations yet</h6>
+                <h6 class=" font-bold text-gray-700 dark:text-white">@lang('No conversations yet')</h6>
             </div>
 
         @endif

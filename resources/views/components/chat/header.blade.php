@@ -32,7 +32,7 @@
                         class="h-8 w-8 lg:w-10 lg:h-10 " />
                     <h6 class="font-bold text-base text-gray-800 dark:text-white w-full truncate">
                         {{ $group ? $group?->name : $receiver?->display_name }} @if ($conversation->isSelfConversation())
-                            (You)
+                            (@lang('You'))
                         @endif
                     </h6>
                 </div>
@@ -72,26 +72,26 @@
 
 
                         <x-wirechat::dropdown-link href='{{ route(WireChat::indexRouteName()) }}'>
-                            Close Chat
+                            @lang('Close Chat')
                         </x-wirechat::dropdown-link>
 
 
                     {{-- Only show delete and clear if conversation is NOT group --}}
                     @if (!$conversation->isGroup())
                     <button class="w-full" wire:click="clearConversation"
-                        wire:confirm="Are you sure you want to clear this Chat History ?">
+                        wire:confirm="{{ __('Are you sure you want to clear this Chat History?') }}">
 
                         <x-wirechat::dropdown-link >
-                            Clear Chat History
+                            @lang('Clear Chat History')
                         </x-wirechat::dropdown-link>
                     </button>
 
                     <button wire:click="deleteConversation"
-                        wire:confirm="Are you sure delete {{ $conversation->isGroup() ? 'Group' : 'Chat' }}"
+                        wire:confirm="{{ __('Are you sure delete '. $conversation->isGroup() ? 'Group' : 'Chat') }}"
                         class="w-full text-start">
 
                         <x-wirechat::dropdown-link class="text-red-500 dark:text-red-500">
-                            Delete Chat
+                            @lang('Delete Chat')
                         </x-wirechat::dropdown-link>
 
                     </button>
@@ -99,11 +99,11 @@
 
 
                     @if ($conversation->isGroup() && !auth()->user()->isOwnerOf($conversation))
-                            <button wire:click="exitConversation" wire:confirm="Are you sure want to exit Group?"
+                            <button wire:click="exitConversation" wire:confirm="{{ __('Are you sure want to exit Group?') }}"
                                 class="w-full text-start ">
 
                                 <x-wirechat::dropdown-link class="text-red-500 dark:text-gray-500">
-                                    Exit Group
+                                    @lang('Exit Group')
                                 </x-wirechat::dropdown-link>
 
                             </button>

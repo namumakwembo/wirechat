@@ -14,7 +14,7 @@
     <style>
         :root {
             --primary-color: {{ $primaryColor }};
-            --wirechat-primary-color: {{ $primaryColor }}
+            --wirechat-primary-color: {{ $primaryColor }};
         }
 
 
@@ -186,7 +186,7 @@
                 <div
                     class="bg-gray-50 w-full text-center text-gray-600 dark:text-gray-200 justify-center text-sm flex py-4 dark:bg-gray-800">
 
-                    Only admins can send messages
+                    @lang('Only admins can send messages')
 
                 </div>
             @else

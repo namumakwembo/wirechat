@@ -149,7 +149,6 @@
                     },
                     init() {
 
-    
                         /*! Changed the event to closeChatWidget in order to not interfere with the main modal */
                         this.listeners.push(Livewire.on('closeChatWidget', (data) => { this.closeWidget(data?.force ?? false, data?.skipPreviousModals ?? 0, data ?.destroySkipped ?? false); }));
 
@@ -193,7 +192,7 @@
                 x-transition:leave="ease-in duration-100 " x-transition:leave-start="opacity-100 translate-x-0"
                 x-transition:leave-end="opacity-0 -translate-x-full"
                 class="fixed inset-0" id="chatwidget-container"
-                x-trap.noscroll.inert="show && showActiveComponent" aria-modal="true">
+                aria-modal="true">
                 @forelse($widgetComponents as $id => $component)
                     <div  x-show.immediate="activeWidgetComponent == '{{ $id }}'" x-ref="{{ $id }}"
                          wire:key="key-{{$id }}" class="h-full">

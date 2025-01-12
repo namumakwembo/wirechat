@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
@@ -206,39 +207,38 @@ class Participant extends Model
         $this->save();
     }
 
-    /**
-     * Determine if the user has deleted this conversation and if the deletion is still "valid."
-     *
-     * This function checks the `conversation_deleted_at` timestamp to see if the conversation
-     * was deleted by the user. Optionally, it can check if this deletion has "expired" by
-     * comparing it to the last `updated_at` timestamp of the conversation.
-     *
-     * - If `$checkDeletionExpired` is true, this method checks if the deletion has expired. A deletion is expired
-     *   if the conversation was updated after the user deleted it, meaning new messages or changes were made.
-     * - If `$checkDeletionExpired` is false, the method only checks if the conversation is deleted,
-     *   without considering updates.
-     *
-     * @param  bool  $checkDeletionExpired  Whether to check if the deletion is expired.
-     * @return bool True if the conversation is deleted (and expired if `$checkDeletionExpired` is true), false otherwise.
-     */
-    public function hasDeletedConversation(bool $checkDeletionExpired = false): bool
-    {
-        // Check if `conversation_deleted_at` is null, which means no deletion
-        if ($this->conversation_deleted_at === null) {
-            return false;
-        }
-
-        // Refresh conversation instance to ensure `updated_at` is current
-        $conversation = $this->conversation;
-
-        if ($checkDeletionExpired) {
-            // If checking expiration, return true only if deletion timestamp is older than updated timestamp
-            return $this->conversation_deleted_at < $conversation->updated_at;
-        }
-
-        // Otherwise, return true if deletion is recent compared to updated timestamp
-        return true;
+  /**
+ * Check if the user has deleted the conversation and if the deletion is still valid.
+ *
+ * This method checks if the user has marked the conversation as deleted by looking at the `conversation_deleted_at` timestamp.
+ * Optionally, it can check if the deletion is still valid by comparing the deletion time with the last update time of the conversation.
+ *
+ * - If `$checkDeletionExpired` is true, the method checks if the deletion is still valid. A deletion is considered expired
+ *   if the conversation has been updated after the user deleted it (e.g., new messages).
+ * - If `$checkDeletionExpired` is false, it only checks if the conversation has been deleted, regardless of updates.
+ *
+ * @param  bool  $checkDeletionExpired  Whether to check if the deletion is still valid.
+ * @return bool True if the conversation is deleted (and valid if `$checkDeletionExpired` is true), false otherwise.
+ */
+public function hasDeletedConversation(bool $checkDeletionExpired = false): bool
+{
+    // If no deletion timestamp is set, the conversation isn't deleted
+    if ($this->conversation_deleted_at === null) {
+        return false;
     }
+
+    // Get the latest updated_at timestamp for the conversation
+    $conversation = $this->conversation;
+
+     //Expited conversation means hasDeletedConversation should return FALSE
+    if ($checkDeletionExpired) {
+        // Check if the deletion timestamp is older than the last update timestamp (i.e., check if deletion is expired)
+        return   $conversation->updated_at > $this->conversation_deleted_at?false:true;
+    }
+
+    // If not checking expiration, simply return true if the conversation is marked as deleted
+    return true;
+}
 
 
     /**

@@ -29,10 +29,20 @@ class Chats extends Component
 
         return [
             'refresh' => '$refresh',
+            'hardRefresh' ,
             'echo-private:participant.'.$userId.',.Namu\\WireChat\\Events\\NotifyParticipant' => 'refreshComponent',
         ];
     }
 
+    
+   /**
+    *  Used to force hat list to reset all data as if it was newly opened
+    */
+   public  function hardRefresh()  {
+        $this->conversations = [];
+        $this->reset(['page', 'canLoadMore']);
+        
+    }
     public function refreshComponent($event)
     {
 

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Enums\ParticipantRole;
@@ -626,6 +627,7 @@ class Conversation extends Model
             return $this->forceDelete();
         }
 
+
         // Check if the conversation is private or self
         if ($this->isPrivate()) {
 
@@ -634,17 +636,19 @@ class Conversation extends Model
 
             // Get Participants
             //!use make sure to get new query() otherwise participants wont be retrieved correctly
-            $participant =  $this->participants()->get();
+            $participants =  $this->participants()->get();
 
-            //Iterate over participants to find out if both have deleted
-            foreach ($participant as $key => $participant) {
-                $deletedByBothParticipants = $deletedByBothParticipants && $participant->hasDeletedConversation();
-            }
 
-            //If true then delete conversation permanently 
-            if ($deletedByBothParticipants) {
-                $this->forceDelete();
-            }
+           
+        // Check if all participants have deleted the conversation
+        $deletedByBothParticipants = $participants->every(function ($participant) use($deletedByBothParticipants){
+            return   $participant->hasDeletedConversation(true)==true;
+        });
+
+        // If all participants have deleted the conversation, force delete it
+        if ($deletedByBothParticipants) {
+            $this->forceDelete();
+        }
         }
     }
 

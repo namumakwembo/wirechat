@@ -242,6 +242,10 @@ class Chat extends Component
 
         //Dispatach event instead if isWidget
         if ($this->isWidget()) {
+            //refresh chats list
+            $this->dispatch('hardRefresh')->to(Chats::class);
+
+             //Notify listener to close chat
             $this->dispatch('close-chat');
         } else {
             //redirect to chats page
@@ -262,6 +266,10 @@ class Chat extends Component
 
         //Dispatach event instead if isWidget
         if ($this->isWidget()) {
+            //refresh chats list
+            $this->dispatch('refresh')->to(Chats::class);
+
+            //Notify listener to close chat
             $this->dispatch('close-chat');
         } else {
             //redirect to chats page
@@ -747,15 +755,17 @@ class Chat extends Component
         }
     }
 
-    private function finalizeConversationState()
+    public function finalizeConversationState()
     {
 
         $this->conversation->markAsRead();
 
         if ($this->authParticipant) {
+            
             $this->authParticipant->update(['last_active_at' => now()]);
 
-            if ($this->authParticipant->hasDeletedConversation(true)) {
+            //If has deletd Conversation and Deletion has expired
+            if ($this->authParticipant->hasDeletedConversation(true)==false) {
                 $this->authParticipant->update(['conversation_deleted_at' => null]);
             }
         }

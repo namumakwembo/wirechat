@@ -450,78 +450,121 @@ describe('deleteFor()', function () {
         expect($auth->conversations()->count())->toBe(1);
     });
 
-    it('permanetenly deletes the conversation if both Participants of Same Model in a private conversation has deleted conversation(All messages)', function () {
+    it('permanetenly deletes the conversation if both Participants of Same Model in a private conversation has deleted conversation WITHOUT any new messages', function () {
 
        
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
+
+        Carbon::setTestNow(now()->subSeconds(20));
+
+        //Send to receiver
+        $conversation = $auth->sendMessageTo($receiver, 'hello-4')->conversation;
+
+        Carbon::setTestNow(now()->addSeconds(20));
+        $auth->sendMessageTo($receiver, 'hello75');
+        $receiver->sendMessageTo($auth, 'hello-5');
+
+        //Reset time
+        Carbon::setTestNow();
+
+        //Authenticate and delete 1
+        $this->actingAs($auth);
+        $conversation->deleteFor($auth);
+
+
+        Carbon::setTestNow();
+        //Authenticate and delete 2
+        $this->actingAs($receiver);
+        $conversation->deleteFor($receiver);
+
+        $this->assertDatabaseMissing((new Conversation())->getTable(), ['id'=>$conversation->id]);
+    });
+
+    it('does not permanetenly delete the conversation even if both Participants of Same Model in a private conversation has deleted deleted BUT convefsation has new messages', function () {
+
+       
+        $auth = User::factory()->create();
+        $receiver = User::factory()->create();
+
+        Carbon::setTestNowAndTimezone(now()->subSeconds(20));
+
+        //Send to receiver
+        $conversation = $auth->sendMessageTo($receiver, 'hello-4')->conversation;
+
+
+        Carbon::setTestNow(now()->addSeconds(5));
+
+
+
+        //Auth Delete
+        $conversation->deleteFor($auth);
+
+
+        Carbon::setTestNow(now()->addSeconds(5));
+
+
+        $auth->sendMessageTo($receiver, 'hello75'); //Send new message
+
+        Carbon::setTestNow();
+ 
+        //Recevier Delete
+        $conversation->deleteFor($receiver);
+
+
+        $this->assertDatabaseHas((new Conversation())->getTable(), ['id'=>$conversation->id]);
+    });
+
+    it('permanetenly deletes the conversation if both participants of Different Models ie(Admin/User) delete it CONSEQUTIVELY without any anew messages ', function () {
+
+        $auth = User::factory()->create();
+        $admin = Admin::factory()->create();
+
+
+        //Travel back 
+        Carbon::setTestNow(now()->subSeconds(20));
+
+        $conversation = $auth->createConversationWith($admin, 'hello-4');
+
+        Carbon::setTestNow(now()->addSeconds(5));
+        $conversation->deleteFor($auth);
+
+
+
+        //Reset Time
+        Carbon::setTestNow();
+
+        //Authenticate and delete 2
+        $conversation->deleteFor($admin);
+
+        $this->assertDatabaseMissing((new Conversation())->getTable(), ['id'=>$conversation->id]);
+    });
+
+    it('does not permanetenly delete the conversation even if both Participants of Mixed Model in a private conversation has deleted deleted BUT convefsation has new messages', function () {
+
+       
+        $auth = User::factory()->create();
+        $receiver = Admin::factory()->create();
+
+        Carbon::setTestNow(now()->subSeconds(20));
 
         //Send to receiver
         $conversation = $auth->sendMessageTo($receiver, 'hello-4')->conversation;
 
         //Authenticate and delete 1
 
-        $this->actingAs($auth);
-        Carbon::setTestNow(now()->subSeconds(20));
-        $auth->sendMessageTo($receiver, 'hello75');
-
-        Carbon::setTestNow();
-
         $conversation->deleteFor($auth);
 
-        //Reset
-        Carbon::setTestNow();
+        Carbon::setTestNow(now()->addSeconds(10));
 
-
-        //Authenticate and delete 2
-        $this->actingAs($receiver);
-
-        Carbon::setTestNow(now()->subSeconds(28));
         $receiver->sendMessageTo($auth, 'hello-5');
 
         Carbon::setTestNow();
 
         $conversation->deleteFor($receiver);
 
-        $this->assertDatabaseMissing((new Conversation())->getTable(), ['id'=>$conversation->id]);
+        $this->assertDatabaseHas((new Conversation())->getTable(), ['id'=>$conversation->id]);
     });
-
-    it('permanetenly deletes the conversation if both participants of Different Models ie(Admin/User) delete it ', function () {
-
-        $auth = User::factory()->create();
-        $admin = Admin::factory()->create();
-
-        //Send to admin
-        $conversation = $auth->sendMessageTo($admin, 'hello-4')->conversation;
-
-        //Authenticate and delete 1
-
-        $this->actingAs($auth);
-        Carbon::setTestNow(now()->subSeconds(20));
-        $auth->sendMessageTo($admin, 'hello75');
-
-        //Reset Time
-        Carbon::setTestNow();
-
-        $conversation->deleteFor($auth);
-
-        //Reset Time
-        Carbon::setTestNow();
-
-
-        //Authenticate and delete 2
-        $this->actingAs($admin);
-
-        Carbon::setTestNow(now()->subSeconds(28));
-        $admin->sendMessageTo($auth, 'hello-5');
-
-        Carbon::setTestNow();
-
-        $conversation->deleteFor($admin);
-
-        $this->assertDatabaseMissing((new Conversation())->getTable(), ['id'=>$conversation->id]);
-    });
-
 
     it('completely deletes the conversation if conversation is self conversation with initiator(User)', function () {
 

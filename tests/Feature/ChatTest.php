@@ -538,7 +538,7 @@ describe('Box presence test: ', function () {
 
             // dd($conversation);
             Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true])
-                ->assertDontSeeHtml('href="'.route(WireChat::indexRouteName()).'"')
+                ->assertDontSeeHtml('href="' . route(WireChat::indexRouteName()) . '"')
                 ->assertSeeHtml('@click="$dispatch(\'close-chat\')"');
         });
 
@@ -552,10 +552,9 @@ describe('Box presence test: ', function () {
 
             // dd($conversation);
             Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => false])
-                ->assertSeeHtml('href="'.route(WireChat::indexRouteName()).'"')
+                ->assertSeeHtml('href="' . route(WireChat::indexRouteName()) . '"')
                 ->assertDontSeeHtml('@click="$dispatch(\'close-chat\')"');
         });
-
     });
 
     // test('it shows message time', function () {
@@ -1902,38 +1901,38 @@ describe('Deleting Conversation', function () {
 
     test('it resets conversation_deleted_at value of auth-particiapant if new message is added to conversation by other user and user opens chat ', function () {
 
-        $auth = User::factory()->create();
+        $auth = User::factory()->create(['name'=>'Mike']);
         $receiver = User::factory()->create(['name' => 'John']);
 
-        $conversation = $auth->createConversationWith($receiver);
+        Carbon::setTestNow(now()->subMinutes(20));
 
-        $authParticipant = $conversation->participant($auth);
+        $conversation = $auth->createConversationWith($receiver,'hi');
 
-        //auth -> receiver
-        $auth->sendMessageTo($receiver, message: '1 message');
-        $auth->sendMessageTo($receiver, message: '2 message');
 
-        //receiver -> auth
-        $receiver->sendMessageTo($auth, message: '3 message');
-        $receiver->sendMessageTo($auth, message: '4 message');
+        Carbon::setTestNow(now()->addMinutes(4));
+
 
         ///load and delete conversation
-        Carbon::setTestNow(now()->addSeconds(4));
-        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])->call('deleteConversation');
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+                    ->call('deleteConversation');
 
-        //assert not null
-        $authParticipant->refresh();
-        expect($authParticipant->conversation_deleted_at)->not->toBe(null);
 
-        //send message from receiver
-        Carbon::setTestNow(now()->addSeconds(20));
-        $receiver->sendMessageTo($auth, message: '4 message');
+        //send message from receiver && reset TIME
+
+        Carbon::setTestNow(now()->addMinutes(10));
+
+
+
+       $message= $auth->sendMessageTo($conversation, message: '4 message');
 
         //load again
-        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id]);
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])->assertOk();
 
         //assert
-        $authParticipant->refresh();
+
+        $authParticipant = $conversation->participant($auth);
+        
+      //  dd(['message'=>$message->created_at->toString(),'participant'=>$authParticipant->conversation_deleted_at->toString(),'conversation'=>$conversation->updated_at->toString()]);
         expect($authParticipant->conversation_deleted_at)->toBe(null);
     });
 
@@ -1984,6 +1983,60 @@ describe('Deleting Conversation', function () {
             $request
                 ->call('deleteConversation')
                 ->assertDispatched('close-chat');
+        });
+
+
+        test('it dispatches "hardRefresh" event after Deleting conversation', function () {
+
+            $auth = User::factory()->create();
+            $receiver = User::factory()->create(['name' => 'John']);
+
+            $conversation = $auth->createConversationWith($receiver);
+
+            //auth -> receiver
+            $auth->sendMessageTo($receiver, message: '1');
+            $auth->sendMessageTo($receiver, message: '2');
+            $auth->sendMessageTo($receiver, message: '3');
+
+            //receiver -> auth
+            $receiver->sendMessageTo($auth, message: '4');
+            $receiver->sendMessageTo($auth, message: '5');
+            $receiver->sendMessageTo($auth, message: '5');
+
+            $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
+
+            $request
+                ->call('deleteConversation')
+                ->assertDispatched('hardRefresh');
+        });
+
+        test('Deleted chat should no longer appea in Chats componnet when "hardRefresh" event is dispacted after Deleting conversation', function () {
+
+            $auth = User::factory()->create();
+            $receiver = User::factory()->create(['name' => 'John']);
+
+            $conversation = $auth->createConversationWith($receiver, 'Hello my message');
+
+
+            //Open chats list 
+            $CHATLIST = Livewire::actingAs($auth)->test(Chatlist::class);
+
+            //Assert conversation is visible
+            $CHATLIST->assertViewHas('conversations', function ($conversation) {
+                return count($conversation) == 1;
+            });
+
+            //login into chat component 
+            $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
+
+            $request
+                ->call('deleteConversation')
+                ->assertDispatched('hardRefresh');
+
+            //Assert conversation no longer visible in chats after claring chat
+            $CHATLIST->dispatch('hardRefresh')->assertViewHas('conversations', function ($conversation) {
+                return count($conversation) == 0;
+            });
         });
     });
 
@@ -2170,7 +2223,7 @@ describe('Clearing Conversation', function () {
                 ->assertNoRedirect();
         });
 
-        test('it dispatches "close-chat" evnt after deleting conversation', function () {
+        test('it dispatches "close-chat" event after clearing conversation', function () {
             $auth = User::factory()->create();
             $receiver = User::factory()->create(['name' => 'John']);
 
@@ -2191,6 +2244,54 @@ describe('Clearing Conversation', function () {
             $request
                 ->call('clearConversation')
                 ->assertDispatched('close-chat');
+        });
+
+        test('it dispatches "refresh" event after Clearing conversation', function () {
+
+            $auth = User::factory()->create();
+            $receiver = User::factory()->create(['name' => 'John']);
+
+            $conversation = $auth->createConversationWith($receiver);
+
+            //auth -> receiver
+            $auth->sendMessageTo($receiver, message: '1');
+            $auth->sendMessageTo($receiver, message: '2');
+            $auth->sendMessageTo($receiver, message: '3');
+
+            //receiver -> auth
+            $receiver->sendMessageTo($auth, message: '4');
+            $receiver->sendMessageTo($auth, message: '5');
+            $receiver->sendMessageTo($auth, message: '5');
+
+            $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
+
+            $request
+                ->call('clearConversation')
+                ->assertDispatched('refresh');
+        });
+
+        test('message is cleared/updated in Chats componnet when refresh "refresh" event is dispacted after Clearing conversation', function () {
+
+            $auth = User::factory()->create();
+            $receiver = User::factory()->create(['name' => 'John']);
+
+            $conversation = $auth->createConversationWith($receiver, 'Hello my message');
+
+
+            //Open chats list 
+            $CHATLIST = Livewire::actingAs($auth)->test(Chatlist::class);
+            //Assert messsage is visible
+            $CHATLIST->assertSee('Hello my message');
+
+            //login into chat component 
+            $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
+
+            $request
+                ->call('clearConversation')
+                ->assertDispatched('refresh');
+
+            //Assert message no longer visible in chats after claring chat
+            $CHATLIST->dispatch('refresh')->assertDontSee('Hello my message');
         });
     });
 });

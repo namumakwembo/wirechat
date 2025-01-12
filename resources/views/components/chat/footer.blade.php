@@ -321,6 +321,7 @@
                                x-data="attachments('files')" class="cursor-pointer">
                                 <input 
                                     wire:loading.attr="disabled"
+                                    wire:target="sendMessage"
                                     dusk="file-upload-input"
                                     @change="handleFileSelect(event, {{ count($files) }})" type="file" multiple
                                     accept="{{ Helper::formattedFileMimesForAcceptAttribute() }}" class="sr-only"
@@ -350,11 +351,12 @@
                         @if (config('wirechat.allow_media_attachments', true))
                             <label  
                             wire:loading.class="cursor-progress" 
-                            w x-data="attachments('media')" class="cursor-pointer">
+                            x-data="attachments('media')" class="cursor-pointer">
 
                                 {{-- Trigger image upload --}}
                                 <input dusk="media-upload-input"
                                       wire:loading.attr="disabled"
+                                      wire:target="sendMessage"
                                     @change="handleFileSelect(event, {{ count($media) }})" type="file" multiple
                                     accept="{{ Helper::formattedMediaMimesForAcceptAttribute() }}" class="sr-only"
                                     style="display: none">
@@ -391,6 +393,7 @@
                 <textarea @focus-input-field.window="$el.focus()" autocomplete="off" x-model='body' x-ref="body"
  
                      wire:loading.delay.longest.attr="disabled"
+                     wire:target="sendMessage"
                     id="chat-input-field" autofocus type="text" name="message" placeholder="Message" maxlength="1700"
                     rows="1" @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px';"
                     @keydown.shift.enter.prevent="insertNewLine($el)" {{-- @keydown.enter.prevent prevents the
@@ -435,7 +438,7 @@
 
                 {{--  Submit button --}}
                     <button    x-show="((body?.trim()?.length>0) ||  $wire.media.length > 0 || $wire.files.length > 0 )"
-                        wire:loading.attr="disabled" type="submit" id="sendMessageButton" class=" ml-auto disabled:cursor-progress font-bold">
+                        wire:loading.attr="disabled" wire:target="sendMessage" type="submit" id="sendMessageButton" class=" ml-auto disabled:cursor-progress font-bold">
 
                         <svg class="w-7 h-7   dark:text-gray-200" xmlns="http://www.w3.org/2000/svg" width="36"
                             height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
@@ -450,7 +453,7 @@
 
                 {{-- send Like button--}}
                     <button  x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
-                       wire:loading.attr="disabled" wire:click='sendLike()' type="button" class="group disabled:cursor-progress">
+                       wire:loading.attr="disabled" wire:target="sendMessage" wire:click='sendLike()' type="button" class="group disabled:cursor-progress">
 
                         <!-- outlined heart -->
                         <span class=" group-hover:hidden transition">

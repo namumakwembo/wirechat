@@ -82,21 +82,16 @@ class NotifyParticipants implements ShouldQueue
             return;
         }
 
-        Log::info('Here');
-
         /**
          * Fetch participants, ordered by `last_active_at` in descending order,
          * so that the most recently active participants are notified first. */
         Participant::where('conversation_id', $this->conversation->id)
-            ->where(function ($query) {
-                return $query->where('participantable_id', '!=', $this->auth->id)
-                    ->orWhere('participantable_type', '==', $this->auth->getMorphClass());
-            })
+            ->withoutParticipantable($this->auth)
             ->latest('last_active_at') // Prioritize active participants
             ->chunk(50, function ($participants) {
                 Log::info(['participants count' => $participants->count()]);
                 foreach ($participants as $key => $participant) {
-                    Log::info(['participant' => ['participantable_id' => $participant->id, 'participantable_type' => $participant->participantable_type]]);
+                   // Log::info(['participant' => ['participantable_id' => $participant->id, 'participantable_type' => $participant->participantable_type]]);
 
                     broadcast(new NotifyParticipant($participant, $this->message));
                 }

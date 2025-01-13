@@ -88,8 +88,20 @@ class Message extends Model
                             $q->where('participantable_id', $user->id)
                                 ->where('participantable_type', $user->getMorphClass())
                                 ->where(function ($q) use ($messagesTableName, $participantTableName) {
-                                    $q->whereNull('conversation_cleared_at') // Include all messages if not cleared
-                                        ->orWhereColumn("$messagesTableName.created_at", '>', "$participantTableName.conversation_cleared_at");
+                                    
+                                    $q->orWhere(function ($q) use ($messagesTableName, $participantTableName){
+                                        $q->whereNull('conversation_cleared_at')
+                                          ->whereNull('conversation_deleted_at');
+
+                                    })
+                                    ->orWhere(function($query)use ($messagesTableName, $participantTableName){
+
+                                        $query->whereColumn("$messagesTableName.created_at", '>', "$participantTableName.conversation_cleared_at")
+                                        ->orWhereColumn("$messagesTableName.created_at", '>', "$participantTableName.conversation_deleted_at");
+
+                                    });
+                                     
+
                                 });
                         });
                     });

@@ -89,10 +89,7 @@ class NotifyParticipants implements ShouldQueue
             ->withoutParticipantable($this->auth)
             ->latest('last_active_at') // Prioritize active participants
             ->chunk(50, function ($participants) {
-                Log::info(['participants count' => $participants->count()]);
                 foreach ($participants as $key => $participant) {
-                   // Log::info(['participant' => ['participantable_id' => $participant->id, 'participantable_type' => $participant->participantable_type]]);
-
                     broadcast(new NotifyParticipant($participant, $this->message));
                 }
             });

@@ -306,7 +306,7 @@ class Conversation extends Model
 
     /**
      * Exclude blank conversations that have no messages at all,
-     * including those that where deleted by the user.
+     * including those that where deleted by the user- meaning .
      */
     public function scopeWithoutBlanks(Builder $builder): void
     {
@@ -314,8 +314,9 @@ class Conversation extends Model
         if ($user) {
 
             $builder->whereHas('messages', function ($q) use ($user) {
-                $q->withoutGlobalScopes()->whereDoesntHave('actions', function ($q) use ($user) {
-                    $q->withoutActor($user) 
+                /* !we only exclude one scope not all because we dont want to check aginast soft delete messages */
+                $q->withoutGlobalScope('excludeDeleted')->whereDoesntHave('actions', function ($q) use ($user) {
+                    $q->whereActor($user) 
                         ->where('type', Actions::DELETE);
                 });
             });

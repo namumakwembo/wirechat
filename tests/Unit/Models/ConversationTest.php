@@ -915,7 +915,6 @@ describe('WithoutBlanks()', function () {
 
     it('it filters out blank messages when ->withoutBlanks() used ', function () {
 
-        //Dusk to
         $auth = User::factory()->create();
 
         //Send to receiver
@@ -931,15 +930,124 @@ describe('WithoutBlanks()', function () {
         $messsag2 = $auth->sendMessageTo($user, 'hello-3');
 
 
+
         //reset timer
         Carbon::setTestNow(now()->addSeconds(5));
 
         $messsage->deleteFor($auth);
-        $messsag2->deleteFor($user);
+        $messsag2->deleteFor($auth);
+
 
         Carbon::setTestNow();
 
         $this->actingAs($auth);
+
+        expect($auth->conversations()->withoutBlanks()->count())->toBe(0);
+
+    });
+
+    it('it filters out blank messages when ->withoutBlanks() used even with soft deleted messages ', function () {
+
+        $auth = User::factory()->create();
+
+        //Send to receiver
+        $auth->createConversationWith(User::factory()->create())->conversation;
+        $auth->createConversationWith(User::factory()->create())->conversation;
+        $conversation2 = $auth->createConversationWith(User::factory()->create())->conversation;
+
+        //create conversation with message
+        Carbon::setTestNow(now()->subSeconds(10));
+
+        $user= User::factory()->create(['name' => 'john']);
+        $messsage = $auth->sendMessageTo($user, 'hello-3');
+        $messsag2 = $auth->sendMessageTo($user, 'hello-3');
+
+
+        //create soft deleted message
+
+        $conversation=$messsag2->conversation;
+
+        Message::factory()->sender($auth)->create(['conversation_id'=>$conversation->id,'deleted_at'=>now()]);
+
+
+        //reset timer
+        Carbon::setTestNow(now()->addSeconds(5));
+
+        $messsage->deleteFor($auth);
+        $messsag2->deleteFor($auth);
+
+
+        Carbon::setTestNow();
+
+        $this->actingAs($auth);
+
+        expect($auth->conversations()->withoutBlanks()->count())->toBe(0);
+
+    });
+
+
+    it('it retrives conversation for other who did not delete all individual messages when ->withoutBlanks() used ', function () {
+
+        $auth = User::factory()->create();
+
+        //Send to receiver
+        $auth->createConversationWith(User::factory()->create())->conversation;
+        $auth->createConversationWith(User::factory()->create())->conversation;
+        $conversation2 = $auth->createConversationWith(User::factory()->create())->conversation;
+
+        //create conversation with message
+        Carbon::setTestNow(now()->subSeconds(10));
+
+        $user= User::factory()->create(['name' => 'john']);
+        $messsage = $auth->sendMessageTo($user, 'hello-3');
+        $messsag2 = $auth->sendMessageTo($user, 'hello-3');
+
+
+
+        //reset timer
+        Carbon::setTestNow(now()->addSeconds(5));
+
+        $messsage->deleteFor($auth);
+        $messsag2->deleteFor($auth);
+
+
+        Carbon::setTestNow();
+
+        $this->actingAs($user);
+
+        expect($auth->conversations()->withoutBlanks()->count())->toBe(1);
+
+    });
+
+
+    test('With Mixed Participants ,it retrives conversation for other who did not delete all individual messages when ->withoutBlanks() used ', function () {
+
+        $auth = User::factory()->create();
+
+        //Send to receiver
+        $auth->createConversationWith(User::factory()->create())->conversation;
+        $auth->createConversationWith(Admin::factory()->create())->conversation;
+        $conversation2 = $auth->createConversationWith(User::factory()->create())->conversation;
+
+        //create conversation with message
+        Carbon::setTestNow(now()->subSeconds(10));
+
+        $user= Admin::factory()->create(['name' => 'john']);
+        $messsage = $auth->sendMessageTo($user, 'hello-3');
+        $messsag2 = $auth->sendMessageTo($user, 'hello-3');
+
+
+
+        //reset timer
+        Carbon::setTestNow(now()->addSeconds(5));
+
+        $messsage->deleteFor($auth);
+        $messsag2->deleteFor($auth);
+
+
+        Carbon::setTestNow();
+
+        $this->actingAs($user);
 
         expect($auth->conversations()->withoutBlanks()->count())->toBe(1);
 
@@ -956,40 +1064,29 @@ describe('WithoutBlanks()', function () {
         $conversation2 = $auth->createConversationWith(User::factory()->create())->conversation;
 
         //create conversation with message
-        Carbon::setTestNow(now()->addSeconds(2));
-        $user= User::factory()->create(['name' => 'john']);
-        $auth->sendMessageTo($user, 'hello-3')->conversation;
+        Carbon::setTestNow(now()->subSeconds(10));
 
-        //Assert Count
+        $user= User::factory()->create(['name' => 'john']);
+        $messsage = $auth->sendMessageTo($user, 'hello-3');
+        $messsag2 = $auth->sendMessageTo($user, 'hello-3');
+
+
+
+        //reset timer
+        Carbon::setTestNow(now()->addSeconds(5));
+
+        $messsage->deleteFor($auth);
+        $messsag2->deleteFor($auth);
+
+
+        Carbon::setTestNow();
+
         $this->actingAs($auth);
 
         expect($auth->conversations()->count())->toBe(4);
 
     });
 
-
-    it('it filters out blank messages when ->withoutBlanks() used Exept those with filter Deleted Actions(as in message is not blank if user has deleted some messages) ', function () {
-
-        //Dusk to
-        $auth = User::factory()->create();
-
-        Carbon::setTestNow(now()->subSeconds(2));
-        //Send to receiver
-        $auth->createConversationWith(User::factory()->create())->conversation;
-        $auth->createConversationWith(User::factory()->create())->conversation;
-
-        //create conversation with message
-        $user= User::factory()->create(['name' => 'john']);
-        $messsage = $auth->sendMessageTo($user, 'hello-3')->conversation;
-
-        //reset timer
-        Carbon::setTestNow();
-        $messsage->deleteFor($auth);
-
-        $this->actingAs($auth);
-        expect($auth->conversations()->withoutBlanks()->count())->toBe(1);
-
-    });
 
 
 
@@ -1031,7 +1128,7 @@ describe('WithoutBlanks()', function () {
     });
 
 
-    it('it filters out blank messages when ->withoutBlanks() in Mixed Model Participants used Exept those with filter Deleted Actions(as in Conversation is not blank if user has deleted some messages) ', function () {
+    it('it filters out blank messages when ->withoutBlanks() in Mixed Model Participants used Exept those with filter Deleted Actions(as in Conversation is not blank if user has deleted only some messages) ', function () {
 
         //Dusk to
         $auth = Admin::factory()->create();

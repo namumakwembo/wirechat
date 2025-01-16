@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Models\Conversation;
-use Namu\WireChat\Models\Scopes\WithoutDeletedScope;
 use Namu\WireChat\Traits\Widget;
 
 class Chats extends Component
@@ -129,7 +128,8 @@ class Chats extends Component
         $groupSearchableFields = ['name', 'description'];
         $columnCache = [];
 
-        $query->withoutGlobalScope(WithoutDeletedScope::class)->where(function ($query) use ($searchableFields, $groupSearchableFields, &$columnCache) {
+        //use withDeleted to reverse withoutDeleted in order to make deleted chats appear in search
+        $query->withDeleted()->where(function ($query) use ($searchableFields, $groupSearchableFields, &$columnCache) {
             // Search in participants' participantable fields
             $query->whereHas('participants', function ($subquery) use ($searchableFields, &$columnCache) {
                 $subquery->whereHas('participantable', function ($query2) use ($searchableFields, &$columnCache) {

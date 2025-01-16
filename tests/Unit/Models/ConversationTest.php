@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Test;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Namu\WireChat\Enums\Actions;
@@ -7,6 +8,7 @@ use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\group;
 use Namu\WireChat\Models\Message;
+use Namu\WireChat\Models\Scopes\WithoutDeletedScope;
 use Symfony\Component\Console\Output\NullOutput;
 use Workbench\App\Models\Admin;
 use Workbench\App\Models\User;
@@ -1060,6 +1062,254 @@ describe('WithoutBlanks()', function () {
 
 
 });
+
+describe('WithoutDeleted()', function () {
+
+    it('retrieves all conversations even deleted when  withoutDeleted local scope is not used', function () {
+        $auth = User::factory()->create();
+
+      //create conversation with message
+      Carbon::setTestNow(now()->subSeconds(10));
+         //create conversations
+         $conversation1= $auth->createConversationWith(User::factory()->create());
+         $conversation2= $auth->createConversationWith(User::factory()->create());
+         $conversation3 = $auth->createConversationWith(User::factory()->create());
+ 
+
+         //delete conversations
+
+
+        //reset timer
+        Carbon::setTestNow();
+
+         $conversation2->deleteFor($auth);
+
+        //Authenticate
+        $this->actingAs($auth);
+
+        expect($auth->conversations->count())->toBe(3);
+
+     
+    });
+
+
+    test('With mixed Paricipnats model it retrieves all conversations even deleted when  withoutDeleted local scope is not used', function () {
+        $auth = User::factory()->create();
+
+      //create conversation with message
+      Carbon::setTestNow(now()->subSeconds(10));
+         //create conversations
+         $conversation1= $auth->createConversationWith(User::factory()->create());
+         $conversation2= $auth->createConversationWith(Admin::factory()->create());
+         $conversation3 = $auth->createConversationWith(Admin::factory()->create());
+ 
+
+         //delete conversations
+
+
+        //reset timer
+        Carbon::setTestNow();
+
+         $conversation2->deleteFor($auth);
+
+        //Authenticate
+        $this->actingAs($auth);
+
+        expect($auth->conversations->count())->toBe(3);
+
+     
+    });
+
+
+    it('exludes deleted conversation when  withoutDeleted local scope is used', function () {
+        $auth = User::factory()->create();
+
+      //create conversation with message
+      Carbon::setTestNow(now()->subSeconds(10));
+         //create conversations
+         $conversation1= $auth->createConversationWith(User::factory()->create());
+         $conversation2= $auth->createConversationWith(User::factory()->create());
+         $conversation3 = $auth->createConversationWith(User::factory()->create());
+ 
+
+         //delete conversations
+
+
+        //reset timer
+        Carbon::setTestNow();
+
+         $conversation2->deleteFor($auth);
+
+        //Authenticate
+        $this->actingAs($auth);
+
+        expect($auth->conversations()->withoutDeleted()->count())->toBe(2);
+
+     
+    });
+
+
+    Test('With Mixed Participnats exludes deleted conversation when  withoutDeleted local scope is used', function () {
+        $auth = User::factory()->create();
+
+      //create conversation with message
+      Carbon::setTestNow(now()->subSeconds(10));
+         //create conversations
+         $conversation1= $auth->createConversationWith(Admin::factory()->create());
+         $conversation2= $auth->createConversationWith(Admin::factory()->create());
+         $conversation3 = $auth->createConversationWith(User::factory()->create());
+ 
+
+         //delete conversations
+
+
+        //reset timer
+        Carbon::setTestNow();
+
+         $conversation2->deleteFor($auth);
+
+        //Authenticate
+        $this->actingAs($auth);
+
+        expect($auth->conversations()->withoutDeleted()->count())->toBe(2);
+
+     
+    });
+  
+  
+
+});
+
+describe('WithDeleted()', function () {
+
+    it('retrieves all conversations even deleted when  withDeleted() local scope is not used', function () {
+        $auth = User::factory()->create();
+
+      //create conversation with message
+      Carbon::setTestNow(now()->subSeconds(10));
+         //create conversations
+         $conversation1= $auth->createConversationWith(User::factory()->create());
+         $conversation2= $auth->createConversationWith(User::factory()->create());
+         $conversation3 = $auth->createConversationWith(User::factory()->create());
+ 
+
+         //delete conversations
+
+
+        //reset timer
+        Carbon::setTestNow();
+
+         $conversation2->deleteFor($auth);
+
+        //Authenticate
+        $this->actingAs($auth);
+
+        expect($auth->conversations->count())->toBe(3);
+
+     
+    });
+
+
+    test('With mixed Paricipnats model it retrieves all conversations even deleted when  withDeleted() local scope is not used', function () {
+        $auth = User::factory()->create();
+
+      //create conversation with message
+      Carbon::setTestNow(now()->subSeconds(10));
+         //create conversations
+         $conversation1= $auth->createConversationWith(User::factory()->create());
+         $conversation2= $auth->createConversationWith(Admin::factory()->create());
+         $conversation3 = $auth->createConversationWith(Admin::factory()->create());
+ 
+
+         //delete conversations
+
+
+        //reset timer
+        Carbon::setTestNow();
+
+         $conversation2->deleteFor($auth);
+
+        //Authenticate
+        $this->actingAs($auth);
+
+        expect($auth->conversations->count())->toBe(3);
+
+     
+    });
+
+
+    it('exludes deleted conversation when  withoutDeleted local scope is used', function () {
+        $auth = User::factory()->create();
+
+      //create conversation with message
+      Carbon::setTestNow(now()->subSeconds(10));
+         //create conversations
+         $conversation1= $auth->createConversationWith(User::factory()->create());
+         $conversation2= $auth->createConversationWith(User::factory()->create());
+         $conversation3 = $auth->createConversationWith(User::factory()->create());
+ 
+
+         //delete conversations
+
+
+        //reset timer
+        Carbon::setTestNow();
+
+         $conversation2->deleteFor($auth);
+
+        //Authenticate
+        $this->actingAs($auth);
+
+        // Test withoutDeleted scope
+    $withoutDeletedConversations = $auth->conversations()->withoutDeleted()->get();
+    expect($withoutDeletedConversations->count())->toBe(2);
+
+    // Test withDeleted scope
+    $withDeletedConversations = $auth->conversations()->withDeleted()->get();
+    expect($withDeletedConversations->count())->toBe(3);
+     
+    });
+
+
+    Test('With Mixed Participnats exludes deleted conversation when  withoutDeleted local scope is used', function () {
+        $auth = User::factory()->create();
+
+      //create conversation with message
+      Carbon::setTestNow(now()->subSeconds(10));
+         //create conversations
+         $conversation1= $auth->createConversationWith(Admin::factory()->create());
+         $conversation2= $auth->createConversationWith(Admin::factory()->create());
+         $conversation3 = $auth->createConversationWith(User::factory()->create());
+ 
+
+         //delete conversations
+
+
+        //reset timer
+        Carbon::setTestNow();
+
+         $conversation2->deleteFor($auth);
+
+        //Authenticate
+          //Authenticate
+          $this->actingAs($auth);
+
+          $withoutDeletedConversations  = $auth->conversations;
+  
+          // Test withoutDeleted scope
+    $withoutDeletedConversations = $auth->conversations()->withoutDeleted()->get();
+    expect($withoutDeletedConversations->count())->toBe(2);
+
+    // Test withDeleted scope
+    $withDeletedConversations = $auth->conversations()->withDeleted()->get();
+    expect($withDeletedConversations->count())->toBe(3);
+     
+    });
+  
+  
+
+});
+
 
 describe('deleting permanently()', function () {
 

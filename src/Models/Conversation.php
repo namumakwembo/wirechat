@@ -366,6 +366,26 @@ class Conversation extends Model
     }
 
     /**
+ * Include conversations that were marked as deleted by the auth participant.
+ */
+public function scopeWithDeleted(Builder $builder)
+{
+    // Dynamically get the parent model (i.e., the user)
+    $user = auth()->user();
+
+    if ($user) {
+        // Get the table name for conversations dynamically to avoid hardcoding.
+
+        // Apply the "with deleted conversations" scope
+        $builder->whereHas('participants', function ($query) use ($user) {
+            $query->whereParticipantable($user)
+                  ->orWhereNotNull("conversation_deleted_at");
+        });
+    }
+}
+
+
+    /**
      * Get receiver Participant for Private Conversation
      * will return null for Self Conversation
      */

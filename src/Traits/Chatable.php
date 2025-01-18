@@ -360,7 +360,7 @@ trait Chatable
         $selfConversationCheck = $participantId === $authenticatedUserId && $participantType === $authenticatedUserType;
 
         // Define the base query for finding conversations
-        $existingConversationQuery = Conversation::withoutGlobalScope(WithoutClearedScope::class)->where('type', ConversationType::PRIVATE);
+        $existingConversationQuery = Conversation::whereIn('type', [ConversationType::PRIVATE,ConversationType::SELF]);
 
         // If it's a self-conversation, adjust the query to check for two identical participants
         if ($selfConversationCheck) {
@@ -368,8 +368,9 @@ trait Chatable
                 $query->select('conversation_id')
                     ->where('participantable_id', $authenticatedUserId)
                     ->where('participantable_type', $authenticatedUserType)
+                    ->whereType(ConversationType::SELF)
                     ->groupBy('conversation_id')
-                    ->havingRaw('COUNT(*) = 2'); // Ensuring two participants in the conversation
+                    ->havingRaw('COUNT(*) = 1'); // Ensuring two participants in the conversation
             });
         } else {
             // If it's a conversation between two different participants, adjust the query accordingly
@@ -377,8 +378,9 @@ trait Chatable
                 $query->select('conversation_id')
                     ->whereIn('participantable_id', [$authenticatedUserId, $participantId])
                     ->whereIn('participantable_type', [$authenticatedUserType, $participantType])
+                    ->whereType(ConversationType::PRIVATE)
                     ->groupBy('conversation_id')
-                    ->havingRaw('COUNT(DISTINCT participantable_id) = 2'); // Ensure both participants are different
+                    ->havingRaw('COUNT(*) = 2'); // Ensure both participants are different
             });
         }
 

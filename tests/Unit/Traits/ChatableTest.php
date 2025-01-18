@@ -532,6 +532,31 @@ describe('hasConversationWith() ', function () {
 
     });
 
+
+
+    it('returns true if user has conversation with another of different Type', function () {
+
+        $auth = User::factory()->create();
+        $receiver = Admin::factory()->create();
+        $conversation = $auth->createConversationWith($receiver);
+
+        //assert
+        expect($receiver->hasConversationWith($auth))->toBe(true);
+
+    });
+
+
+    it('returns true if user has conversation themselves', function () {
+
+        $auth = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($auth);
+
+        //assert
+        expect($auth->hasConversationWith($auth))->toBe(true);
+
+    });
+
 });
 
 describe('getUnreadCount()', function () {

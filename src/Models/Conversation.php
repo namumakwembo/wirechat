@@ -15,6 +15,7 @@ use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
+use Namu\WireChat\Models\Scopes\WithoutRemovedMessages;
 use Namu\WireChat\Traits\Actionable;
 
 class Conversation extends Model
@@ -114,7 +115,7 @@ class Conversation extends Model
     {
         $query = Participant::where('participantable_id', $user->id)
             ->where('participantable_type', $user->getMorphClass())
-            ->where('conversation_id', $this->id); // Ensures you're querying for the correct conversation
+            ->where('conversation_id', $this->id); //* Ensures you're querying for the correct conversation
 
         if ($withoutGlobalScopes) {
             $query->withoutGlobalScopes(); // Apply this condition if necessary
@@ -315,7 +316,7 @@ class Conversation extends Model
 
             $builder->whereHas('messages', function ($q) use ($user) {
                 /* !we only exclude one scope not all because we dont want to check aginast soft delete messages */
-                $q->withoutGlobalScope('excludeDeleted')->whereDoesntHave('actions', function ($q) use ($user) {
+                $q->withoutGlobalScope(WithoutRemovedMessages::class)->whereDoesntHave('actions', function ($q) use ($user) {
                     $q->whereActor($user) 
                         ->where('type', Actions::DELETE);
                 });

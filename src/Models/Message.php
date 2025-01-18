@@ -2,7 +2,7 @@
 
 namespace Namu\WireChat\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Facades\WireChat;
+use Namu\WireChat\Models\Scopes\WithoutRemovedMessages;
 use Namu\WireChat\Traits\Actionable;
 
 class Message extends Model
@@ -64,49 +65,10 @@ class Message extends Model
         return \Namu\WireChat\Workbench\Database\Factories\MessageFactory::new();
     }
 
-    protected static function boot()
+    protected static function booted()
     {
-        parent::boot();
-
         // Add scope if authenticated
-        static::addGlobalScope('excludeDeleted', function (Builder $builder) {
-
-            $messagesTableName = (new Message)->getTable();
-            $participantTableName = (new Participant)->getTable();
-
-            if (auth()->check()) {
-                $user = auth()->user();
-
-                $builder->whereDoesntHave('actions', function ($q) use ($user) {
-                    $q->where('actor_id', $user->id)
-                        ->where('actor_type', $user->getMorphClass())
-                        ->where('type', Actions::DELETE);
-                })
-                    ->where(function ($query) use ($user, $messagesTableName, $participantTableName) {
-                        // Filter messages based on `conversation_deleted_at` in the participants table
-                        $query->whereHas('conversation.participants', function ($q) use ($user, $messagesTableName, $participantTableName) {
-                            $q->where('participantable_id', $user->id)
-                                ->where('participantable_type', $user->getMorphClass())
-                                ->where(function ($q) use ($messagesTableName, $participantTableName) {
-                                    
-                                    $q->orWhere(function ($q) use ($messagesTableName, $participantTableName){
-                                        $q->whereNull('conversation_cleared_at')
-                                          ->whereNull('conversation_deleted_at');
-
-                                    })
-                                    ->orWhere(function($query)use ($messagesTableName, $participantTableName){
-
-                                        $query->whereColumn("$messagesTableName.created_at", '>', "$participantTableName.conversation_cleared_at")
-                                        ->orWhereColumn("$messagesTableName.created_at", '>', "$participantTableName.conversation_deleted_at");
-
-                                    });
-                                     
-
-                                });
-                        });
-                    });
-            }
-        });
+        static::addGlobalScope(WithoutRemovedMessages::class);
 
         // listen to deleted
         static::deleted(function ($message) {
@@ -174,7 +136,7 @@ class Message extends Model
     // Relationship for the parent message
     public function parent()
     {
-        return $this->belongsTo(Message::class, 'reply_id')->withoutGlobalScope('excludeDeleted')->withTrashed();
+        return $this->belongsTo(Message::class, 'reply_id')->withoutGlobalScope(WithoutRemovedMessages::class)->withTrashed();
     }
 
     // Relationship for the reply

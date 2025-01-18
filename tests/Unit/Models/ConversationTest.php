@@ -8,8 +8,6 @@ use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\group;
 use Namu\WireChat\Models\Message;
-use Namu\WireChat\Models\Scopes\WithoutDeletedScope;
-use Symfony\Component\Console\Output\NullOutput;
 use Workbench\App\Models\Admin;
 use Workbench\App\Models\User;
 
@@ -1407,7 +1405,6 @@ describe('WithDeleted()', function () {
 
 });
 
-
 describe('deleting permanently()', function () {
 
     it('deletes all it\'s participants when conversation is deleted inluding exited and remove_by_admin', function () {
@@ -1512,7 +1509,6 @@ describe('deleting permanently()', function () {
         expect(Message::withoutGlobalScopes()->count())->toBe(0);
     });
 });
-
 
 describe('recieverParticipant()', function () {
 

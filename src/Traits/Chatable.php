@@ -14,7 +14,6 @@ use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Group;
 use Namu\WireChat\Models\Message;
 use Namu\WireChat\Models\Participant;
-use Namu\WireChat\Models\Scopes\WithoutClearedScope;
 
 /**
  * Trait Chatable

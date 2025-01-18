@@ -127,92 +127,7 @@ class Conversation extends Model
         return $participant;
     }
 
-    // public function participant(Model $user)
-    // {
 
-    //     $participant = null;
-    //     // If loaded, simply check the existing collection
-    //     if ($this->relationLoaded('participants')) {
-    //         $participant = $this->participants()
-    //             ->withoutGlobalScope('withoutExited')
-    //             ->where('participantable_id', $user->id)
-    //             ->where('participantable_type', get_class($user))
-    //             ->first();
-    //     } else {
-    //         $participant = $this->participants()
-    //             ->withoutGlobalScope('withoutExited')
-
-    //             ->where('participantable_id', $user->id)
-    //             ->where('participantable_type', get_class($user))
-    //             ->first();
-    //     }
-
-    //     return $participant;
-    // }
-
-    /**
-     * Add a new participant to the conversation.
-     *
-     * @param  bool  $revive  =if user was recently deleted by admin or owner then add them back
-     */
-    // public function addParticipant(Model $user, bool $revive = false): Participant
-    // {
-    //     // Check if the participant is already in the conversation
-    //     abort_if(
-    //         $this->participants()
-    //             ->where('participantable_id', $user->id)
-    //             ->where('participantable_type', get_class($user))
-    //             ->exists(),
-    //         422,
-    //         'Participant is already in the conversation.'
-    //     );
-
-    //     #If the conversation is private, ensure it doesn't exceed two participants
-    //     if ($this->isPrivate()) {
-    //         abort_if(
-    //             $this->participants()->count() >= 2,
-    //             422,
-    //             'Private conversations cannot have more than two participants.'
-    //         );
-    //     }
-
-    //     #ensure Self conversations do not have more than 1 participant
-    //     if ($this->isSelf()) {
-    //         abort_if(
-    //             $this->participants()->count() >= 1,
-    //             422,
-    //             'Self conversations cannot have more than 1 participant.'
-    //         );
-    //     }
-
-    //     $participantWithoutScopes = $this->participants()
-    //         ->withoutGlobalScopes()
-    //         ->where('participantable_id', $user->id)
-    //         ->where('participantable_type', get_class($user))
-    //         ->first();
-
-    //     if ($participantWithoutScopes) {
-    //         # abort if exited already exited group
-    //         abort_if($participantWithoutScopes?->hasExited(), 403, 'Cannot add ' . $user->display_name . ' because they left the group');
-
-    //         #reomve removed_by_action if existed
-    //         if ($revive) {
-    //             $participantWithoutScopes->actions()->where('type', Actions::REMOVED_BY_ADMIN)->delete();
-    //         }
-
-    //         return $participantWithoutScopes;
-    //     } else {
-
-    //         #create particicipant
-    //         $participant = $this->participants()->withoutGlobalScopes()->updateOrCreate([
-    //             'participantable_id' => $user->id,
-    //             'participantable_type' => get_class($user),
-    //             'role' => ParticipantRole::PARTICIPANT
-    //         ]);
-
-    //         return $participant;
-    //     }
-    // }
 
     /**
      * Add a new participant to the conversation.
@@ -506,31 +421,8 @@ public function scopeWithDeleted(Builder $builder)
             });
         }
 
-        //dd($this->messages()->get());
-
         // Query builder for unread messages
         $query = $this->messages();
-
-
-        //  dd($query->get());
-
-        // Exclude messages that belong to the user
-        //return 
-
-        //   $messages =$query->whereDoesntHaveMorph(
-        //     'sendable',
-        //    $user->getMorphClass(),
-        //     function (Builder $query) use($user){
-        //         //dd($user);
-        //         $query->where('id','!=' ,$user->id);
-        //     }
-        // )->get();
-
-
-        // Exclude messages that belong to the user
-        // $messages= $query->where('sendable_id', '!=', $user->id)
-        // ->where('sendable_type', $user->getMorphClass())
-        // ->get(); // Return the collection of unread messages
 
         //WORKING
         $messages = $query->whereIsNotOwnedBy($user)->when($lastReadAt, function ($query) use ($lastReadAt) {
@@ -538,32 +430,6 @@ public function scopeWithDeleted(Builder $builder)
             $query->where('created_at', '>', $lastReadAt);
         })->get();
 
-
-
-
-        //  $messages= $query->whereDoesntBelongTo( 'sendable',function ($query) use ($user) {
-        //     $query->where('id',  $user->id)
-        //           ->where('id',$user->getMorphClass());
-        // })->get();
-        //  $messages= $query->where(function ($query) use ($user) {
-        //     $query->where('sendable_id', "==", $user->id)
-        //           ->orWhere('sendable_type', "<=>", $user->getMorphClass());
-        // })->get();
-        //$messages= $query->whereMorphedTo('sendable',  $user->getMorphClass())->get();
-        /// $messages= $query->whereNotMorphedTo('sendable', $user)->get();
-
-        // $messages= $query->whereDoesntHaveMorph('sendable',  $user->getMorphClass())->get();
-        //whereDoesntHaveMorph
-
-        // $messages = $query->whereHasMorph('sendable', $user->getMorphClass(), function (Builder $query,$type) use($user) {
-        //     $query->where('id','!=',$user->id);
-        // })->when($lastReadAt,function($query) use($lastReadAt){
-
-        //         $query->where('created_at', '>', $lastReadAt);
-
-        // })->get();
-
-        // dd($messages);
         return $messages;
     }
 
@@ -694,7 +560,7 @@ public function scopeWithDeleted(Builder $builder)
     }
 
     /**
-     * Check if the conversation is owned by the  user themselves
+     * Check if the conversation is a self conversations
      */
     public function isSelfConversation(?Model $participant = null): bool
     {

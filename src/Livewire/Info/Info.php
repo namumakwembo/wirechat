@@ -7,12 +7,15 @@ use Livewire\Attributes\Locked;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
+use Namu\WireChat\Livewire\Chat\Chats;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
 use Namu\WireChat\Models\Conversation;
+use Namu\WireChat\Traits\Widget;
 
 class Info extends ModalComponent
 {
     use WithFileUploads;
+    use Widget;
 
     #[Locked]
     public Conversation $conversation;
@@ -167,8 +170,10 @@ class Info extends ModalComponent
         //delete conversation
         $this->conversation->deleteFor(auth()->user());
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+        //redirect to chats page pr
+         //Dispatach event instead if isWidget
+         $this->handleComponentTermination();
+
     }
 
     /**
@@ -192,10 +197,9 @@ class Info extends ModalComponent
         abort_unless($participantCount == 0, 403, 'Cannot delete group: Please remove all members before attempting to delete the group.');
 
         //delete conversation
-        $this->conversation->forceDelete();
+        $this->conversation?->forceDelete();
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+        $this->handleComponentTermination();
     }
 
     public function exitConversation()
@@ -210,8 +214,8 @@ class Info extends ModalComponent
         //delete conversation
         $auth->exitConversation($this->conversation);
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+
+       $this->handleComponentTermination();
     }
 
     public function placeholder()
@@ -243,10 +247,15 @@ class Info extends ModalComponent
     public function render()
     {
 
+
+        $participant = $this->conversation->participant(auth()->user());
+
+      //  dd($this->isWidget(),$participant);
+
         // Pass data to the view
         return view('wirechat::livewire.info.info', [
             'receiver' => $this->conversation->getReceiver(),
-            'participant' => $this->conversation->participant(auth()->user()),
+            'participant' => $participant,
         ]);
     }
 }

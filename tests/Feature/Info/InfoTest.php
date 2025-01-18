@@ -48,6 +48,26 @@ describe('presence test', function () {
             ->assertSee('Musa');
     });
 
+
+    test('it shows receiver name if conversaton is private and Mixed Model', function () {
+        $auth = User::factory()->create(['id' => '345678']);
+        $receiver = Admin::factory()->create(['name' => 'Musa']);
+
+        $conversation = $auth->createConversationWith($receiver, 'hello');
+
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
+            ->assertSee('Musa');
+    });
+
+    test('it shows receiver name if conversaton is self', function () {
+        $auth = User::factory()->create(['id' => '345678','name' => 'John']);
+
+        $conversation = $auth->createConversationWith($auth, 'hello');
+
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
+            ->assertSee('John');
+    });
+
     test('it shows group name if conversaton is group', function () {
 
         $auth = User::factory()->create(['id' => '345678']);
@@ -749,30 +769,67 @@ describe('updating group name and description', function () {
 
 describe('Deleting Chat', function () {
 
-    test('it redirects to index route after deleting Private conversation', function () {
+    test('it redirects to index route and Does NOT dispatch  "close-chat"  & "hardRefresh" events after deleting Private conversation when isNotWidget', function () {
 
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
         $conversation = $auth->createConversationWith($receiver);
 
-        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation,'widget'=>false])
             ->call('deleteChat')
             ->assertStatus(200)
-            ->assertRedirect(route(WireChat::indexRouteName()));
+            ->assertRedirect(route(WireChat::indexRouteName()))
+            ->assertNotDispatched('close-chat')
+            ->assertNotDispatched('hardRefresh');
+
     });
 
-    test('it redirects to index route after deleting Self conversation', function () {
+    test('when isWidget it dispatches  "close-chat" & "hardRefresh" events  and Does NOT redirects to index route after deleting Private conversation', function () {
+
+        $auth = User::factory()->create();
+        $receiver = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($receiver);
+
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation,'widget'=>true])
+            ->call('deleteChat')
+            ->assertStatus(200)
+            ->assertNoRedirect()
+            ->assertDispatched('close-chat')
+            ->assertDispatched('hardRefresh');
+
+    });
+
+    test('it redirects to index route and Does NOT dispatch "close-chat"  & "hardRefresh" events after deleting Self conversation  when isNotWidget', function () {
 
         $auth = User::factory()->create();
 
         $conversation = $auth->createConversationWith($auth);
 
-        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation,'widget'=>false])
             ->call('deleteChat')
             ->assertStatus(200)
+            ->assertNotDispatched('close-chat')
+            ->assertNotDispatched('hardRefresh')
             ->assertRedirect(route(WireChat::indexRouteName()));
     });
+
+    test('when isWidget it dispatches "close-chat"  & "hardRefresh" events and Does NOT redirects to index route   after deleting Self conversation', function () {
+
+        $auth = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($auth);
+
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation, 'widget'=>'true'])
+            ->call('deleteChat')
+            ->assertStatus(200)
+            ->assertDispatched('close-chat')
+            ->assertDispatched('hardRefresh')
+            ->assertNoRedirect(route(WireChat::indexRouteName()));
+    });
+
+
 
     test('it aborts if conversation is Group', function () {
 
@@ -801,10 +858,8 @@ describe('Deleting Group', function () {
         expect(Conversation::withoutGlobalScopes()->count())->toBe(0);
     });
 
- 
 
-
-    test('it redirects to index route after deleting Group conversation', function () {
+    test('it redirects to index route and Does NOT dispatch  "close-chat"  & "hardRefresh" events after deleting Group conversation when isNotWidget', function () {
 
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
@@ -814,8 +869,26 @@ describe('Deleting Group', function () {
         Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
             ->call('deleteGroup')
             ->assertStatus(200)
-            ->assertRedirect(route(WireChat::indexRouteName()));
+            ->assertRedirect(route(WireChat::indexRouteName()))
+            ->assertNotDispatched('close-chat')
+            ->assertNotDispatched('hardRefresh');
     });
+
+    test('when isWidget  it dispatches  "close-chat" & "hardRefresh" events  and Does NOT redirects to index route after deleting Group conversation', function () {
+
+        $auth = User::factory()->create();
+        $receiver = User::factory()->create();
+
+        $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
+
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation,'widget'=>true])
+            ->call('deleteGroup')
+            ->assertStatus(200)
+            ->assertNoRedirect(route(WireChat::indexRouteName()))
+            ->assertDispatched('close-chat')
+            ->assertDispatched('hardRefresh');
+    });
+
 
     test('it aborts if conversation is private ', function () {
 
@@ -845,7 +918,6 @@ describe('Deleting Group', function () {
             ->call('deleteGroup')
             ->assertStatus(403, 'Cannot delete group: Please remove all members before attempting to delete the group.');
     });
-
 
     test('it aborts if group of Mixed Model members is not 0 excluding owner', function () {
 
@@ -920,7 +992,7 @@ describe('Deleting Group', function () {
 
 describe('Exiting Chat', function () {
 
-    test('it redirects to index route after exiting conversation', function () {
+    test('it redirects to index route and Does NOT dispatch  "close-chat"  & "hardRefresh" events after exiting Group conversation when isNotWidget', function () {
 
         $auth = User::factory()->create();
 
@@ -929,10 +1001,29 @@ describe('Exiting Chat', function () {
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
         $conversation->addParticipant($user);
-        Livewire::actingAs($user)->test(Info::class, ['conversation' => $conversation])
+        Livewire::actingAs($user)->test(Info::class, ['conversation' => $conversation,'widget'=>false])
             ->call('exitConversation')
             ->assertStatus(200)
-            ->assertRedirect(route(WireChat::indexRouteName()));
+            ->assertRedirect(route(WireChat::indexRouteName()))
+            ->assertNotDispatched('close-chat')
+            ->assertNotDispatched('hardRefresh');
+    });
+
+    test('when isWidget  it dispatches  "close-chat" & "hardRefresh" events  and Does NOT redirects to index route after exiting Group conversation', function () {
+
+        $auth = User::factory()->create();
+
+        $user = User::factory()->create();
+
+        $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
+
+        $conversation->addParticipant($user);
+        Livewire::actingAs($user)->test(Info::class, ['conversation' => $conversation,'widget'=>true])
+            ->call('exitConversation')
+            ->assertStatus(200)
+            ->assertNoRedirect(route(WireChat::indexRouteName()))
+            ->assertDispatched('close-chat')
+            ->assertDispatched('hardRefresh');
     });
 
     test('owner cannot exit conversation', function () {

@@ -1,10 +1,11 @@
 <div id="info-modal" class="bg-white dark:bg-gray-900 space-y-auto h-screen">
 
+
     @php
-        $authIsAdminInGroup = $participant->isAdmin();
-        $authIsOwner = $participant->isOwner();
-        $isGroup = $conversation->isGroup();
-        $group = $conversation->group;
+        $authIsAdminInGroup = $participant?->isAdmin();
+        $authIsOwner = $participant?->isOwner();
+        $isGroup = $conversation?->isGroup();
+        $group = $conversation?->group;
 
 
     @endphp
@@ -24,7 +25,7 @@
         @if ($isGroup)
 
            {{-- Edit group form  --}}
-           @if ($authIsAdminInGroup || $group->allowsMembersToEditGroupInfo())
+           @if ($authIsAdminInGroup || $group?->allowsMembersToEditGroupInfo())
             <div @dusk="edit_group_information_section" class="flex  flex-col items-center gap-5 py-5  px-4    ">
 
                 {{-- Avatar --}}
@@ -199,14 +200,14 @@
 
                 <div class="mx-auto items-center justify-center grid">
 
-                    <a href="{{ $receiver->profile_url }}">
+                    <a href="{{ $receiver?->profile_url }}">
                         <x-wirechat::avatar src="{{ $cover_url }}" class=" h-32 w-32 mx-auto" />
                     </a>
                 </div>
 
                 <div class=" grid  ">
 
-                    <a class="px-8 py-5 " @dusk="receiver_name" href="{{ $receiver->profile_url }}">
+                    <a class="px-8 py-5 " @dusk="receiver_name" href="{{ $receiver?->profile_url }}">
                         <h5 class="text-2xl">{{ $receiver?->display_name }}</h5>
                     </a>
                 </div>
@@ -230,7 +231,7 @@
 
             {{-- Members count --}}
             <button
-                wire:click="$dispatch('openChatDialog', {component: 'members',arguments: { conversation: {{ $conversation->id }} }})"
+                wire:click="$dispatch('openChatDialog', {component: 'members',arguments: { conversation: {{ $conversation?->id }} }})"
                 class="flex w-full justify-between items-center px-8 focus:outline-none ">
                 <span class="text-gray-600 dark:text-gray-300"> Members {{ $totalParticipants }}</span>
 
@@ -247,8 +248,8 @@
             </button>
 
             {{-- Add Members --}}
-            @if ($authIsAdminInGroup || $group->allowsMembersToAddOthers())
-            <button @dusk="open_add_members_modal_button" wire:click="$dispatch('openChatDialog', {component: 'add-members',arguments: { conversation: {{ $conversation->id }} }})"
+            @if ($authIsAdminInGroup || $group?->allowsMembersToAddOthers())
+            <button @dusk="open_add_members_modal_button" wire:click="$dispatch('openChatDialog', {component: 'add-members',arguments: { conversation: {{ $conversation?->id }} }})"
                 class=" w-full py-5 px-8 hover:bg-gray-200 focus:outline-none transition dark:hover:bg-gray-800 flex gap-3 items-center">
 
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"

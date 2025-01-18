@@ -17,14 +17,16 @@
 
         {{-- Return --}}
         <a 
-        @if($widget)
+        @if($this->isWidget())
             @click="$dispatch('close-chat')"
+            dusk="return_to_home_button_dispatch"
         @else
             href="{{ route(WireChat::indexRouteName(), $conversation->id) }}"
+            dusk="return_to_home_button_link"
         @endif
         
-        class=" shrink-0 lg:hidden  dark:text-white" id="chatReturn">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+        @class(['shrink-0  cursor-pointer dark:text-white','lg:hidden'=>!$this->isWidget()]) id="chatReturn">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
                 stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>

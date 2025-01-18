@@ -539,6 +539,8 @@ describe('Box presence test: ', function () {
             // dd($conversation);
             Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true])
                 ->assertDontSeeHtml('href="' . route(WireChat::indexRouteName()) . '"')
+                ->assertSeeHtml('dusk="return_to_home_button_dispatch"')
+                ->assertDontSeeHtml('dusk="return_to_home_button_link"')
                 ->assertSeeHtml('@click="$dispatch(\'close-chat\')"');
         });
 
@@ -553,6 +555,8 @@ describe('Box presence test: ', function () {
             // dd($conversation);
             Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => false])
                 ->assertSeeHtml('href="' . route(WireChat::indexRouteName()) . '"')
+                ->assertDontSeeHtml('dusk="return_to_home_button_dispatch"')
+                ->assertSeeHtml('dusk="return_to_home_button_link"')
                 ->assertDontSeeHtml('@click="$dispatch(\'close-chat\')"');
         });
     });

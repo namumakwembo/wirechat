@@ -191,9 +191,10 @@ class Info extends ModalComponent
         // Ensure all participants are removed before deleting the group
         $participantCount = $this->conversation->participants()
             ->withoutParticipantable(auth()->user())
-            ->where('type', '!=', ParticipantRole::OWNER)
+            ->where('role', '!=', ParticipantRole::OWNER)
             ->count();
 
+            dd($participantCount);
         abort_unless($participantCount == 0, 403, 'Cannot delete group: Please remove all members before attempting to delete the group.');
 
         //delete conversation

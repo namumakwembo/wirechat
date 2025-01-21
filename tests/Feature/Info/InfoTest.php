@@ -951,7 +951,7 @@ describe('Deleting Group', function () {
             ->assertStatus(200);
 
         expect(Conversation::withoutGlobalScopes()->count())->toBe(0);
-    });
+    })->only();
 
     test('group can be deleted after removing all members of Mixed Models or when if they all remove themselves', function () {
 

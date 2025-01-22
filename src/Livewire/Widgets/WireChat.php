@@ -32,13 +32,14 @@ class WireChat extends Component
         ];
     }
 
-    public function openChatWidget($conversationId, $arguments = [], $modalAttributes = []): void
+    public function openChatWidget($conversation, $arguments = [], $modalAttributes = []): void
     {
         $component = 'chat';
         // $componentClass = app(ComponentRegistry::class)->getClass($component);
 
         // Generate a unique ID using the conversationId and arguments
-        $id = md5($component.$conversationId.serialize($arguments));
+        $id = md5($component.$conversation.serialize($arguments));
+
 
         // Merge modal attributes with defaults
         $defaultModalAttributes = [
@@ -51,7 +52,8 @@ class WireChat extends Component
         $this->widgetComponents = [
             $id => [
                 'name' => $component,
-                'conversationId' => $conversationId,
+                //'conversationId' => $conversation,
+                'conversation' => $conversation,
                 'modalAttributes' => $modalAttributes,
             ],
         ];

@@ -118,7 +118,7 @@
                         this.closeOnEscape = attributes.closeOnEscape ?? false;
                         this.closeOnEscapeIsForceful = attributes.closeOnEscapeIsForceful ?? false;
                         this.dispatchCloseEvent = attributes.dispatchCloseEvent ?? false;
-                        this.destroyOnClose = attributes.destroyOnClose ?? false; 
+                        this.destroyOnClose = attributes.destroyOnClose ?? true; 
                         this.closeModalOnClickAway = attributes.closeModalOnClickAway ?? false; 
 
 

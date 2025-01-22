@@ -12,15 +12,18 @@ use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
+use Namu\WireChat\Livewire\Widgets\WireChat as WidgetsWireChat;
 use Namu\WireChat\Models\Action;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Participant;
+use Namu\WireChat\Traits\Widget;
 
 class Members extends ModalComponent
 {
     use WithFileUploads;
     use WithPagination;
-
+    use Widget;
+    
     #[Locked]
     public Conversation $conversation;
 
@@ -77,7 +80,25 @@ class Members extends ModalComponent
 
         $conversation = auth()->user()->createConversationWith($participant->participantable);
 
-        return redirect()->route(WireChat::viewRouteName(), [$conversation->id]);
+
+        $this->handleComponentTermination(
+            redirectRoute:route(WireChat::viewRouteName(),[$conversation->id]),
+            events:[
+                WidgetsWireChat::class => ['open-chat',  ['conversation' => $conversation->id]],
+                'closeModal'
+            ]
+        );
+
+        // $this->closeModalWithEvents([
+        //   //  WidgetsWireChat::class => ['close-chat'],
+        //     WidgetsWireChat::class => ['open-chat',  ['conversation' => $conversation->id]],
+        //    // 'closeChatDrawer',
+        // ]);
+        // $this->dispatch('closeChatDrawer');
+        // $this->dispatch('open-chat',conversation: $conversation->id);
+        // $this->dispatch('closeModal');
+
+
     }
 
     /**

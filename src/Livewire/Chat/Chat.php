@@ -34,7 +34,7 @@ class Chat extends Component
     use WithFileUploads;
     use WithPagination;
 
-    //  public Conversation $conversation;
+   // public ?Conversation $conversation;
     public $conversation;
 
     public $conversationId;
@@ -74,8 +74,8 @@ class Chat extends Component
 
         return [
             'refresh' => '$refresh',
-            'echo-private:conversation.'.$conversationId.',.Namu\\WireChat\\Events\\MessageCreated' => 'appendNewMessage',
-            'echo-private:conversation.'.$conversationId.',.Namu\\WireChat\\Events\\MessageDeleted' => 'removeDeletedMessage',
+            'echo-private:conversation.' . $conversationId . ',.Namu\\WireChat\\Events\\MessageCreated' => 'appendNewMessage',
+            'echo-private:conversation.' . $conversationId . ',.Namu\\WireChat\\Events\\MessageDeleted' => 'removeDeletedMessage',
 
             //  'echo-private:conversation.' .$this->conversation->id. ',.Namu\\WireChat\\Events\\MessageDeleted' => 'removeDeletedMessage',
         ];
@@ -112,7 +112,6 @@ class Chat extends Component
 
             // Dispatch refresh event
             $this->dispatch('refresh')->to(Chats::class);
-
         }
     }
 
@@ -213,7 +212,6 @@ class Chat extends Component
     {
 
         $this->resetErrorBag(['media', 'files']);
-
     }
 
     public function listenBroadcastedMessage($event)
@@ -245,7 +243,7 @@ class Chat extends Component
             //refresh chats list
             $this->dispatch('hardRefresh')->to(Chats::class);
 
-             //Notify listener to close chat
+            //Notify listener to close chat
             $this->dispatch('close-chat');
         } else {
             //redirect to chats page
@@ -306,12 +304,12 @@ class Chat extends Component
     {
         $perMinute = 60;
 
-        if (RateLimiter::tooManyAttempts('send-message:'.auth()->id(), $perMinute)) {
+        if (RateLimiter::tooManyAttempts('send-message:' . auth()->id(), $perMinute)) {
 
             return abort(429, 'Too many attempts!, Please slow down');
         }
 
-        RateLimiter::increment('send-message:'.auth()->id());
+        RateLimiter::increment('send-message:' . auth()->id());
     }
 
     /**
@@ -448,7 +446,6 @@ class Chat extends Component
 
             //dispatch event 'refresh ' to chatlist
             $this->dispatch('refresh')->to(Chats::class);
-
         }
 
         //     dd('hoting');
@@ -624,13 +621,10 @@ class Chat extends Component
                     //    Notification::send($this->receiver, new NewMessageNotification($message));
 
                 }
-
             } else {
                 // code...
                 NotifyParticipants::dispatch($this->conversation, $message);
-
             }
-
         } catch (\Throwable $th) {
 
             Log::error($th->getMessage());
@@ -698,13 +692,12 @@ class Chat extends Component
         // Calculate whether more messages can be loaded
         // Group the messages
         $this->loadedMessages = $messages
-            ->groupBy(fn ($message) => $this->messageGroupKey($message))  // Grouping by custom logic
+            ->groupBy(fn($message) => $this->messageGroupKey($message))  // Grouping by custom logic
             ->map->values();  // Re-index each group
 
         $this->canLoadMore = $this->totalMessageCount > $messages->count();
 
         return $this->loadedMessages;
-
     }
 
     public function placeholder()
@@ -712,7 +705,7 @@ class Chat extends Component
         return view('wirechat::components.placeholders.chat');
     }
 
-    public function mount($conversation)
+    public function mount($conversation = null)
     {
 
         $this->initializeConversation($conversation);
@@ -724,11 +717,27 @@ class Chat extends Component
     private function initializeConversation($conversation)
     {
         abort_unless(auth()->check(), 401);
-        $this->conversation = Conversation::where('id', $this->conversation)->firstOr(fn () => abort(404));
+
+        // Handle different input scenarios
+        if ($conversation instanceof Conversation) {
+            $this->conversation = $conversation;
+        } elseif (is_numeric($conversation)) {
+            // Cast to integer if numeric (handles numeric strings too)
+            $conversationId = (int) $conversation;
+            $this->conversation = Conversation::find($conversationId);
+
+            if (!$this->conversation) {
+                abort(404, "Conversation not found."); // Custom error response
+            }
+        } elseif (is_null($conversation)) {
+            abort(422, "A conversation id is required"); // Custom error for missing input
+        } else {
+           return abort(422, "Invalid conversation input."); // Handle invalid input types
+        }
+
+        //$this->conversation = Conversation::where('id', $conversation)->firstOr(fn () => abort(404));
         $this->totalMessageCount = Message::where('conversation_id', $this->conversation->id)->count();
         abort_unless(auth()->user()->belongsToConversation($this->conversation), 403);
-
-        $this->conversationId = $this->conversation->id;
     }
 
     private function initializeParticipants()
@@ -761,11 +770,11 @@ class Chat extends Component
         $this->conversation->markAsRead();
 
         if ($this->authParticipant) {
-            
+
             $this->authParticipant->update(['last_active_at' => now()]);
 
             //If has deletd Conversation and Deletion has expired
-            if ($this->authParticipant->hasDeletedConversation(true)==false) {
+            if ($this->authParticipant->hasDeletedConversation(true) == false) {
                 $this->authParticipant->update(['conversation_deleted_at' => null]);
             }
         }

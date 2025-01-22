@@ -67,8 +67,21 @@ describe('Initial page', function () {
         $auth = ModelsUser::factory()->create();
         $request = Livewire::actingAs($auth)->test(NewGroup::class);
         $request->assertSee('Cancel');
+        $request->assertSeeHtml('dusk="cancel_create_new_group_button"');
+        $request ->assertMethodWired('$dispatch(\'closeModal\')');
 
+    })->only();
+
+    test('close_modal_button_is_set_correctly', function () {
+
+        $auth = ModelsUser::factory()->create(['email_verified_at' => now()]);
+        $request = Livewire::actingAs($auth)->test(NewChat::class);
+        $request
+            ->assertSeeHtml('dusk="close_modal_button"');
+        $request ->assertMethodWired('$dispatch(\'closeModal\')');
+    
     });
+    
 
     test('Next button is set', function () {
         $auth = ModelsUser::factory()->create();

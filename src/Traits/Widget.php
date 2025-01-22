@@ -6,6 +6,8 @@ use Livewire\Attributes\Locked;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Chat\Chats;
 
+use function PHPUnit\Framework\isEmpty;
+
 /**
  * Trait Actionable
  */
@@ -32,17 +34,47 @@ trait Widget
      * If the component is a widget, it dispatches events to refresh the chat list
      * and notify the listener to close the chat. Otherwise, it redirects to the chats page.
      */
-    public function handleComponentTermination()
-    {
-        if ($this->isWidget()) {
-            // Dispatch an event to refresh the chats list in the widget
-            $this->dispatch('hardRefresh')->to(Chats::class);
+    public function handleComponentTermination(?string $redirectRoute=null, ?array $events=null)
 
-            // Notify the listener to close the current chat widget
-            $this->dispatch('close-chat');
+    {
+
+        //set redirect route
+       if($redirectRoute==null){
+           $redirectRoute=route(WireChat::indexRouteName());
+        }
+
+             //set events to dispatch on termination
+             if ($events==null) {
+                 $events = [
+                     Chats::class => 'refresh-chats',
+                    'close-chat',
+                ];
+            }
+        if ($this->isWidget()) {
+        
+         $this->dispatchWidgetEvents($events);
+
         } else {
             // Redirect to the main chats page
-            $this->redirectRoute(WireChat::indexRouteName());
+           return $this->redirect($redirectRoute);
+        }
+    }
+
+    /** 
+     * Dispatch events to the widget components. upon terminatoin   
+     */
+    private function dispatchWidgetEvents(array $events): void
+    {
+        foreach ($events as $component => $event) {
+            if (is_array($event)) {
+                [$event, $params] = $event;
+            }
+
+            if (is_numeric($component)) {
+                $this->dispatch($event, ...$params ?? []);
+            } else {
+                $this->dispatch($event, ...$params ?? [])->to($component);
+            }
         }
     }
 }

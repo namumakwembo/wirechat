@@ -178,8 +178,8 @@
       </div>
       <main
            x-data="ChatWidget()" 
-           x-on:open-chat="this.selectedConversationId= $event.detail.conversation;"
-           x-on:close-chat.stop="setShowPropertyTo(false)"
+           x-on:open-chat.window="this.selectedConversationId= $event.detail.conversation;"
+           x-on:close-chat.stop.window="setShowPropertyTo(false)"
            x-on:keydown.escape.stop.window="closeChatWidgetOnEscape({ modalType: 'ChatWidget', event: $event });"
            aria-modal="true"
            tabindex="0"
@@ -196,7 +196,7 @@
                 @forelse($widgetComponents as $id => $component)
                     <div  x-show.immediate="activeWidgetComponent == '{{ $id }}'" x-ref="{{ $id }}"
                          wire:key="key-{{$id }}" class="h-full">
-                        @livewire($component['name'], ['conversation'=> $component['conversationId'] ,'widget'=>true], key($id))
+                        @livewire($component['name'], ['conversation'=> $component['conversation'] ,'widget'=>true], key($id))
                     </div>
                 @empty
                 @endforelse

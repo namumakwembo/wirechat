@@ -7,7 +7,7 @@ use Livewire\Component;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Traits\Widget;
-
+use Livewire\Attributes\On;
 class Chats extends Component
 {
     use Widget;
@@ -41,6 +41,12 @@ class Chats extends Component
         $this->conversations = [];
         $this->reset(['page', 'canLoadMore']);
         
+    }
+
+    #[On('refresh-chats')]
+    public  function refreshChats()  {
+            $this->conversations = [];
+            $this->reset(['page', 'canLoadMore']);
     }
     public function refreshComponent($event)
     {

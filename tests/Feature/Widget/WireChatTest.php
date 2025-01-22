@@ -46,7 +46,7 @@ test('it renders Chat when "openChatWidget" event is selected ', function () {
 
     $response->assertDontSeeLivewire(Chat::class);
 
-    $response->dispatch('openChatWidget', conversationId: $conversation->id);
+    $response->dispatch('openChatWidget', conversation: $conversation->id);
 
     //dd($response);
     $response->assertSeeLivewire(Chat::class);
@@ -63,7 +63,7 @@ test('it removes Chat when "closeChatWidget" event is selected ', function () {
     $response->assertDontSeeLivewire(Chat::class);
 
     //open
-    $response->dispatch('openChatWidget', conversationId: $conversation->id);
+    $response->dispatch('openChatWidget', conversation: $conversation->id);
 
     //assert
     $response->assertSeeLivewire(Chat::class);

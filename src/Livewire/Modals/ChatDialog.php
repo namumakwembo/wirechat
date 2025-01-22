@@ -89,7 +89,7 @@ class ChatDialog extends Component
             ->filter();
     }
 
-    public function destroyWireChatComponent($id): void
+    public function destroyChatDialog($id): void
     {
         unset($this->dialogComponents[$id]);
     }
@@ -98,7 +98,7 @@ class ChatDialog extends Component
     {
         return [
             'openChatDialog',
-            'destroyWireChatComponent',
+            'destroyChatDialog',
         ];
     }
 

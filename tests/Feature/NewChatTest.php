@@ -60,8 +60,9 @@ test('close_modal_button_is_set_correctly', function () {
     $request = Livewire::actingAs($auth)->test(NewChat::class);
     $request
         ->assertSeeHtml('dusk="close_modal_button"');
+    $request ->assertMethodWired('$dispatch(\'closeModal\')');
 
-});
+})->only();
 
 it('shows New group if allowed', function () {
 

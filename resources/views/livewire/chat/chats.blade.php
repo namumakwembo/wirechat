@@ -131,7 +131,7 @@
 
                         <a 
                         @if($widget)
-                         @click="$dispatch('open-chat',{conversationId:'@json($conversation->id)'})"
+                         @click="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
                         @else
                          href="{{ route(WireChat::viewRouteName(), $conversation->id) }}" class="shrink-0"
                             
@@ -152,8 +152,8 @@
                             tabindex="0" 
                             role="button" 
                             dusk="openChatWidgetButton"
-                            @click="$dispatch('open-chat',{conversationId:'@json($conversation->id)'})"
-                            @keydown.enter="$dispatch('open-chat',{conversationId:'@json($conversation->id)'})"
+                            @click="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
+                            @keydown.enter="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
                             @else
                             wire:navigate href="{{ route(WireChat::viewRouteName(), $conversation->id) }}"
                             @endif

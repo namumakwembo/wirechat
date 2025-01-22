@@ -46,6 +46,8 @@ abstract class ModalComponent extends Component
         $this->dispatch('closeModal', force: $this->forceClose, skipPreviousModals: $this->skipModals, destroySkipped: $this->destroySkipped);
     }
 
+    
+
     public function closeModalWithEvents(array $events): void
     {
         $this->emitModalEvents($events);

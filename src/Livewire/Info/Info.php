@@ -194,7 +194,6 @@ class Info extends ModalComponent
             ->where('role', '!=', ParticipantRole::OWNER)
             ->count();
 
-            dd($participantCount);
         abort_unless($participantCount == 0, 403, 'Cannot delete group: Please remove all members before attempting to delete the group.');
 
         //delete conversation

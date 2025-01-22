@@ -71,7 +71,7 @@
                     <x-slot name="content">
 
                         <button
-                            wire:click="$dispatch('openChatDrawer', {component: 'info',arguments: { conversation: {{ $conversation->id }},widget:  @json($this->isWidget())  }})"
+                            wire:click="$dispatch('openChatDrawer', {component: 'info',arguments: { conversation: {{ $conversation->id }},widget: @json($this->isWidget())  }})"
                             class="w-full text-start">
 
                             <x-wirechat::dropdown-link>

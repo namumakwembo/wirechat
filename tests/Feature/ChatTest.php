@@ -258,6 +258,60 @@ describe('Presense', function () {
 
 describe('mount()', function () {
 
+
+    test('it renders component when conversation is passed as Id ', function () {
+        $auth = User::factory()->create();
+        $receiver = User::factory()->create(['name' => 'John']);
+
+
+        $conversation = $auth->createConversationWith($receiver);
+
+        $request =  Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id]);
+
+        $request->assertOk();
+    });
+
+
+    test('it renders component when conversation is passed as Conversation Model ', function () {
+        $auth = User::factory()->create();
+        $receiver = User::factory()->create(['name' => 'John']);
+
+
+        $conversation = $auth->createConversationWith($receiver);
+
+        $request =  Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation]);
+
+        $request->assertOk();
+    });
+
+    test('it aborts 422 if conversation is passsed as invalid input', function () {
+        $auth = User::factory()->create();
+        $receiver = User::factory()->create(['name' => 'John']);
+
+
+        $conversation = $auth->createConversationWith($receiver);
+
+        $request =  Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => 'randmo..']);
+
+        $request->assertStatus(422);
+    });
+
+
+
+
+    test('it aborts 422 if conversation is passsed as null', function () {
+        $auth = User::factory()->create();
+        $receiver = User::factory()->create(['name' => 'John']);
+
+
+        $conversation = $auth->createConversationWith($receiver);
+
+        $request =  Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => null]);
+
+        $request->assertStatus(422,"A conversation is required");
+    });
+
+
     test('updates the auth particiapnt  last_active_at field when component is opened', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create(['name' => 'John']);

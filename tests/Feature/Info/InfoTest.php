@@ -769,7 +769,7 @@ describe('updating group name and description', function () {
 
 describe('Deleting Chat', function () {
 
-    test('it redirects to index route and Does NOT dispatch  "close-chat"  & "hardRefresh" events after deleting Private conversation when isNotWidget', function () {
+    test('it redirects to index route and Does NOT dispatch  "close-chat"  & "refresh-chats" events after deleting Private conversation when isNotWidget', function () {
 
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
@@ -781,11 +781,11 @@ describe('Deleting Chat', function () {
             ->assertStatus(200)
             ->assertRedirect(route(WireChat::indexRouteName()))
             ->assertNotDispatched('close-chat')
-            ->assertNotDispatched('hardRefresh');
+            ->assertNotDispatched('refresh-chats');
 
     });
 
-    test('when isWidget it dispatches  "close-chat" & "hardRefresh" events  and Does NOT redirects to index route after deleting Private conversation', function () {
+    test('when isWidget it dispatches  "close-chat" & "refresh-chats" events  and Does NOT redirects to index route after deleting Private conversation', function () {
 
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
@@ -797,11 +797,11 @@ describe('Deleting Chat', function () {
             ->assertStatus(200)
             ->assertNoRedirect()
             ->assertDispatched('close-chat')
-            ->assertDispatched('hardRefresh');
+            ->assertDispatched('refresh-chats');
 
     });
 
-    test('it redirects to index route and Does NOT dispatch "close-chat"  & "hardRefresh" events after deleting Self conversation  when isNotWidget', function () {
+    test('it redirects to index route and Does NOT dispatch "close-chat"  & "refresh-chats" events after deleting Self conversation  when isNotWidget', function () {
 
         $auth = User::factory()->create();
 
@@ -811,11 +811,11 @@ describe('Deleting Chat', function () {
             ->call('deleteChat')
             ->assertStatus(200)
             ->assertNotDispatched('close-chat')
-            ->assertNotDispatched('hardRefresh')
+            ->assertNotDispatched('refresh-chats')
             ->assertRedirect(route(WireChat::indexRouteName()));
     });
 
-    test('when isWidget it dispatches "close-chat"  & "hardRefresh" events and Does NOT redirects to index route   after deleting Self conversation', function () {
+    test('when isWidget it dispatches "close-chat"  & "refresh-chats" events and Does NOT redirects to index route   after deleting Self conversation', function () {
 
         $auth = User::factory()->create();
 
@@ -825,7 +825,7 @@ describe('Deleting Chat', function () {
             ->call('deleteChat')
             ->assertStatus(200)
             ->assertDispatched('close-chat')
-            ->assertDispatched('hardRefresh')
+            ->assertDispatched('refresh-chats')
             ->assertNoRedirect(route(WireChat::indexRouteName()));
     });
 
@@ -859,7 +859,7 @@ describe('Deleting Group', function () {
     });
 
 
-    test('it redirects to index route and Does NOT dispatch  "close-chat"  & "hardRefresh" events after deleting Group conversation when isNotWidget', function () {
+    test('it redirects to index route and Does NOT dispatch  "close-chat"  & "refresh-chats" events after deleting Group conversation when isNotWidget', function () {
 
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
@@ -871,10 +871,10 @@ describe('Deleting Group', function () {
             ->assertStatus(200)
             ->assertRedirect(route(WireChat::indexRouteName()))
             ->assertNotDispatched('close-chat')
-            ->assertNotDispatched('hardRefresh');
+            ->assertNotDispatched('refresh-chats');
     });
 
-    test('when isWidget  it dispatches  "close-chat" & "hardRefresh" events  and Does NOT redirects to index route after deleting Group conversation', function () {
+    test('when isWidget  it dispatches  "close-chat" & "refresh-chats" events  and Does NOT redirects to index route after deleting Group conversation', function () {
 
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
@@ -886,7 +886,7 @@ describe('Deleting Group', function () {
             ->assertStatus(200)
             ->assertNoRedirect(route(WireChat::indexRouteName()))
             ->assertDispatched('close-chat')
-            ->assertDispatched('hardRefresh');
+            ->assertDispatched('refresh-chats');
     });
 
 
@@ -951,7 +951,7 @@ describe('Deleting Group', function () {
             ->assertStatus(200);
 
         expect(Conversation::withoutGlobalScopes()->count())->toBe(0);
-    })->only();
+    });
 
     test('group can be deleted after removing all members of Mixed Models or when if they all remove themselves', function () {
 
@@ -992,7 +992,7 @@ describe('Deleting Group', function () {
 
 describe('Exiting Chat', function () {
 
-    test('it redirects to index route and Does NOT dispatch  "close-chat"  & "hardRefresh" events after exiting Group conversation when isNotWidget', function () {
+    test('it redirects to index route and Does NOT dispatch  "close-chat"  & "refresh-chats" events after exiting Group conversation when isNotWidget', function () {
 
         $auth = User::factory()->create();
 
@@ -1006,10 +1006,10 @@ describe('Exiting Chat', function () {
             ->assertStatus(200)
             ->assertRedirect(route(WireChat::indexRouteName()))
             ->assertNotDispatched('close-chat')
-            ->assertNotDispatched('hardRefresh');
+            ->assertNotDispatched('refresh-chats');
     });
 
-    test('when isWidget  it dispatches  "close-chat" & "hardRefresh" events  and Does NOT redirects to index route after exiting Group conversation', function () {
+    test('when isWidget  it dispatches  "close-chat" & "refresh-chats" events  and Does NOT redirects to index route after exiting Group conversation', function () {
 
         $auth = User::factory()->create();
 
@@ -1023,7 +1023,7 @@ describe('Exiting Chat', function () {
             ->assertStatus(200)
             ->assertNoRedirect(route(WireChat::indexRouteName()))
             ->assertDispatched('close-chat')
-            ->assertDispatched('hardRefresh');
+            ->assertDispatched('refresh-chats');
     });
 
     test('owner cannot exit conversation', function () {

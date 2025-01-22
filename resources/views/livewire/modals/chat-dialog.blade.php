@@ -65,7 +65,7 @@
                     //Check if should completley destroy component on close 
                     //Meaning state won't be retained if component is opened again
                     if (this.destroyOnClose === true) {
-                        Livewire.dispatch('destroyWireChatComponent', {
+                        Livewire.dispatch('destroyChatDialog', {
                             id: this.activeDialogComponent
                         });
                     }

@@ -144,7 +144,7 @@
                 init() {
 
                     this.listeners.push(
-                        Livewire.on('closeModal', (data) => {
+                        Livewire.on('closeChatDialog', (data) => {
                             this.closeDialog(data?.force ?? false, data?.skipPreviousModals ?? 0, data
                                 ?.destroySkipped ?? false);
                         })

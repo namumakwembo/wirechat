@@ -65,9 +65,9 @@ describe('presence test', function () {
 
         //* since converstaion already have one user which is the auth then default is 1
         $request ->assertSeeHtml('dusk="close_modal_button"');
-        $request ->assertMethodWired('$dispatch(\'closeModal\')');;
+        $request ->assertMethodWired('$dispatch(\'closeChatDialog\')');;
 
-    })->only();
+    });
 
     test('it loads members', function () {
         $auth = User::factory()->create();
@@ -465,7 +465,7 @@ describe('actions test', function () {
             ->call('sendMessage', $participant->id)
             ->assertRedirect(route(WireChat::viewRouteName(), 2))
             ->assertNotDispatched('close-chat')
-            ->assertNotDispatched('closeModal')
+            ->assertNotDispatched('closeChatDialog')
             ->assertNotDispatched('open-chat');
     });
 
@@ -483,7 +483,7 @@ describe('actions test', function () {
             ->call('sendMessage', $participant->id)
             ->assertNoRedirect(route(WireChat::viewRouteName(), 2))
             ->assertDispatched('open-chat')
-            ->assertDispatched('closeModal')
+            ->assertDispatched('closeChatDialog')
             ->assertNotDispatched('close-chat');
 
     });

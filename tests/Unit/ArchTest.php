@@ -23,3 +23,15 @@ arch('Make sure Actionable is used in Message Model')
 arch('Make sure Actionable is used in Participant Model')
     ->expect('Namu\\WireChat\\Traits\\Actionable')
     ->toBeUsedIn('Namu\WireChat\Models\Participant');
+
+   
+describe('Test Compenents use Widget Trait',function(){
+    arch('make the component use Widget Trait')
+    ->expect('Namu\WireChat\Livewire\Components\NewChat')
+    ->expect('Namu\WireChat\Livewire\Components\NewGroup')
+
+    ->toUseTrait('Namu\WireChat\Traits\Widget');
+
+
+})->only();
+    

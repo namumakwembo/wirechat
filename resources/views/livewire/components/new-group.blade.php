@@ -86,7 +86,7 @@
 
                 <footer class="flex gap-4 justify-end mt-auto">
 
-                    <button type="button" wire:click="$dispatch('closeModal')" dusk="cancel_create_new_group_button"
+                    <button type="button" wire:click="$dispatch('closeChatDialog')" dusk="cancel_create_new_group_button"
                         class="font-bold dark:hover:bg-gray-700 p-3 px-4 rounded-xl ">
                         Cancel
                     </button>
@@ -127,7 +127,7 @@
                         wire:click="create"
                         wire:loading.attr="disabled"
                         wire:target='create'
-                        class="p-2 disabled:cursor-not-allowed  ml-0 text-gray-600 hover:dark:bg-gray-700 hover:dark:text-white rounded-full hover:text-gray-800 hover:bg-gray-50">
+                        class="p-2 disabled:cursor-not-allowed  ml-0 text-gray-600 dark:text-gray-300 hover:dark:bg-gray-700 hover:dark:text-white rounded-full hover:text-gray-800 hover:bg-gray-50">
                         Create
                     </button>
 

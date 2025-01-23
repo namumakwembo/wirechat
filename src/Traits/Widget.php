@@ -34,29 +34,28 @@ trait Widget
      * If the component is a widget, it dispatches events to refresh the chat list
      * and notify the listener to close the chat. Otherwise, it redirects to the chats page.
      */
-    public function handleComponentTermination(?string $redirectRoute=null, ?array $events=null)
+    public function handleComponentTermination(?string $redirectRoute = null, ?array $events = null)
 
     {
 
         //set redirect route
-       if($redirectRoute==null){
-           $redirectRoute=route(WireChat::indexRouteName());
+        if ($redirectRoute == null) {
+            $redirectRoute = route(WireChat::indexRouteName());
         }
 
-             //set events to dispatch on termination
-             if ($events==null) {
-                 $events = [
-                     Chats::class => 'refresh-chats',
-                    'close-chat',
-                ];
-            }
+        //set events to dispatch on termination
+        if ($events == null) {
+            $events = [
+                Chats::class => 'refresh-chats',
+                'close-chat',
+            ];
+        }
         if ($this->isWidget()) {
-        
-         $this->dispatchWidgetEvents($events);
 
+            $this->dispatchWidgetEvents($events);
         } else {
             // Redirect to the main chats page
-           return $this->redirect($redirectRoute);
+            return $this->redirect($redirectRoute);
         }
     }
 
@@ -76,5 +75,24 @@ trait Widget
                 $this->dispatch($event, ...$params ?? [])->to($component);
             }
         }
+    }
+
+
+    /**
+     * A method to dispatch open chat widget 
+     * @param int $conversation
+     */
+    public function openChat(int $conversation): void
+    {
+        $this->dispatch('open-chat', ['conversation' => $conversation]);
+    }
+
+    /**
+     * A method to dispatch close chat widget 
+     * @param null
+     */
+    public function closeChat(): void
+    {
+        $this->dispatch('close-chat');
     }
 }

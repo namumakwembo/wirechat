@@ -85,7 +85,7 @@ class Members extends ModalComponent
             redirectRoute:route(WireChat::viewRouteName(),[$conversation->id]),
             events:[
                 WidgetsWireChat::class => ['open-chat',  ['conversation' => $conversation->id]],
-                'closeModal'
+                'closeChatDialog'
             ]
         );
 

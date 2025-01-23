@@ -27,11 +27,19 @@ arch('Make sure Actionable is used in Participant Model')
    
 describe('Test Compenents use Widget Trait',function(){
     arch('make the component use Widget Trait')
+    //Chat
+    ->expect('Namu\WireChat\Livewire\Chat\Chat')
+    ->expect('Namu\WireChat\Livewire\Chat\Chats')
+    //componnets 
     ->expect('Namu\WireChat\Livewire\Components\NewChat')
     ->expect('Namu\WireChat\Livewire\Components\NewGroup')
+    //Info
+    ->expect('Namu\WireChat\Livewire\Info\AddMembers')
+    ->expect('Namu\WireChat\Livewire\Info\Info')
+    ->expect('Namu\WireChat\Livewire\Info\Members')
 
     ->toUseTrait('Namu\WireChat\Traits\Widget');
 
 
-})->only();
+});
     

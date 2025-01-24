@@ -183,7 +183,7 @@
            x-on:keydown.escape.stop.window="closeChatWidgetOnEscape({ modalType: 'ChatWidget', event: $event });"
            aria-modal="true"
            tabindex="0"
-           class=" hidden md:grid grid  w-full  grow"
+           class=" hidden md:grid grid  w-full  grow  focus:outline-none focus:border-none"
            style="contain:content;">
             <div 
                 x-cloak

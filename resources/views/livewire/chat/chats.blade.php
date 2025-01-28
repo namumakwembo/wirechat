@@ -53,9 +53,7 @@
 
 
 <div 
-x-data="{
-    selectedConversationId:@json(request()->conversation_id??$selectedConversationId)
-}"
+x-data="{selectedConversationId:'{{request()->conversation_id??$selectedConversationId}}' }"
 x-on:close-chat.window="$wire.selectedConversationId=null;selectedConversationId=null"
 x-on:open-chat.window="selectedConversationId= $event.detail.conversation;"
 x-init=" setTimeout(() => {
@@ -118,30 +116,25 @@ x-init=" setTimeout(() => {
                         $belongsToAuth = $lastMessage?->belongsToAuth();
 
                     @endphp
-
-                    {{-- @dd($conversation->receiver()->first()) --}}
-
                     {{-- Chat list item --}}
                     {{-- We use style here to make it easy for dynamic and safe injection --}}
                     <li 
-                    x-data="{
-                        conversationID:@json($conversation->id)
-                    }"
-                    id="conversation-{{ $conversation->id }}" wire:key="conversation-em-{{ $conversation->id }}"
+                       x-data="{conversationID:'@json($conversation->id)'}"
+                       id="conversation-{{$conversation->id }}"
+                       wire:key="conversation-em-{{$conversation->id}}"
 
                         @style([
                             'border-color:' . $primaryColor . '20' => $selectedConversationId == $conversation?->id,
                         ]) 
-                        class="py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-sm transition-colors duration-150 flex gap-4 relative w-full cursor-pointer px-2 {{($selectedConversationId == $conversation?->id)?
-                            'bg-gray-50 dark:bg-gray-800   border-r-4':''}}"
-
-                        :class="selectedConversationId==conversationID && 'bg-gray-50 dark:bg-gray-800 border-r-4  border-opacity-20 border-[var(--wirechat-primary-color)]'"
-                        >
+                        class="py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-sm transition-colors duration-150 flex gap-4 relative w-full cursor-pointer px-2"
+                        :class="selectedConversationId == conversationID && 'bg-gray-50 dark:bg-gray-800 border-r-4  border-opacity-20 border-[var(--wirechat-primary-color)]'">
 
                         <a
-                            @if ($widget) @click="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
+                        @if ($widget)
+                             @click="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
                         @else
-                         href="{{ route(WireChat::viewRouteName(), $conversation->id) }}" class="shrink-0" @endif>
+                         href="{{ route(WireChat::viewRouteName(), $conversation->id) }}" class="shrink-0" 
+                         @endif>
                             <x-wirechat::avatar disappearing="{{ $conversation->hasDisappearingTurnedOn() }}"
                                 group="{{ $conversation->isGroup() }}"
                                 src="{{ $group ? $group?->cover_url : $receiver?->cover_url ?? null }}"

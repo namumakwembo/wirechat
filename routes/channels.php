@@ -27,7 +27,13 @@ Broadcast::channel('conversation.{conversationId}', function ($user, int $conver
 
     return false; // Deny access to the channel
 
-});
+}
+, 
+[
+'guards' => config('wirechat.routes.guards',['web']),
+'middleware'=>config('wirechat.routes.middleware',['web','auth'])
+]
+);
 
 Broadcast::channel('participant.{id}', function ($user, $id) {
     //*Check if the authenticated user matches the broadcast recipient (polymorphic check)
@@ -36,4 +42,9 @@ Broadcast::channel('participant.{id}', function ($user, $id) {
 
     // Log::info('here');
     return $user->id == $id;
-});
+}, 
+[
+'guards' => config('wirechat.routes.guards',['web']),
+'middleware'=>config('wirechat.routes.middleware',['web','auth'])
+]
+);

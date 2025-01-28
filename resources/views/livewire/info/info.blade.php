@@ -1,4 +1,4 @@
-<div id="info-modal" class="bg-white dark:bg-gray-900">
+<div id="info-modal" class="bg-white dark:bg-gray-900 border    min-h-screen">
 
 
     @php

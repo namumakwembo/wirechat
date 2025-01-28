@@ -59,18 +59,17 @@
             }
         }
 
-        /* Emoji picker Dark mode configuration */
-        @media (prefers-color-scheme: dark) {
-            emoji-picker {
-                --background: #1f2937;
-                --input-border-color: #374151;
-                --outline-color: none;
-                --outline-size: 1px;
-                --border-color: none;
-                --input-font-color: white;
-                --indicator-color: #9ca3af;
-                --button-hover-background: #9ca3af
-            }
+
+        /* Ensure dark mode takes precedence */
+        .dark emoji-picker {
+            --background: none !important;
+            --input-border-color: #374151;
+            --outline-color: none;
+            --outline-size: 1px;
+            --border-color: none;
+            --input-font-color: white;
+            --indicator-color: #9ca3af;
+            --button-hover-background: #9ca3af
         }
 
 
@@ -114,30 +113,28 @@
     </style>
 @endassets
 
-    <div x-data="{
-        initializing: true,
-        conversationElement: document.getElementById('conversation'),
-        'loadEmojiPicker': function() {
+<div x-data="{
+    initializing: true,
+    conversationElement: document.getElementById('conversation'),
+    'loadEmojiPicker': function() {
 
-            let script = document.createElement('script');
-            script.type = 'module';
-            script.src = 'https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js';
-            script.defer = true;
-            document.head.appendChild(script);
-        }
-    }" x-init="setTimeout(() => {
-        $wire.dispatch('focus-input-field');
-        requestAnimationFrame(() => {
-          
+        let script = document.createElement('script');
+        script.type = 'module';
+        script.src = 'https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js';
+        script.defer = true;
+        document.head.appendChild(script);
+    }
+}" x-init="setTimeout(() => {
+    $wire.dispatch('focus-input-field');
+    requestAnimationFrame(() => {
 
-            initializing = false;
-        });
 
-        }, 120);
+        initializing = false;
+    });
 
-        loadEmojiPicker();
-    "
+}, 120);
 
+loadEmojiPicker();"
     class=" w-full transition  bg-white/95 dark:bg-gray-900 overflow-hidden  h-full relative" style="contain:content">
 
     {{-- todo: add rounded corners to attachment --}}

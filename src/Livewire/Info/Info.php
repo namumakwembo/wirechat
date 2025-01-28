@@ -9,6 +9,7 @@ use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Chat\Chats;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
+use Namu\WireChat\Livewire\Widgets\WireChat as WidgetsWireChat;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Traits\Widget;
 
@@ -199,7 +200,18 @@ class Info extends ModalComponent
         //delete conversation
         $this->conversation?->forceDelete();
 
-        $this->handleComponentTermination();
+      //  $this->conversation->deleteFor(auth()->user());
+
+            //redirect to conversation
+            $this->handleComponentTermination(
+                redirectRoute:route(WireChat::indexRouteName()),
+                events:[
+                    'close-chat',
+                    'refresh-chats',
+                    //Chats::class=> ['chat-deleted'=>['conversation'=>$this->conversation->id]],
+                    //Chats::class => ['chat-deleted',  [$this->conversation->id]]
+                ]
+            );
     }
 
     public function exitConversation()
@@ -246,15 +258,17 @@ class Info extends ModalComponent
 
     public function render()
     {
+      
 
+        $participant = $this->conversation?->participant(auth()->user());
+    
 
-        $participant = $this->conversation->participant(auth()->user());
 
       //  dd($this->isWidget(),$participant);
 
         // Pass data to the view
         return view('wirechat::livewire.info.info', [
-            'receiver' => $this->conversation->getReceiver(),
+            'receiver' => $this->conversation?->getReceiver(),
             'participant' => $participant,
         ]);
     }

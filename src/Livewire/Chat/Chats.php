@@ -48,6 +48,21 @@ class Chats extends Component
             $this->conversations = [];
             $this->reset(['page', 'canLoadMore']);
     }
+
+
+    /**
+     * Handle the 'chat-deleted' event
+     */
+    #[On('chat-deleted')]
+    public function chatDeleted($conversationId)
+    {
+        $this->conversations = $this->conversations->reject(function ($conversation) use ($conversationId) {
+            return $conversation->id === $conversationId;
+        });
+        
+    }
+
+
     public function refreshComponent($event)
     {
 
@@ -178,6 +193,7 @@ class Chats extends Component
         abort_unless(auth()->check(), 401);
         $this->selectedConversationId = request()->conversation_id;
         //$this->loadConversations();
+        $this->conversations=collect();
     }
 
     public function render()

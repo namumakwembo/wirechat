@@ -238,17 +238,13 @@ class Chat extends Component
         //delete conversation
         $this->conversation->deleteFor(auth()->user());
 
-        //Dispatach event instead if isWidget
-        if ($this->isWidget()) {
-            //refresh chats list
-            $this->dispatch('hardRefresh')->to(Chats::class);
-
-            //Notify listener to close chat
-            $this->dispatch('close-chat');
-        } else {
-            //redirect to chats page
-            $this->redirectRoute(WireChat::indexRouteName());
-        }
+        $this->handleComponentTermination(
+            redirectRoute:route(WireChat::indexRouteName()),
+            events:[
+                'close-chat',
+                 Chats::class => ['chat-deleted',  [$this->conversation->id]]
+            ]
+        );
     }
 
     /**
@@ -263,16 +259,14 @@ class Chat extends Component
         $this->reset('loadedMessages', 'media', 'files', 'body');
 
         //Dispatach event instead if isWidget
-        if ($this->isWidget()) {
-            //refresh chats list
-            $this->dispatch('refresh')->to(Chats::class);
 
-            //Notify listener to close chat
-            $this->dispatch('close-chat');
-        } else {
-            //redirect to chats page
-            $this->redirectRoute(WireChat::indexRouteName());
-        }
+        $this->handleComponentTermination(
+            redirectRoute:route(WireChat::indexRouteName()),
+            events:[
+                'close-chat',
+                 Chats::class => 'refresh'
+            ]
+        );
     }
 
     public function exitConversation()

@@ -2044,7 +2044,7 @@ describe('Deleting Conversation', function () {
         });
 
 
-        test('it dispatches "hardRefresh" event after Deleting conversation', function () {
+        test('it dispatches "chat-deleted" event after Deleting conversation', function () {
 
             $auth = User::factory()->create();
             $receiver = User::factory()->create(['name' => 'John']);
@@ -2065,10 +2065,10 @@ describe('Deleting Conversation', function () {
 
             $request
                 ->call('deleteConversation')
-                ->assertDispatched('hardRefresh');
+                ->assertDispatched('chat-deleted');
         });
 
-        test('Deleted chat should no longer appea in Chats componnet when "hardRefresh" event is dispacted after Deleting conversation', function () {
+        test('Deleted chat should no longer appea in Chats componnet when "chat-deleted" event is dispacted after Deleting conversation', function () {
 
             $auth = User::factory()->create();
             $receiver = User::factory()->create(['name' => 'John']);
@@ -2089,10 +2089,10 @@ describe('Deleting Conversation', function () {
 
             $request
                 ->call('deleteConversation')
-                ->assertDispatched('hardRefresh');
+                ->assertDispatched('chat-deleted');
 
             //Assert conversation no longer visible in chats after claring chat
-            $CHATLIST->dispatch('hardRefresh')->assertViewHas('conversations', function ($conversation) {
+            $CHATLIST->dispatch('chat-deleted',$conversation->id)->assertViewHas('conversations', function ($conversation) {
                 return count($conversation) == 0;
             });
         });

@@ -46,8 +46,7 @@ trait Widget
         //set events to dispatch on termination
         if ($events == null) {
             $events = [
-                Chats::class => 'refresh-chats',
-                'close-chat',
+                'close-chat'
             ];
         }
         if ($this->isWidget()) {

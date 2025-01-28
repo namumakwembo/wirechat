@@ -15,7 +15,7 @@ use Namu\WireChat\Models\Participant;
 
 class BroadcastMessage implements ShouldQueue
 {
-    use Batchable,Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * Create a new job instance.

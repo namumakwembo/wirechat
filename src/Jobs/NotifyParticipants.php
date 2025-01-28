@@ -78,7 +78,7 @@ class NotifyParticipants implements ShouldQueue
             // Delete the job and stop further processing
             //$this->fail();
             $this->delete();
-
+            Log::error('Participants not notified : Job older than '.$messageAgeInSeconds.'seconds');
             return;
         }
 

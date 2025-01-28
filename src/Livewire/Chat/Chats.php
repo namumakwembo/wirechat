@@ -38,14 +38,14 @@ class Chats extends Component
     *  Used to force hat list to reset all data as if it was newly opened
     */
    public  function hardRefresh()  {
-        $this->conversations = [];
+        $this->conversations = collect();
         $this->reset(['page', 'canLoadMore']);
         
     }
 
     #[On('refresh-chats')]
     public  function refreshChats()  {
-            $this->conversations = [];
+            $this->conversations = collect();
             $this->reset(['page', 'canLoadMore']);
     }
 
@@ -62,6 +62,17 @@ class Chats extends Component
         
     }
 
+    /**
+     * Handle the 'chat-exited' event
+     */
+    #[On('chat-exited')]
+    public function chatExited($conversationId)
+    {
+        $this->conversations = $this->conversations->reject(function ($conversation) use ($conversationId) {
+            return $conversation->id === $conversationId;
+        });
+        
+    }
 
     public function refreshComponent($event)
     {

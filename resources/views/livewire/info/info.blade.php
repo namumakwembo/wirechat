@@ -1,4 +1,4 @@
-<div id="info-modal" class="bg-white dark:bg-gray-900 border    min-h-screen">
+<div id="info-modal" class="bg-white dark:bg-gray-900     min-h-screen">
 
 
     @php
@@ -6,8 +6,6 @@
         $authIsOwner = $participant?->isOwner();
         $isGroup = $conversation?->isGroup();
         $group = $conversation?->group;
-
-
     @endphp
 
     <section class="flex gap-4 z-[10]  items-center p-5 sticky top-0 bg-white dark:bg-gray-900  ">

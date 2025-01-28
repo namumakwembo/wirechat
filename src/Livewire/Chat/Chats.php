@@ -74,6 +74,8 @@ class Chats extends Component
         
     }
 
+    
+
     public function refreshComponent($event)
     {
 

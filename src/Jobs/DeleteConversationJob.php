@@ -25,15 +25,13 @@ class DeleteConversationJob implements ShouldQueue
     {
         //
          $this->onQueue(WireChat::notificationsQueue());
-        // $this->delay(now()->addSeconds(2)); // Delay
+         $this->delay(now()->addSeconds(5)); // Delay
     }
 
     public function handle()
     {
 
         $this->conversation->delete();
-        logger('Deleted');
 
- 
     }
 }

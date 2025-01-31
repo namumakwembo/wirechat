@@ -111,9 +111,10 @@ class WireChatServiceProvider extends ServiceProvider
     protected function loadAssets(){
 
         Blade::directive('wirechatAssets', function () {
-
-        return "<?php echo view('wirechat::assets')->render(); ?>";
-          //  return " @livewire('chat-dialog') <x-wirechat::toast />";
+        return "<?php 
+                echo Blade::render('@livewire(\'chat-dialog\')');
+                echo Blade::render('<x-wirechat::toast/>');
+                ?>";
         });
     }
 

@@ -62,7 +62,6 @@
 
     @wirechatAssets
 
-
 </body>
 
 </html>

@@ -332,6 +332,45 @@ describe('mount()', function () {
 
         expect($participant->last_active_at)->not->toBe(null);
     });
+
+
+
+
+    test('When NOT Widget it does not dispatches "chat-opened" event after succesfully loading chat', function () {
+        $auth = User::factory()->create();
+
+        //create group
+        $conversation = $auth->createGroup(name: 'New group', description: 'description');
+        $auth->sendMessageTo($conversation, 'hi');
+
+        //add user and exit conversation
+        $user = User::factory()->create();
+        $conversation->addParticipant($user);
+        $user->sendMessageTo($conversation, 'hi');
+
+        //login as user not auth (Owner)
+        $request = Livewire::actingAs($user)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => false]);
+
+        $request
+            ->assertStatus(200)
+            ->assertNotDispatched('chat-opened');
+    });
+
+    test('When Widget it dispatches "chat-opened" event after succesfully loading chat', function () {
+        $auth = User::factory()->create();
+        $user = User::factory()->create();
+
+        //create group
+        $conversation = $auth->createConversationWith($auth,'hi');
+        //login as user not auth (Owner)
+        $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
+
+        $request
+            ->assertOK()
+            ->assertDispatched('chat-opened');
+    });
+
+
 });
 
 describe('Box presence test: ', function () {

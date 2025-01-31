@@ -123,13 +123,13 @@
         script.src = 'https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js';
         script.defer = true;
         document.head.appendChild(script);
-    }
+    },
 }" x-init="setTimeout(() => {
-    $wire.dispatch('focus-input-field');
+
     requestAnimationFrame(() => {
-
-
         initializing = false;
+        $wire.dispatch('focus-input-field');
+       
     });
 
 }, 120);
@@ -137,7 +137,6 @@
 loadEmojiPicker();"
     class=" w-full transition  bg-white/95 dark:bg-gray-900 overflow-hidden  h-full relative" style="contain:content">
 
-    {{-- todo: add rounded corners to attachment --}}
     <div class=" flex flex-col  grow  h-full relative ">
 
         {{-- ---------- --}}

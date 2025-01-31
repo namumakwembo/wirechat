@@ -772,6 +772,14 @@ class Chat extends Component
                 $this->authParticipant->update(['conversation_deleted_at' => null]);
             }
         }
+
+
+        //Dispach hideUnreadStatus for conversation if is widget
+        //Only fire event if chat is widget to avoid unecessary event firing 
+        if ($this->isWidget()) {
+            $this->dispatch('chat-opened',conversation: $this->conversation->id);
+        }
+
     }
 
     public function render()

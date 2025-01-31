@@ -119,16 +119,19 @@ x-init=" setTimeout(() => {
                     {{-- Chat list item --}}
                     {{-- We use style here to make it easy for dynamic and safe injection --}}
                     <li 
-                       x-data="{conversationID:'@json($conversation->id)'}"
+                       x-data="{
+                        conversationID:'@json($conversation->id)',
+                        showUnreadStatus:true,
+                        handleChatOpened($event){
+                            this.showUnreadStatus= $event.detail.conversation == this.conversationID?false:true;
+                        }
+                    }"
                        id="conversation-{{$conversation->id }}"
                        wire:key="conversation-em-{{$conversation->id}}"
-
-                        @style([
-                            'border-color:' . $primaryColor . '20' => $selectedConversationId == $conversation?->id,
-                        ]) 
+                       x-on:chat-opened.window="handleChatOpened($event)"
+                        @style([ 'border-color:' . $primaryColor . '20' => $selectedConversationId == $conversation?->id, ]) 
                         class="py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-sm transition-colors duration-150 flex gap-4 relative w-full cursor-pointer px-2"
                         :class="selectedConversationId == conversationID && 'bg-gray-50 dark:bg-gray-800 border-r-4  border-opacity-20 border-[var(--wirechat-primary-color)]'">
-
                         <a
                         @if ($widget)
                              @click="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
@@ -144,7 +147,7 @@ x-init=" setTimeout(() => {
                         <aside class="grid  grid-cols-12 w-full">
 
 
-                            <a @if ($widget) tabindex="0" 
+                        <a @if ($widget) tabindex="0" 
                             role="button" 
                             dusk="openChatWidgetButton"
                             @click="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
@@ -209,10 +212,10 @@ x-init=" setTimeout(() => {
                             {{-- Read status --}}
                             {{-- Only show if AUTH is NOT onwer of message --}}
 
-                            {{-- {{'read by auth ?' . $isReadByAuth}} --}}
                             @if ($lastMessage != null && !$lastMessage?->ownedBy($authUser) && !$isReadByAuth)
-                                <div dusk="unreadMessagesDot" class=" col-span-2 flex flex-col text-center my-auto">
+                                <div x-show="showUnreadStatus" dusk="unreadMessagesDot" class=" col-span-2 flex flex-col text-center my-auto">
                                     {{-- Dots icon --}}
+                                    <span dusk="unreadDotItem" class="sr-only">unread dot</span>
                                     <svg @style(['color:' . $primaryColor]) xmlns="http://www.w3.org/2000/svg" width="16"
                                         height="16" fill="currentColor" class="bi bi-dot w-10 h-10 text-blue-500"
                                         viewBox="0 0 16 16">

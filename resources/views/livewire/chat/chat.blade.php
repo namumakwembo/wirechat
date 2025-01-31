@@ -111,18 +111,23 @@
 
         }
     </style>
+
+{{-- <script type='module' defer  src='https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js'></script> --}}
+
+
 @endassets
 
 <div x-data="{
     initializing: true,
     conversationElement: document.getElementById('conversation'),
-    'loadEmojiPicker': function() {
-
+    loadEmojiPicker () {
+    if (!document.head.querySelector('script[src=\'https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js\']')) {
         let script = document.createElement('script');
         script.type = 'module';
+        script.async = true; // Load asynchronously
         script.src = 'https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js';
-        script.defer = true;
         document.head.appendChild(script);
+    }
     },
 }" x-init="setTimeout(() => {
 
@@ -130,11 +135,12 @@
         initializing = false;
         $wire.dispatch('focus-input-field');
        
+        loadEmojiPicker();
     });
 
 }, 120);
 
-loadEmojiPicker();"
+"
     class=" w-full transition  bg-white/95 dark:bg-gray-900 overflow-hidden  h-full relative" style="contain:content">
 
     <div class=" flex flex-col  grow  h-full relative ">
@@ -162,9 +168,6 @@ loadEmojiPicker();"
 
 
     </div>
-
-
-
 
     <livewire:chat-drawer />
 </div>

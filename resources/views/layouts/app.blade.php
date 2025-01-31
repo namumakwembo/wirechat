@@ -57,10 +57,12 @@
         </main>
 
     </div>
+
     @livewireScripts
-    @once
-    @livewire('chat-dialog')
-   @endonce
+
+    @wirechatAssets
+
+
 </body>
 
 </html>

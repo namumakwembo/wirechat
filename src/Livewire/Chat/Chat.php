@@ -784,7 +784,6 @@ class Chat extends Component
 
     public function render()
     {
-        // $this->conversation->turnOnDisappearing(3600);
         return view('wirechat::livewire.chat.chat');
     }
 }

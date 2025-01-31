@@ -24,6 +24,9 @@ use Namu\WireChat\View\Components\ChatBox\Image;
 
 class WireChatServiceProvider extends ServiceProvider
 {
+
+
+    
     public function boot()
     {
 
@@ -57,6 +60,23 @@ class WireChatServiceProvider extends ServiceProvider
         // Load the package's channels.php file
         // require __DIR__ . '/../routes/channels.php';
 
+        //load assets
+        $this->loadAssets();
+
+    }
+
+    public function register()
+    {
+
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/wirechat.php', 'wirechat'
+        );
+
+        //register facades
+        $this->app->singleton('wirechat', function ($app) {
+            return new WireChatService;
+        });
+
     }
 
     //custom methods for livewire components
@@ -86,19 +106,16 @@ class WireChatServiceProvider extends ServiceProvider
 
     }
 
-    public function register()
-    {
 
-        $this->mergeConfigFrom(
-            __DIR__.'/../config/wirechat.php', 'wirechat'
-        );
+    //load assets 
+    protected function loadAssets(){
 
-        //register facades
-        $this->app->singleton('wirechat', function ($app) {
-            return new WireChatService;
+        Blade::directive('wirechatAssets', function () {
+
+        return "<?php echo view('wirechat::assets')->render(); ?>";
+          //  return " @livewire('chat-dialog') <x-wirechat::toast />";
         });
-
-        //      $this->app->register(LivewireModalServiceProvider::class);
-
     }
+
+  
 }

@@ -114,7 +114,10 @@ class WireChatServiceProvider extends ServiceProvider
         return "<?php 
                 echo Blade::render('@livewire(\'chat-dialog\')');
                 echo Blade::render('<x-wirechat::toast/>');
-                ?>";
+                ?>
+                
+                <script type='module' defer src='https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js'></script>
+                ";
         });
     }
 

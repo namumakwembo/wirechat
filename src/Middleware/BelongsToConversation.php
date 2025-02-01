@@ -24,7 +24,7 @@ class BelongsToConversation
 
         if (!$user || !$user->belongsToConversation($conversation)
         ) {
-            abort(403, 'Unauthorized');
+            abort(403, 'Forbidden');
         }
 
         return $next($request);

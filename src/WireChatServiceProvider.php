@@ -2,6 +2,7 @@
 
 namespace Namu\WireChat;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -19,6 +20,7 @@ use Namu\WireChat\Livewire\Info\Members;
 use Namu\WireChat\Livewire\Modals\ChatDialog;
 use Namu\WireChat\Livewire\Modals\ChatDrawer;
 use Namu\WireChat\Livewire\Widgets\WireChat;
+use Namu\WireChat\Middleware\BelongsToConversation;
 use Namu\WireChat\Services\WireChatService;
 use Namu\WireChat\View\Components\ChatBox\Image;
 
@@ -63,6 +65,10 @@ class WireChatServiceProvider extends ServiceProvider
         //load assets
         $this->loadAssets();
 
+
+        //load middleware
+        $this->registerMiddlewares();
+
     }
 
     public function register()
@@ -103,6 +109,13 @@ class WireChatServiceProvider extends ServiceProvider
 
         //Widgets
         Livewire::component('wirechat', WireChat::class);
+
+    }
+
+    protected function registerMiddlewares(){
+
+        $router = $this->app->make(Router::class);
+        $router->aliasMiddleware('belongsToConversation', BelongsToConversation::class);
 
     }
 

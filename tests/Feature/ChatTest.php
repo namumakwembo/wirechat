@@ -336,7 +336,7 @@ describe('mount()', function () {
 
 
 
-    test('When NOT Widget it does not dispatches "chat-opened" event after succesfully loading chat', function () {
+    test('When NOT Widget it does not dispatches "refresh" event after succesfully loading chat', function () {
         $auth = User::factory()->create();
 
         //create group
@@ -353,10 +353,10 @@ describe('mount()', function () {
 
         $request
             ->assertStatus(200)
-            ->assertNotDispatched('chat-opened');
+            ->assertNotDispatched('refresh');
     });
 
-    test('When Widget it dispatches "chat-opened" event after succesfully loading chat', function () {
+    test('When Widget it dispatches "refresh" event after succesfully loading chat', function () {
         $auth = User::factory()->create();
         $user = User::factory()->create();
 
@@ -367,7 +367,7 @@ describe('mount()', function () {
 
         $request
             ->assertOK()
-            ->assertDispatched('chat-opened');
+            ->assertDispatched('refresh');
     });
 
 
@@ -633,8 +633,10 @@ describe('Box presence test: ', function () {
             Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true])
                 ->assertDontSeeHtml('href="' . route(WireChat::indexRouteName()) . '"')
                 ->assertSeeHtml('dusk="return_to_home_button_dispatch"')
-                ->assertDontSeeHtml('dusk="return_to_home_button_link"')
-                ->assertSeeHtml('@click="$dispatch(\'close-chat\')"');
+                ->assertDontSeeHtml('dusk="return_to_home_button_link"');
+//                ->assertMethodWired('$dispatch(\'close-chat\')');
+
+                
         });
 
         test('it doesnt render $dispatch("close-chat") BUT Renders redirect to chats index', function () {

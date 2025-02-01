@@ -46,7 +46,7 @@ trait Widget
         //set events to dispatch on termination
         if ($events == null) {
             $events = [
-                'close-chat'
+                ['close-chat',  ['conversation'=> $this->conversation->id]]
             ];
         }
         if ($this->isWidget()) {

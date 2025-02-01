@@ -54,7 +54,6 @@
 
 <div 
 x-data="{selectedConversationId:'{{request()->conversation_id??$selectedConversationId}}' }"
-x-on:close-chat.window="$wire.selectedConversationId=null;selectedConversationId=null"
 x-on:open-chat.window="selectedConversationId= $event.detail.conversation;"
 x-init=" setTimeout(() => {
      conversationElement = document.getElementById('conversation-'+selectedConversationId);
@@ -119,16 +118,20 @@ x-init=" setTimeout(() => {
                     {{-- Chat list item --}}
                     {{-- We use style here to make it easy for dynamic and safe injection --}}
                     <li 
-                       x-data="{
-                        conversationID:'@json($conversation->id)',
-                        showUnreadStatus:true,
-                        handleChatOpened($event){
-                            this.showUnreadStatus= $event.detail.conversation == this.conversationID?false:true;
+                    x-data="{
+                        conversationID: @js($conversation->id),
+                        showUnreadStatus: @js(!$isReadByAuth),
+                        handleCloseChat($event) {
+                            // Clear the globally selected conversation.
+                            $wire.selectedConversationId = null;
+                            selectedConversationId = null;
                         }
                     }"
+                
                        id="conversation-{{$conversation->id }}"
                        wire:key="conversation-em-{{$conversation->id}}"
-                       x-on:chat-opened.window="handleChatOpened($event)"
+                       x-on:close-chat.window="handleCloseChat($event)"
+                       
                         @style([ 'border-color:' . $primaryColor . '20' => $selectedConversationId == $conversation?->id, ]) 
                         class="py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-sm transition-colors duration-150 flex gap-4 relative w-full cursor-pointer px-2"
                         :class="selectedConversationId == conversationID && 'bg-gray-50 dark:bg-gray-800 border-r-4  border-opacity-20 border-[var(--wirechat-primary-color)]'">

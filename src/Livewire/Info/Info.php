@@ -213,7 +213,7 @@ class Info extends ModalComponent
         $this->handleComponentTermination(
                 redirectRoute:route(WireChat::indexRouteName()),
                 events:[
-                    'close-chat',
+                    ['close-chat',  ['conversation'=> $this->conversation->id]],
                     Chats::class => ['chat-deleted',  [$this->conversation->id]]
                 ]
             );

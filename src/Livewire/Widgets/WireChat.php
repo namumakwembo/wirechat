@@ -14,12 +14,16 @@ class WireChat extends Component
 {
     public ?string $activeWireChatWidgetComponent = null;
 
+
+    public $selectedConversationId = null;
+
     public array $widgetComponents = [];
 
     public function resetState(): void
     {
         $this->widgetComponents = [];
         $this->activeWireChatWidgetComponent = null;
+        $this->selectedConversationId= null;
     }
 
     public static function modalAttributes(): array
@@ -59,6 +63,9 @@ class WireChat extends Component
         ];
 
         $this->activeWireChatWidgetComponent = $id;
+
+        //Set the selected conversationId
+        $this->selectedConversationId= $conversation;
 
         /*! Changed listener name to activeChatWidgetComponentChanged to not interfere with main modal */
         $this->dispatch('activeChatWidgetComponentChanged', id: $id);

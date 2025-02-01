@@ -1,6 +1,6 @@
 <div>
 
-    @script
+    @assets
         <script>
             window.ChatWidget = () => {
                 return {
@@ -167,25 +167,31 @@
                 };
             }
         </script>
-    @endscript
+    @endassets
 
 
     <div 
     x-data="{
         selectedConversationId:null,
+        get chatIsOpen(){
+
+            return $wire.selectedConversationId !==null;
+
+        }
     }"
-     class ='w-full h-[calc(100vh_-_10.0rem)] bg-white dark:bg-gray-900 border dark:border-gray-700 flex overflow-hidden rounded-lg'>
-      <div class="relative  w-full h-full   md:w-[360px] lg:w-[400px] xl:w-[450px] shrink-0 overflow-y-auto  ">
+     class ='w-full h-[calc(100vh_-_10.0rem)] transition-all bg-white dark:bg-gray-900 border dark:border-gray-700 flex overflow-hidden rounded-lg'>
+      <div :class="chatIsOpen && 'hidden md:grid'" class="relative  w-full h-full   md:w-[360px] lg:w-[400px] xl:w-[450px] shrink-0 overflow-y-auto  ">
           <livewire:chats :widget="true" />
       </div>
       <main
            x-data="ChatWidget()" 
-           x-on:open-chat.window="this.selectedConversationId= $event.detail.conversation;"
+           x-on:open-chat.window="$wire.selectedConversationId= $event.detail.conversation;"
            x-on:close-chat.stop.window="setShowPropertyTo(false)"
            x-on:keydown.escape.stop.window="closeChatWidgetOnEscape({ modalType: 'ChatWidget', event: $event });"
            aria-modal="true"
            tabindex="0"
-           class=" hidden md:grid grid  w-full  grow  focus:outline-none focus:border-none"
+           class="w-full  grow  focus:outline-none focus:border-none"
+           :class="!chatIsOpen && 'hidden md:grid'"
            style="contain:content;">
             <div 
                 x-cloak
@@ -204,7 +210,7 @@
                 @endforelse
             </div>
 
-            <div  x-show="!show" class="m-auto  justify-center flex gap-3 flex-col  items-center ">
+            <div  x-show="!show && !chatIsOpen " class="m-auto  justify-center flex gap-3 flex-col  items-center ">
 
                 <h4
                     class="font-medium p-2 px-3 rounded-full font-semibold bg-gray-50 dark:bg-gray-800 dark:text-white dark:font-normal">

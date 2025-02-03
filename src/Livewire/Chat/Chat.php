@@ -776,9 +776,9 @@ class Chat extends Component
 
         //Dispach hideUnreadStatus for conversation if is widget
         //Only fire event if chat is widget to avoid unecessary event firing 
-        if ($this->isWidget()) {
-            $this->dispatch('refresh')->to(Chats::class);
-        }
+        // if ($this->isWidget()) {
+        //    // $this->dispatch('refresh')->to(Chats::class);
+        // }
 
     }
 

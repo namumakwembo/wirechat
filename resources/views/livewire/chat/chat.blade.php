@@ -129,13 +129,26 @@
         document.head.appendChild(script);
     }
     },
+    get isWidget(){
+
+        return $wire.widget==true;
+    }
 }" x-init="setTimeout(() => {
 
     requestAnimationFrame(() => {
         initializing = false;
         $wire.dispatch('focus-input-field');
        
+
         loadEmojiPicker();
+
+        if(isWidget){
+
+            $wire.dispatchTo('chats','refresh');
+        }
+
+        ///dispatch refreh event if is Widget
+
     });
 
 }, 120);

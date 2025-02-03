@@ -54,7 +54,7 @@
 
 <div 
 x-data="{selectedConversationId:'{{request()->conversation_id??$selectedConversationId}}' }"
-x-on:open-chat.window="selectedConversationId= $event.detail.conversation;"
+x-on:open-chat.window="selectedConversationId= $event.detail.conversation; $wire.selectedConversationId= $event.detail.conversation;"
 x-init=" setTimeout(() => {
      conversationElement = document.getElementById('conversation-'+selectedConversationId);
 
@@ -134,7 +134,7 @@ x-init=" setTimeout(() => {
                        
                         @style([ 'border-color:' . $primaryColor . '20' => $selectedConversationId == $conversation?->id, ]) 
                         class="py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-sm transition-colors duration-150 flex gap-4 relative w-full cursor-pointer px-2"
-                        :class="selectedConversationId == conversationID && 'bg-gray-50 dark:bg-gray-800 border-r-4  border-opacity-20 border-[var(--wirechat-primary-color)]'">
+                        :class="$wire.selectedConversationId == conversationID && 'bg-gray-50 dark:bg-gray-800 border-r-4  border-opacity-20 border-[var(--wirechat-primary-color)]'">
                         <a
                         @if ($widget)
                              @click="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"

@@ -35,6 +35,7 @@ Broadcast::channel('conversation.{conversationId}', function ($user, int $conver
 ]
 );
 
+
 Broadcast::channel('participant.{id}', function ($user, $id) {
     //*Check if the authenticated user matches the broadcast recipient (polymorphic check)
     //*we don't use  tripple '===' because the type and id are polymophic hence can be strings

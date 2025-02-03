@@ -11,7 +11,7 @@
     <section class=" justify-between flex items-center mb-4  pb-2">
 
         <div class="flex items-center gap-2 truncate ">
-            <h2 class=" text-2xl font-bold dark:text-white">Chats 
+            <h2 class=" text-2xl font-bold dark:text-white">Chats  {{auth()->user()->name}}
             </h2> 
         </div>
 

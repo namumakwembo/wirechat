@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Event;
 use Namu\WireChat\Events\NotifyParticipant;
+use Namu\WireChat\Helpers\MorphTypeResolver;
 use Workbench\App\Models\User;
 
 describe(' Data verifiction ', function () {
@@ -61,7 +62,10 @@ describe(' Data verifiction ', function () {
         Event::assertDispatched(NotifyParticipant::class, function ($event) use ($participant) {
 
             $broadcastOn = $event->broadcastOn();
-            expect($broadcastOn[0]->name)->toBe('private-participant.'.$participant->participantable_id);
+
+            //resolve morphClass= 
+            $encodedType = MorphTypeResolver::encode($participant->participantable_type);
+            expect($broadcastOn[0]->name)->toBe('private-participant.'.$encodedType.'.'.$participant->participantable_id);
 
             return $this;
         });

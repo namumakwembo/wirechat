@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Broadcast;
+use Namu\WireChat\Helpers\MorphTypeResolver;
 use Namu\WireChat\Models\Conversation;
 
 /*
@@ -36,16 +38,24 @@ Broadcast::channel('conversation.{conversationId}', function ($user, int $conver
 );
 
 
-Broadcast::channel('participant.{id}', function ($user, $id) {
-    //*Check if the authenticated user matches the broadcast recipient (polymorphic check)
-    //*we don't use  tripple '===' because the type and id are polymophic hence can be strings
-    //*so the validation will fail
+Broadcast::channel('participant.{encodedType}.{id}', function ($user, $encodedType, $id) {
+    // Decode the encoded type to get the raw value.
+    $morphType = MorphTypeResolver::decode($encodedType);
 
-    // Log::info('here');
-    return $user->id == $id;
-}, 
-[
-'guards' => config('wirechat.routes.guards',['web']),
-'middleware'=>config('wirechat.routes.middleware',['web','auth'])
-]
-);
+    // Use Laravel's morph map helper to get the FQCN if a mapping exists,
+    // otherwise fall back to the raw morph type.
+    // $fqcn = Relation::getMorphedModel($morphType) ?? $morphType;
+
+    // if (! class_exists($fqcn)) {
+    //     return false;
+    // }
+
+    logger([
+        '$morphType'=>$morphType,
+        '$id'=>$id
+    ]);
+    return $user->id == $id && $user->getMorphClass() == $morphType;
+}, [
+    'guards'     => config('wirechat.routes.guards', ['web']),
+    'middleware' => config('wirechat.routes.middleware', ['web', 'auth'])
+]);

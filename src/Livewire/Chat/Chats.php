@@ -8,6 +8,8 @@ use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Traits\Widget;
 use Livewire\Attributes\On;
+use Namu\WireChat\Helpers\MorphTypeResolver;
+
 class Chats extends Component
 {
     use Widget;
@@ -22,14 +24,19 @@ class Chats extends Component
 
     public $selectedConversationId;
 
+  
     public function getListeners()
     {
-        $userId = auth()->id(); // Adjust guard as needed
-
+        $user = auth()->user();
+        $encodedType = MorphTypeResolver::encode($user->getMorphClass());
+        $userId = $user->id;
+    
+       // dd($encodedType,$userId);
         return [
             'refresh' => '$refresh',
-            'hardRefresh' ,
-            'echo-private:participant.'.$userId.',.Namu\\WireChat\\Events\\NotifyParticipant' => 'refreshComponent',
+            'hardRefresh',
+            // Construct the channel name using the encoded type and user ID.
+            "echo-private:participant.{$encodedType}.{$userId},.Namu\\WireChat\\Events\\NotifyParticipant" => 'refreshComponent',
         ];
     }
 
@@ -207,6 +214,7 @@ class Chats extends Component
         $this->selectedConversationId = request()->conversation_id;
         //$this->loadConversations();
         $this->conversations=collect();
+
     }
 
     public function render()

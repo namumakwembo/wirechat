@@ -10,7 +10,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Namu\WireChat\Facades\WireChat;
-use Namu\WireChat\Helpers\MorphTypeResolver;
+use Namu\WireChat\Helpers\MorphClassResolver;
 use Namu\WireChat\Models\Message;
 use Namu\WireChat\Models\Participant;
 
@@ -48,7 +48,7 @@ class NotifyParticipant implements ShouldBroadcastNow
 
     public function broadcastOn(): array
     {
-        $encodedType = MorphTypeResolver::encode($this->participant->participantable_type);
+        $encodedType = MorphClassResolver::encode($this->participant->participantable_type);
         
         return [
             new PrivateChannel('participant.' . $encodedType . '.' . $this->participant->participantable_id),

@@ -2,7 +2,7 @@
 
 namespace Namu\WireChat\Helpers;
 
-class MorphTypeResolver
+class MorphClassResolver
 {
     /**
      * Encodes the given raw type using hexadecimal encoding.

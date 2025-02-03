@@ -8,7 +8,7 @@ use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Traits\Widget;
 use Livewire\Attributes\On;
-use Namu\WireChat\Helpers\MorphTypeResolver;
+use Namu\WireChat\Helpers\MorphClassResolver;
 
 class Chats extends Component
 {
@@ -28,7 +28,7 @@ class Chats extends Component
     public function getListeners()
     {
         $user = auth()->user();
-        $encodedType = MorphTypeResolver::encode($user->getMorphClass());
+        $encodedType = MorphClassResolver::encode($user->getMorphClass());
         $userId = $user->id;
     
        // dd($encodedType,$userId);

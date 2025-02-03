@@ -14,6 +14,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+---
+
+## [Unreleased]  
+### Added  
+- Initial changelog setup.  
+- Placeholder for upcoming features.
+### Updated:
+-notify participant channel to use type and id in order to distinguice different models
+
+---
+
 ## [v0.0.7](https://github.com/namumakwembo/wirechat/releases/tag/0.0.7) - 2024-12-20  
 ### Added  
 - Introduced `Actor` and `Actionable` traits for improved polymorphic relationship handling.  

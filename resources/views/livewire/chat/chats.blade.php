@@ -73,7 +73,14 @@
     {{-- Import header --}}
     <x-wirechat::chats.header />
 
-
+    <div >
+        <input x-on:click="$wire.updateOptions()" wire:model="only_my_message_sources" type="checkbox" id="only_my_message_sources"> 
+        <label class="dark:text-white" for="only_my_message_sources">Ver solo mi WhatsApp</label> 
+        <br>
+        <input x-on:click="$wire.updateOptions()" wire:model="only_my_customers" type="checkbox" id="only_my_customers"> 
+        <label class="dark:text-white" for="only_my_customers">Ver solo mis Clientes</label>
+         
+    </div>
     <main x-data {{-- Detect when scrolled to the bottom --}}
         @scroll.self.debounce="
     // Calculate scroll values

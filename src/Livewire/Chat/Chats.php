@@ -20,6 +20,15 @@ class Chats extends Component
 
     public $selectedConversationId;
 
+    public $only_my_message_sources=true;
+
+    public $only_my_customers=true;
+    
+    public function updateOptions(){
+        session(['only_my_customers' => $this->only_my_customers]);
+        session(['only_my_message_sources' => $this->only_my_message_sources]);
+    }
+
     public function getListeners()
     {
         return [

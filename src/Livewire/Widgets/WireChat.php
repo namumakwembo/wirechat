@@ -138,6 +138,6 @@ class WireChat extends Component
 
     public function render()
     {
-        return view('wirechat::livewire.widgets.wire-chat');
+        return view('wirechat::livewire.widgets.wirechat');
     }
 }

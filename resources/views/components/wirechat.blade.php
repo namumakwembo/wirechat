@@ -14,8 +14,6 @@
           class=" hidden md:grid  bg-white dark:bg-gray-900 w-full   dark:border-gray-700 h-full relative overflow-y-auto"
           style="contain:content">
 
-          <livewire:chat conversation=54 />
-
           
       </main>
   </div>

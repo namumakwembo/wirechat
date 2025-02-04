@@ -473,7 +473,7 @@
     
                     </button>
                 {{-- Botón para grabar audio --}}
-        @assets
+        
         <button 
         x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
         wire:loading.attr="disabled" 
@@ -539,7 +539,7 @@
             }));
         });
         </script>
-        @endassets
+        
 
 
                

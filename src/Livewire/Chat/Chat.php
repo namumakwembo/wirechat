@@ -42,7 +42,7 @@ class Chat extends Component
     public $receiver;
 
     public $body;
-
+    public $audioFile;
     public $loadedMessages;
 
     public int $paginate_var = 10;
@@ -78,6 +78,55 @@ class Chat extends Component
         ];
     }
 
+
+
+        // Save the recorded  file as message
+        public function saveRecorded()
+        {
+            $attachment = $this->audioFile;
+    
+            // Debug to see the temporary file info
+            $this->validate(['audioFile' => 'file|max:12288']);
+    
+            $path = $attachment->store(config('wirechat.attachments.storage_folder', 'attachments'), config('wirechat.attachments.storage_disk', 'public'));
+    
+            // Determine the reply ID based on conditions
+            $replyId = ($this->replyMessage) ? $this->replyMessage->id : null;
+            // Create the message
+            $message = Message::create([
+                'reply_id' => $replyId,
+                'conversation_id' => $this->conversation->id,
+                'sendable_type' => auth()->user()->getMorphClass(), // Polymorphic sender type
+                'sendable_id' => auth()->id(), // Polymorphic sender ID
+                'type' => MessageType::VOICE, //SAVE type as voice
+                // 'body' => $this->body, // Add body if required
+            ]);
+    
+            // Create and associate the attachment with the message
+            $message->attachment()->create([
+                'file_path' => $path,
+                'file_name' => basename($path),
+                'original_name' => $attachment->getClientOriginalName(),
+                'mime_type' => $attachment->getMimeType(),
+                'url' => Storage::url($path),
+            ]);
+    
+            //update the conversation model - for sorting in chatlist
+            $this->conversation->updated_at = now();
+            $this->conversation->save();
+    
+            $this->pushMessage($message);
+    
+            //scroll to bottom
+            $this->dispatch('scroll-bottom');
+    
+            //dispatch event 'refresh ' to chatlist
+            $this->dispatch('refresh')->to(Chats::class);
+    
+            //broadcast message
+            $this->dispatchMessageCreatedEvent($message);
+        }
+    
     /**
      * Method to remove message from group key
      */

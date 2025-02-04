@@ -256,6 +256,11 @@
                                                 source="{{ $attachment?->url }}" />
                                         @endif
 
+                                            {{-- Attachemnt is audio/ --}}
+                                            @if (str()->startsWith($attachment->mime_type, 'audio/'))
+                                            <audio src="{{ $attachment?->url }}" controls controlslist=" nodownload noremoteplayback "></audio>
+                                            @endif
+
                                         {{-- Attachemnt is image/ --}}
                                         @if (str()->startsWith($attachment->mime_type, 'image/'))
                                             <x-wirechat::chat.image :previousMessage="$previousMessage" :message="$message"

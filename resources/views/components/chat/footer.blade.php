@@ -472,69 +472,71 @@
     
                     </button>
                 {{-- Botón para grabar audio --}}
-<button 
-x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
-wire:loading.attr="disabled" 
-@click="isRecording ? stopRecording() : startRecording()"
-type="button" 
-class="group disabled:cursor-progress">
+        @assets
+        <button 
+        x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
+        wire:loading.attr="disabled" 
+        @click="isRecording ? stopRecording() : startRecording()"
+        type="button" 
+        class="group disabled:cursor-progress">
 
-<!-- Icono de micrófono cuando NO está grabando -->
-<span x-show="!isRecording" class="group-hover:hidden transition">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-      </svg>
-      
-</span>
+        <!-- Icono de micrófono cuando NO está grabando -->
+        <span x-show="!isRecording" class="group-hover:hidden transition">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+            </svg>
+            
+        </span>
 
-<!-- Icono de grabación activa cuando está grabando -->
-<span x-show="isRecording" class="hidden group-hover:block transition">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-        <path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" />
-        <path d="M6 10.5a.75.75 0 0 1 .75.75v1.5a5.25 5.25 0 1 0 10.5 0v-1.5a.75.75 0 0 1 1.5 0v1.5a6.751 6.751 0 0 1-6 6.709v2.291h3a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3v-2.291a6.751 6.751 0 0 1-6-6.709v-1.5A.75.75 0 0 1 6 10.5Z" />
-      </svg>
-      
-</span>
-</button>
+        <!-- Icono de grabación activa cuando está grabando -->
+        <span x-show="isRecording" class="hidden group-hover:block transition">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                <path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" />
+                <path d="M6 10.5a.75.75 0 0 1 .75.75v1.5a5.25 5.25 0 1 0 10.5 0v-1.5a.75.75 0 0 1 1.5 0v1.5a6.751 6.751 0 0 1-6 6.709v2.291h3a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3v-2.291a6.751 6.751 0 0 1-6-6.709v-1.5A.75.75 0 0 1 6 10.5Z" />
+            </svg>
+            
+        </span>
+        </button>
 
-<script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('audioRecorder', () => ({
-        isRecording: false,
-        mediaRecorder: null,
-        audioChunks: [],
+        <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('audioRecorder', () => ({
+                isRecording: false,
+                mediaRecorder: null,
+                audioChunks: [],
 
-        startRecording() {
-            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-                this.mediaRecorder = new MediaRecorder(stream);
-                this.audioChunks = [];
+                startRecording() {
+                    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                        this.mediaRecorder = new MediaRecorder(stream);
+                        this.audioChunks = [];
 
-                this.mediaRecorder.ondataavailable = event => {
-                    this.audioChunks.push(event.data);
-                };
+                        this.mediaRecorder.ondataavailable = event => {
+                            this.audioChunks.push(event.data);
+                        };
 
-                this.mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    
-                    // Aquí puedes enviar el archivo a Livewire
-                    @this.upload('audioFile', audioBlob);
-                };
+                        this.mediaRecorder.onstop = () => {
+                            const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+                            const audioUrl = URL.createObjectURL(audioBlob);
+                            
+                            // Aquí puedes enviar el archivo a Livewire
+                            @this.upload('audioFile', audioBlob);
+                        };
 
-                this.mediaRecorder.start();
-                this.isRecording = true;
-            });
-        },
+                        this.mediaRecorder.start();
+                        this.isRecording = true;
+                    });
+                },
 
-        stopRecording() {
-            if (this.mediaRecorder) {
-                this.mediaRecorder.stop();
-                this.isRecording = false;
-            }
-        }
-    }));
-});
-</script>
+                stopRecording() {
+                    if (this.mediaRecorder) {
+                        this.mediaRecorder.stop();
+                        this.isRecording = false;
+                    }
+                }
+            }));
+        });
+        </script>
+        @endassets
 
 
                

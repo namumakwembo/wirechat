@@ -450,7 +450,7 @@
 
                 {{-- send Like button--}}
                     <button  x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
-                       wire:loading.attr="disabled" wire:click='sendLike()' type="button" class="group disabled:cursor-progress">
+                       wire:loading.attr="disabled" @click="isRecording ? stopRecording() : startRecording()" type="button" class="group disabled:cursor-progress">
 
                         <!-- outlined heart -->
                         <span class=" group-hover:hidden transition">

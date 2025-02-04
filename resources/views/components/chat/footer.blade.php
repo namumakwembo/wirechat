@@ -471,29 +471,72 @@
                         </span>
     
                     </button>
-                {{-- record audio button--}}
-                <button  x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
-                    wire:loading.attr="disabled" wire:click='sendLike()' type="button" class="group disabled:cursor-progress">
+                {{-- Botón para grabar audio --}}
+<button 
+x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
+wire:loading.attr="disabled" 
+@click="isRecording ? stopRecording() : startRecording()"
+type="button" 
+class="group disabled:cursor-progress">
 
-                     <!-- outlined record audio -->
-                     <span class=" group-hover:hidden transition">
-                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                             stroke="currentColor"
-                             class="w-7 h-7 text-gray-600 dark:text-white/90 stroke-[1.4] dark:stroke-[1.4]">
-                             <path stroke-linecap="round" stroke-linejoin="round"
-                                 d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                         </svg>
-                     </span>
-                     <!--  filled record audio -->
-                     <span class="hidden group-hover:block transition " x-bounce>
-                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                             class="size-6 w-7 h-7   text-red-500">
-                             <path
-                                 d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
-                         </svg>
-                     </span>
- 
-                 </button>
+<!-- Icono de micrófono cuando NO está grabando -->
+<span x-show="!isRecording" class="group-hover:hidden transition">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor" class="w-7 h-7 text-gray-600 dark:text-white/90 stroke-[1.4] dark:stroke-[1.4]">
+        <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 2a4 4 0 0 1 4 4v6a4 4 0 1 1-8 0V6a4 4 0 0 1 4-4zM19 10v2a7 7 0 0 1-14 0v-2" />
+        <line x1="12" x2="12" y1="19" y2="22" />
+    </svg>
+</span>
+
+<!-- Icono de grabación activa cuando está grabando -->
+<span x-show="isRecording" class="hidden group-hover:block transition">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+        class="w-7 h-7 text-red-500">
+        <circle cx="12" cy="12" r="10" />
+    </svg>
+</span>
+</button>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('audioRecorder', () => ({
+        isRecording: false,
+        mediaRecorder: null,
+        audioChunks: [],
+
+        startRecording() {
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                this.mediaRecorder = new MediaRecorder(stream);
+                this.audioChunks = [];
+
+                this.mediaRecorder.ondataavailable = event => {
+                    this.audioChunks.push(event.data);
+                };
+
+                this.mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    // Aquí puedes enviar el archivo a Livewire
+                    @this.upload('audioFile', audioBlob);
+                };
+
+                this.mediaRecorder.start();
+                this.isRecording = true;
+            });
+        },
+
+        stopRecording() {
+            if (this.mediaRecorder) {
+                this.mediaRecorder.stop();
+                this.isRecording = false;
+            }
+        }
+    }));
+});
+</script>
+
 
                
             </div>

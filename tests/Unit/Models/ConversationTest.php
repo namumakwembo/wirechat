@@ -1650,6 +1650,193 @@ describe('authParticipant()', function () {
 
 });
 
+describe('peerParticipant()', function () {
+
+    it('it gets correct peer particiapnt in the conversaiton in a private conversation ', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($otherUser);
+
+
+         //get receiver 
+         $peerParticipant= $conversation->peerParticipant(reference:$auth);
+
+        expect($peerParticipant->participantable->id)->toBe($otherUser->id);
+        expect($peerParticipant->participantable->getMorphClass())->toBe($otherUser->getMorphClass());
+        expect($peerParticipant->participantable->name)->toBe($otherUser->name);
+
+
+    });
+
+
+    it('it gets correct peer particiapnt in the conversaiton in a private conversation  of Mixed Models', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = Admin::factory()->create();
+
+        $conversation = $auth->createConversationWith($otherUser);
+
+
+         //get receiver 
+         $peerParticipant= $conversation->peerParticipant(reference:$auth);
+
+        expect($peerParticipant->participantable->id)->toBe($otherUser->id);
+        expect($peerParticipant->participantable->getMorphClass())->toBe($otherUser->getMorphClass());
+        expect($peerParticipant->participantable->name)->toBe($otherUser->name);
+
+
+    });
+
+
+    it('it gets correct peer particiapnt in the conversaiton in a self conversation ', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($auth);
+         //get receiver 
+         $peerParticipant= $conversation->peerParticipant(reference:$auth);
+
+
+        expect($peerParticipant->participantable->id)->toBe($auth->id);
+        expect($peerParticipant->participantable->getMorphClass())->toBe($auth->getMorphClass());
+        expect($peerParticipant->participantable->name)->toBe($auth->name);
+
+
+    });
+
+
+    it('it returns null if reference does not belong to conversation  ', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $randomUser = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($otherUser);
+
+         $peerParticipant= $conversation->peerParticipant(reference:$randomUser);
+
+        expect($peerParticipant)->toBe(null);
+
+    });
+
+
+})->only();
+
+describe('peerParticipants()', function () {
+
+    it('gets correct peer participants in a group conversation', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = User::factory()->create();
+    
+        // Create a group conversation
+        $conversation = $auth->createGroup('test');
+    
+        // Add $otherUser to the conversation
+        $conversation->addParticipant($otherUser);
+    
+        // Add 10 other participants
+        $participants = collect();
+        for ($i = 0; $i < 10; $i++) { 
+            $participants->push($conversation->addParticipant(User::factory()->create()));
+        }
+    
+        // Get peer participants, excluding the authenticated user ($auth)
+        $peerParticipants = $conversation->peerParticipants(reference: $auth);
+    
+        // Ensure that all retrieved peer participants are in the expected set
+        expect($peerParticipants)->toHaveCount(11); // 10 random + 1 ($otherUser)
+    
+       
+        foreach ($peerParticipants as $peerParticipant) {
+            foreach ($participants as $key => $participant) {
+
+                expect($peerParticipant->participantable)->not->toBe($auth); // Ensure $auth is excluded
+                expect($participant->pluck('participantable_id'))->contains($peerParticipant->participantable->id)->toBeTrue(); // Ensure they are part of the added participants
+                expect($participant->pluck('participantable_type'))->contains($peerParticipant->participantable->getMorphClass())->toBeTrue(); // Ensure they are part of the added participants
+            }
+         
+        }
+    });
+    
+
+    it('it gets correct peer particiapnt in the conversaiton in a group conversation  of Mixed Models', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = Admin::factory()->create();
+    
+        // Create a group conversation
+        $conversation = $auth->createGroup('test');
+    
+        // Add $otherUser to the conversation
+        $conversation->addParticipant($otherUser);
+        // Add 10 other participants
+        $participants = collect();
+        for ($i = 0; $i < 10; $i++) { 
+            $participants->push($conversation->addParticipant(User::factory()->create()));
+        }
+    
+        // Get peer participants, excluding the authenticated user ($auth)
+        $peerParticipants = $conversation->peerParticipants(reference: $auth);
+    
+        // Ensure that all retrieved peer participants are in the expected set
+        expect($peerParticipants)->toHaveCount(11); // 10 random + 1 ($otherUser)
+    
+        foreach ($peerParticipants as $peerParticipant) {
+            foreach ($participants as $key => $participant) {
+
+                expect($peerParticipant->participantable)->not->toBe($auth); // Ensure $auth is excluded
+                expect($participant->pluck('participantable_id'))->contains($peerParticipant->participantable->id)->toBeTrue(); // Ensure they are part of the added participants
+                expect($participant->pluck('participantable_type'))->contains($peerParticipant->participantable->getMorphClass())->toBeTrue(); // Ensure they are part of the added participants
+            
+            }
+         
+        }
+    });
+    
+
+
+    it('can return one user for private conversation', function () {
+
+        $auth = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($otherUser);
+
+         //get receiver 
+         $peerParticipants= $conversation->peerParticipants(reference:$auth);
+
+
+        expect($peerParticipants)->toHaveCount(1); // 1
+
+         foreach ($peerParticipants as $peerParticipant) {
+            expect($peerParticipant->pluck('participantable_id'))->contains($otherUser->id)->toBeTrue(); // Ensure they are part of the added participants
+            expect($peerParticipant->pluck('participantable_type'))->contains($otherUser->getMorphClass())->toBeTrue(); // Ensure they are part of the added participants
+        
+        }
+
+    });
+
+
+    it('returns only one  peer particiapnt in the conversaiton in a self conversation ', function () {
+
+        $auth = User::factory()->create();
+
+        $conversation = $auth->createConversationWith($auth);
+
+         //get receiver 
+         $peerParticipants= $conversation->peerParticipants(reference:$auth);
+
+        expect($peerParticipants)->toBeEmpty(); // 1
+    });
+
+
+})->only();
+
+
 describe('getReciever()', function () {
 
     it('it gets correct receiverParticipant in a private conversation ', function () {

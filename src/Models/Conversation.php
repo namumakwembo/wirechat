@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Namu\WireChat\Enums\Actions;
@@ -232,7 +233,7 @@ class Conversation extends Model
             $builder->whereHas('messages', function ($q) use ($user) {
                 /* !we only exclude one scope not all because we dont want to check aginast soft delete messages */
                 $q->withoutGlobalScope(WithoutRemovedMessages::class)->whereDoesntHave('actions', function ($q) use ($user) {
-                    $q->whereActor($user) 
+                    $q->whereActor($user)
                         ->where('type', Actions::DELETE);
                 });
             });
@@ -277,30 +278,88 @@ class Conversation extends Model
             // Apply the "without deleted conversations" scope
             $builder->whereHas('participants', function ($query) use ($user, $conversationsTableName) {
                 $query->whereParticipantable($user)
-                      ->whereRaw(" (conversation_deleted_at IS NULL OR conversation_deleted_at < {$conversationsTableName}.updated_at) ");
+                    ->whereRaw(" (conversation_deleted_at IS NULL OR conversation_deleted_at < {$conversationsTableName}.updated_at) ");
             });
         }
     }
 
     /**
- * Include conversations that were marked as deleted by the auth participant.
- */
-public function scopeWithDeleted(Builder $builder)
-{
-    // Dynamically get the parent model (i.e., the user)
-    $user = auth()->user();
+     * Include conversations that were marked as deleted by the auth participant.
+     */
+    public function scopeWithDeleted(Builder $builder)
+    {
+        // Dynamically get the parent model (i.e., the user)
+        $user = auth()->user();
 
-    if ($user) {
-        // Get the table name for conversations dynamically to avoid hardcoding.
+        if ($user) {
+            // Get the table name for conversations dynamically to avoid hardcoding.
 
-        // Apply the "with deleted conversations" scope
-        $builder->whereHas('participants', function ($query) use ($user) {
-            $query->whereParticipantable($user)
-                  ->orWhereNotNull("conversation_deleted_at");
-        });
+            // Apply the "with deleted conversations" scope
+            $builder->whereHas('participants', function ($query) use ($user) {
+                $query->whereParticipantable($user)
+                    ->orWhereNotNull("conversation_deleted_at");
+            });
+        }
     }
-}
 
+
+    /**
+     * Get the peer participant in a private or self conversation.
+     * 
+     * This method retrieves the other participant in a private conversation
+     * or returns the given reference user for self conversations.
+     * 
+     * @param Model $reference The reference user/model to exclude.
+     * @return Participant|null The other participant or null if not applicable.
+     */
+    public function peerParticipant(Model $reference): ?Participant
+    {
+
+        //return null if user does not belong to conversation
+        if (!$reference->belongsToConversation($this)) {
+            return null;
+        }
+
+        if (!in_array($this->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
+            return null;
+        }
+
+             // Check if 'participants' relationship is already loaded to avoid extra queries
+             $participants = $this->relationLoaded('participants')
+             ? $this->participants
+             : $this->participants();
+
+        if ($this->isSelf()) {
+           return $participants->whereParticipantable($reference)->first();
+        }
+
+   
+
+        return $participants->withoutParticipantable($reference)->first();
+    }
+
+    /**
+     * Get all peer participants in a conversation, excluding the reference user.
+     * 
+     * This method retrieves all other participants in a conversation
+     * except for the given reference user.
+     * 
+     * @param Model $reference The reference user/model to exclude.
+     * @return Collection<int, ?Participant> A collection of peer participants.
+     */
+    public function peerParticipants(Model $reference): ?Collection
+    {
+
+        //return null if user does not belong to conversation
+        if (!$reference->belongsToConversation($this)) {
+            return null;
+        }
+        
+        // Check if 'participants' relationship is already loaded to avoid extra queries
+        $participants = $this->relationLoaded('participants') ? $this->participants : $this->participants();
+
+        return $participants->withoutParticipantable($reference)->get();
+    }
 
     /**
      * Get receiver Participant for Private Conversation
@@ -330,7 +389,7 @@ public function scopeWithDeleted(Builder $builder)
             ->whereParticipantable($user)
             ->where('role', ParticipantRole::OWNER)
             ->whereHas('conversation', function ($query) {
-                $query->whereIn('type', [ConversationType::PRIVATE,ConversationType::SELF]);
+                $query->whereIn('type', [ConversationType::PRIVATE, ConversationType::SELF]);
             });
     }
 
@@ -527,16 +586,16 @@ public function scopeWithDeleted(Builder $builder)
             $participants =  $this->participants()->get();
 
 
-           
-        // Check if all participants have deleted the conversation
-        $deletedByBothParticipants = $participants->every(function ($participant) use($deletedByBothParticipants){
-            return   $participant->hasDeletedConversation(true)==true;
-        });
 
-        // If all participants have deleted the conversation, force delete it
-        if ($deletedByBothParticipants) {
-            $this->forceDelete();
-        }
+            // Check if all participants have deleted the conversation
+            $deletedByBothParticipants = $participants->every(function ($participant) use ($deletedByBothParticipants) {
+                return   $participant->hasDeletedConversation(true) == true;
+            });
+
+            // If all participants have deleted the conversation, force delete it
+            if ($deletedByBothParticipants) {
+                $this->forceDelete();
+            }
         }
     }
 

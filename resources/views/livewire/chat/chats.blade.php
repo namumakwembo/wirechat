@@ -72,7 +72,9 @@
 
     {{-- Import header --}}
     <x-wirechat::chats.header />
-
+    <div>s:
+        {{$auth()->user()?->getUserDefaultMessageSource();}}
+    </div>
     <div >
         <input x-on:click="$wire.updateOptions()" wire:model="only_my_message_sources" type="checkbox" id="only_my_message_sources"> 
         <label class="dark:text-white" for="only_my_message_sources">Ver solo mi WhatsApp</label> 

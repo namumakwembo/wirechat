@@ -46,21 +46,30 @@ class WireChatServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'wirechat');
 
+
+        //publish config
         $this->publishes([
             __DIR__.'/../config/wirechat.php' => config_path('wirechat.php'),
         ], 'wirechat-config');
 
-        //!for seamless devlopement loadmigrateions directly instead of publishing in development
-        //only publish in production
-
+        //publish migrations
         $this->publishes([
             __DIR__.'/../database/migrations' => database_path('migrations'),
         ], 'wirechat-migrations');
 
+
+        //publish views
+        if ($this->app->runningInConsole()) {
+            // Publish views
+            $this->publishes([
+              __DIR__.'/../resources/views' => resource_path('views/vendor/wirechat'),
+            ], 'wirechat-views');
+          
+          }
+          
+
         /* Load channel routes */
         $this->loadRoutesFrom(__DIR__.'/../routes/channels.php');
-        // Load the package's channels.php file
-        // require __DIR__ . '/../routes/channels.php';
 
         //load assets
         $this->loadAssets();

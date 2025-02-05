@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Namu\WireChat\Console\Commands\InstallWireChat;
 use Namu\WireChat\Livewire\Chat\Chat;
-use Namu\WireChat\Livewire\Chat\Chats;
+use Namu\WireChat\Livewire\Chats\Chats;
 use Namu\WireChat\Livewire\Chat\Index;
 use Namu\WireChat\Livewire\Chat\View;
 use Namu\WireChat\Livewire\Components\NewChat;

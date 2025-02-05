@@ -112,48 +112,44 @@
         }
     </style>
 
-{{-- <script type='module' defer  src='https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js'></script> --}}
-
-
+    {{-- <script type='module' defer  src='https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js'></script> --}}
 @endassets
 
 <div x-data="{
     initializing: true,
     conversationElement: document.getElementById('conversation'),
-    loadEmojiPicker () {
-    if (!document.head.querySelector('script[src=\'https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js\']')) {
-        let script = document.createElement('script');
-        script.type = 'module';
-        script.async = true; // Load asynchronously
-        script.src = 'https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js';
-        document.head.appendChild(script);
-    }
+    loadEmojiPicker() {
+        if (!document.head.querySelector('script[src=\'https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js\']')) {
+            let script = document.createElement('script');
+            script.type = 'module';
+            script.async = true; // Load asynchronously
+            script.src = 'https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js';
+            document.head.appendChild(script);
+        }
     },
-    get isWidget(){
+    get isWidget() {
 
-        return $wire.widget==true;
+        return $wire.widget == true;
     }
 }" x-init="setTimeout(() => {
 
     requestAnimationFrame(() => {
         initializing = false;
         $wire.dispatch('focus-input-field');
-       
+
 
         loadEmojiPicker();
 
-        if(isWidget){
+        if (isWidget) {
 
-            $wire.dispatchTo('chats','refresh');
+            $wire.dispatchTo('chats', 'refresh');
         }
 
         ///dispatch refreh event if is Widget
 
     });
 
-}, 120);
-
-"
+}, 120);"
     class=" w-full transition  bg-white/95 dark:bg-gray-900 overflow-hidden  h-full relative" style="contain:content">
 
     <div class=" flex flex-col  grow  h-full relative ">
@@ -161,24 +157,15 @@
         {{-- ---------- --}}
         {{-- --Header-- --}}
         {{-- ---------- --}}
-        <x-wirechat::chat.header :receiver="$receiver" :conversation="$conversation" />
-
-
+        @include('wirechat::livewire.chat.includes.header', [ 'conversation' => $conversation, 'receiver' => $receiver])
         {{-- ---------- --}}
         {{-- -Body----- --}}
         {{-- ---------- --}}
-
-
-        <x-wirechat::chat.body :conversation="$conversation" :authParticipant="$authParticipant" :loadedMessages="$loadedMessages" :isPrivate="$conversation->isPrivate()" :isGroup="$conversation->isGroup()"
-            :receiver="$receiver" />
-
-
+        @include('wirechat::livewire.chat.includes.body', [ 'conversation' => $conversation, 'authParticipant' => $authParticipant, 'loadedMessages' => $loadedMessages, 'isPrivate' => $conversation->isPrivate(), 'isGroup' => $conversation->isGroup(), 'receiver' => $receiver])
         {{-- ---------- --}}
         {{-- -Footer--- --}}
         {{-- ---------- --}}
-
-        <x-wirechat::chat.footer :conversation="$conversation" :authParticipant="$authParticipant"  :media="$media" :files="$files" :replyMessage="$replyMessage" />
-
+        @include('wirechat::livewire.chat.includes.footer', [ 'conversation' => $conversation, 'authParticipant' => $authParticipant, 'media' => $media, 'files' => $files, 'replyMessage' => $replyMessage])
 
     </div>
 

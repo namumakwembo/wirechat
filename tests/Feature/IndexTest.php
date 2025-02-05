@@ -2,7 +2,7 @@
 
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Chat\Chat;
-use Namu\WireChat\Livewire\Chat\Chats as Chatlist;
+use Namu\WireChat\Livewire\Chats\Chats as Chatlist;
 use Workbench\App\Models\User;
 
 ///Auth checks

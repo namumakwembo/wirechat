@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Chat;
+namespace Namu\WireChat\Livewire\Chats;
 
 use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
@@ -222,6 +222,6 @@ class Chats extends Component
 
         $this->loadConversations();
 
-        return view('wirechat::livewire.chat.chats');
+        return view('wirechat::livewire.chats.chats');
     }
 }

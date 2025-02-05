@@ -19,7 +19,7 @@ use Namu\WireChat\Helpers\Helper;
 use Namu\WireChat\Jobs\BroadcastMessage;
 use Namu\WireChat\Jobs\NotifyParticipants;
 use Namu\WireChat\Livewire\Chat\Chat as ChatBox;
-use Namu\WireChat\Livewire\Chat\Chats as Chatlist;
+use Namu\WireChat\Livewire\Chats\Chats as Chatlist;
 use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message;

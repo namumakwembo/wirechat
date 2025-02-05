@@ -1,6 +1,4 @@
 @use('Namu\WireChat\Helpers\Helper')
-@props(['media', 'files', 'replyMessage', 'authParticipant', 'conversation'])
-
 
 <footer class="shrink-0 h-auto relative   sticky bottom-0 mt-auto">
 
@@ -89,15 +87,13 @@
                                                         d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
                                                 </svg>
                                             </button>
-                                            <x-wirechat::chat.video height="h-24 sm:h-36 " :cover="false"
+                                            <x-wirechat::video height="h-24 sm:h-36 " :cover="false"
                                                 :showToggleSound="false" :source="$mediaItem->temporaryUrl()" />
                                         </div>
                                     @endif
                                 @endforeach
 
 
-
-                                {{-- TODO @if"( count($media)< $MAXFILES )" to hide upload button when maz files exceeded --}} {{-- Add more media --}}
                                 <label wire:loading.class="cursor-progress"
                                     class="shrink-0 cursor-pointer relative w-16 h-14 rounded-lg bg-gray-100 dark:bg-gray-700 flex text-center justify-center border dark:border-gray-700 border-gray-50">
                                     <input wire:loading.attr="disabled"

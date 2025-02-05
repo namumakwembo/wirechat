@@ -2,30 +2,24 @@
 
 namespace Namu\WireChat\Livewire\Chat;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
-//use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Enums\MessageType;
-use Namu\WireChat\Events\BroadcastMessageEvent;
 use Namu\WireChat\Events\MessageCreated;
 use Namu\WireChat\Events\MessageDeleted;
-use Namu\WireChat\Events\NotifyParticipant;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Jobs\NotifyParticipants;
-use Namu\WireChat\Models\Attachment;
+use Namu\WireChat\Livewire\Chats\Chats;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message;
 use Namu\WireChat\Models\Participant;
-use Namu\WireChat\Notifications\NewMessageNotification;
 use Namu\WireChat\Traits\Widget;
 
 class Chat extends Component
@@ -148,16 +142,7 @@ class Chat extends Component
         }
     }
 
-    //   function testable($event)  {
-
-    //     dd($event);
-
-    //   }
-
     /**
-     * Todo: Authorize the property
-     * Todo: or lock it
-     * todo:Check if user can reply to this message
      * Set replyMessage as Message Model
      *  */
     public function setReply(Message $message)
@@ -310,8 +295,6 @@ class Chat extends Component
      * Send a message  */
     public function sendMessage()
     {
-
-        //dd($this->body);
 
         abort_unless(auth()->check(), 401);
 

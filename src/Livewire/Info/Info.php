@@ -2,16 +2,15 @@
 
 namespace Namu\WireChat\Livewire\Info;
 
-use Carbon\Carbon;
+
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Locked;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Jobs\DeleteConversationJob;
-use Namu\WireChat\Livewire\Chat\Chats;
+use Namu\WireChat\Livewire\Chats\Chats;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
-use Namu\WireChat\Livewire\Widgets\WireChat as WidgetsWireChat;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Traits\Widget;
 

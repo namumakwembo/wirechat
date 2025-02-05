@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `peerParticipants(referece:$user)` && `peerParticipant(referece:$user)` to Conversation model to make it easy to retrieve corespndants in the conversaiotn
 - command for publishing config files 
 - Docs on Authorization , Extending UI & components 
+- belongsToConversation middleware
 
 ### Fixed  
 - And updaed code with tests to fully sopport converations with mixed models 

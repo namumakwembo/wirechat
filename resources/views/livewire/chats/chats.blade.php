@@ -73,8 +73,7 @@ x-init=" setTimeout(() => {
     @endphp
 
     {{-- Import header --}}
-    <x-wirechat::chats.header widget="{{ $widget }}" />
-
+    @include('wirechat::livewire.chats.includes.header')
 
     <main x-data {{-- Detect when scrolled to the bottom --}}
         @scroll.self.debounce="

@@ -1,6 +1,3 @@
-@props([
-    'attachment'=>$attachment
-])
 
 <div class="flex items-center group overflow-hidden border dark:border-gray-700 rounded-xl">
     <span class=" p-2">

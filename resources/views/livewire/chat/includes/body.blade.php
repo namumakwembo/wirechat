@@ -1,12 +1,3 @@
-@props([
-    'loadedMessages' => $loadedMessages,
-    'receiver' => $receiver,
-    'isGroup' => false,
-    'isPrivate'=>$isPrivate,
-    'authParticipant'=>$authParticipant,
-    "conversation"
-])
-
 
 <main x-data="{
     height: 0,
@@ -79,7 +70,7 @@
 
 
     x-cloak
-    {{$attributes->merge(['class'=>'flex flex-col h-full  relative gap-2 gap-y-4 p-4 md:p-5 lg:p-8  flex-grow  overscroll-contain overflow-x-hidden w-full my-auto'])}}
+     class='flex flex-col h-full  relative gap-2 gap-y-4 p-4 md:p-5 lg:p-8  flex-grow  overscroll-contain overflow-x-hidden w-full my-auto'
     style="contain: content" >
 
 
@@ -114,7 +105,6 @@
                     // keep track of previous message
                     // The ($key -1 ) will get the previous message from loaded
                     // messages since $key is directly linked to $message
-                    // dd($message);
                     if ($key > 0) {
                         $previousMessage = $messageGroup->get($key - 1);
                     }
@@ -274,19 +264,17 @@
                                         @endif
                                         {{-- Attachemnt is Application/ --}}
                                         @if (str()->startsWith($attachment->mime_type, 'application/'))
-                                            <x-wirechat::chat.file  :attachment="$attachment" />
+                                            @include('wirechat::livewire.chat.includes.file', [ 'attachment' => $attachment ])
                                         @endif
 
                                         {{-- Attachemnt is Video/ --}}
                                         @if (str()->startsWith($attachment->mime_type, 'video/'))
-                                            <x-wirechat::chat.video height="max-h-[400px]" :cover="false"
-                                                source="{{ $attachment?->url }}" />
+                                            <x-wirechat::video height="max-h-[400px]" :cover="false" source="{{ $attachment?->url }}" />
                                         @endif
 
                                         {{-- Attachemnt is image/ --}}
                                         @if (str()->startsWith($attachment->mime_type, 'image/'))
-                                            <x-wirechat::chat.image :previousMessage="$previousMessage" :message="$message"
-                                                :nextMessage="$nextMessage" :belongsToAuth="$belongsToAuth" :attachment="$attachment" />
+                                            @include('wirechat::livewire.chat.includes.image', [ 'previousMessage' => $previousMessage, 'message' => $message, 'nextMessage' => $nextMessage, 'belongsToAuth' => $belongsToAuth, 'attachment' => $attachment ])
                                         @endif
                                     @endif
 
@@ -303,8 +291,7 @@
                                     {{-- -------------------- --}}
 
                                     @if ($message->body && !$isEmoji)
-                                        <x-wirechat::chat.message :previousMessage="$previousMessage" :message="$message" :nextMessage="$nextMessage"
-                                            :belongsToAuth="$belongsToAuth" :isGroup="$isGroup" :attachment="$attachment" />
+                                    @include('wirechat::livewire.chat.includes.message', [ 'previousMessage' => $previousMessage, 'message' => $message, 'nextMessage' => $nextMessage, 'belongsToAuth' => $belongsToAuth, 'isGroup' => $isGroup, 'attachment' => $attachment, ])
                                     @endif
 
                                 </div>

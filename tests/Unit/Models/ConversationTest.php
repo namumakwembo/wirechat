@@ -1723,7 +1723,7 @@ describe('peerParticipant()', function () {
     });
 
 
-})->only();
+});
 
 describe('peerParticipants()', function () {
 
@@ -1834,7 +1834,7 @@ describe('peerParticipants()', function () {
     });
 
 
-})->only();
+});
 
 
 describe('getReciever()', function () {

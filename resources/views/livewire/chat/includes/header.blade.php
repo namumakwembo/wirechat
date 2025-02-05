@@ -1,11 +1,5 @@
 @use("Namu\WireChat\Facades\WireChat")
 
-@props([
-    'receiver' => $receiver,
-    'conversation' => $conversation,
-    'widget' => false
-])
-
 @php
     $group = $conversation->group;
 @endphp

@@ -73,7 +73,7 @@
     {{-- Import header --}}
     <x-wirechat::chats.header />
     <div>s:
-        {{auth()->user()?->getUserDefaultMessageSource()['settings'];}}
+        {{auth()->user()?->getUserDefaultMessageSource()->settings['phone_number'];}}
     </div>
     <div >
         <input x-on:click="$wire.updateOptions()" wire:model="only_my_message_sources" type="checkbox" id="only_my_message_sources"> 

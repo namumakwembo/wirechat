@@ -72,7 +72,7 @@
 
     {{-- Import header --}}
     <x-wirechat::chats.header />
-    <div>s:
+    <div class="dark:text-white">s:
         {{auth()->user()?->getDefaultMessageSource()->settings['phone_number'];}}
     </div>
     <div >

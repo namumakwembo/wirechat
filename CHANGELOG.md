@@ -10,7 +10,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]  
 ### Added  
 - Initial changelog setup.  
-- Placeholder for upcoming features.
+- new config vairables 
+  - `'guards'=>['web','admin']`
+  - `'show_send_heart_button' => false`
+  - `'layout'=>'wirechat::layouts.app'`
+- `peerParticipants(referece:$user)` && `peerParticipant(referece:$user)` to Conversation model to make it easy to retrieve corespndants in the conversaiotn
+- command for publishing config files 
+- Docs on Authorization , Extending UI & components 
+
+### Fixed  
+- And updaed code with tests to fully sopport converations with mixed models 
+
+### Updated:
+- Code and query improvements for faster loading  of conversations
+
+
+
 
 ---
 

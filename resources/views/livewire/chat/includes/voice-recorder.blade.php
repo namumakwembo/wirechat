@@ -1,6 +1,7 @@
 <div 
+x-cloak
+x-show="isRecording" 
 
-{{$attributes}}
 x-data="{
   //  isRecording: false,
     isPaused: false,

@@ -1,6 +1,12 @@
 @use('Namu\WireChat\Helpers\Helper')
 
-<footer class="shrink-0 h-auto relative   sticky bottom-0 mt-auto">
+
+<footer x-data="{
+    isRecording: false
+}" x-on:stop-recording="isRecording=false"
+    class="shrink-0 h-auto relative   sticky bottom-0 mt-auto">
+
+
 
     {{-- Check if group allows :sending messages --}}
     @if ($conversation->isGroup() && !$conversation->group?->allowsMembersToSendMessages() && !$authParticipant->isAdmin())
@@ -9,7 +15,12 @@
             Only admins can send messages
         </div>
     @else
-        <div id="chat-footer" x-data="{ 'openEmojiPicker': false }"
+    {{-- Show recording sectionis is recording --}}
+
+        @include('wirechat::livewire.chat.includes.voice-recorder')
+
+        {{-- Hide send message section when recording --}}
+        <div id="chat-footer"  x-show="!isRecording" x-data="{ 'openEmojiPicker': false }"
             class=" px-3 md:px-1 border-t shadow   dark:bg-gray-800 bg-gray-50 z-[50]    dark:border-gray-800/80  flex flex-col gap-3 items-center  w-full   mx-auto">
 
             {{-- Emoji section , we put it seperate to avoid interfering as overlay for form when opened --}}
@@ -19,7 +30,7 @@
                 x-transition:leave-end="translate-y-full"
                 class="w-full flex hidden sm:flex   py-2 sm:px-4 py-1.5 border-b dark:border-gray-700  h-96 min-w-full">
 
-                <emoji-picker  dusk="emoji-picker" style="width: 100%"
+                <emoji-picker dusk="emoji-picker" style="width: 100%"
                     class=" flex w-full h-full rounded-xl"></emoji-picker>
             </section>
             {{-- form and detail section  --}}
@@ -42,8 +53,8 @@
                                     <button @click="$wire.resetAttachmentErrors()">X</button>
                             </span>
                             @enderror --}}
-                                                {{-- todo:Show progress when uploading files --}}
-                                                {{-- <div  x-show="isUploading"  class="w-full">
+                            {{-- todo:Show progress when uploading files --}}
+                            {{-- <div  x-show="isUploading"  class="w-full">
                                     <progress class="w-full h-1 rounded-lg" max="100" x-bind:value="progress"></progress>
                                 </div> --}}
                             <section
@@ -455,32 +466,51 @@
                         </button>
 
 
+                        <button 
+                        x-show="!(body?.trim()?.length > 0 || $wire.media.length > 0 || $wire.files.length > 0)"
+            
+                          wire:loading.attr="disabled"
+                        @click="$dispatch('start-recording')"
+                        class="text-gray-800 dark:text-gray-300 disabled:cursor-progress ">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                            stroke="currentColor" class="size-6 w-7 h-7">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                        </svg>
+            
+                    </button>
 
-                        {{-- send Like button --}}
-                        <button
-                            x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
-                            wire:loading.attr="disabled" wire:target="sendMessage" wire:click='sendLike()'
-                            type="button" class="group disabled:cursor-progress">
+                        {{-- mic --}}
+                        <!-- The record/stop button -->
 
-                            <!-- outlined heart -->
-                            <span class=" group-hover:hidden transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    class="w-7 h-7 text-gray-600 dark:text-white/90 stroke-[1.4] dark:stroke-[1.4]">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                                </svg>
-                            </span>
-                            <!--  filled heart -->
-                            <span class="hidden group-hover:block transition " x-bounce>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                    class="size-6 w-7 h-7   text-red-500">
-                                    <path
-                                        d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
-                                </svg>
-                            </span>
 
-                        </button>
+
+                            {{-- send Like button --}}
+                            {{-- <button
+                                x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
+                                wire:loading.attr="disabled" wire:target="sendMessage" wire:click='sendLike()'
+                                type="button" class="group disabled:cursor-progress">
+
+                                <!-- outlined heart -->
+                                <span class=" group-hover:hidden transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        class="w-7 h-7 text-gray-600 dark:text-white/90 stroke-[1.4] dark:stroke-[1.4]">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                    </svg>
+                                </span>
+                                <!--  filled heart -->
+                                <span class="hidden group-hover:block transition " x-bounce>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                        class="size-6 w-7 h-7   text-red-500">
+                                        <path
+                                            d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+                                    </svg>
+                                </span>
+
+                            </button> --}}
+
 
 
                     </div>
@@ -649,3 +679,4 @@
 
 
 </footer>
+

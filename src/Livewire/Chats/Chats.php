@@ -1,15 +1,19 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Chat;
+namespace Namu\WireChat\Livewire\Chats;
 
 use Illuminate\Support\Facades\Schema;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Namu\WireChat\Facades\WireChat;
+use Namu\WireChat\Helpers\MorphClassResolver;
 use Namu\WireChat\Models\Conversation;
-use Namu\WireChat\Models\Scopes\WithoutDeletedScope;
+use Namu\WireChat\Traits\Widget;
 
 class Chats extends Component
 {
+    use Widget;
+
     public $search;
 
     public $conversations = [];
@@ -31,10 +35,58 @@ class Chats extends Component
 
     public function getListeners()
     {
+        $user = auth()->user();
+        $encodedType = MorphClassResolver::encode($user->getMorphClass());
+        $userId = $user->id;
+
+        // dd($encodedType,$userId);
         return [
             'refresh' => '$refresh',
-            'echo-private:participant.'.auth()->id().',.Namu\\WireChat\\Events\\NotifyParticipant' => 'refreshComponent',
+            'hardRefresh',
+            // Construct the channel name using the encoded type and user ID.
+            "echo-private:participant.{$encodedType}.{$userId},.Namu\\WireChat\\Events\\NotifyParticipant" => 'refreshComponent',
         ];
+    }
+
+    /**
+     *  Used to force hat list to reset all data as if it was newly opened
+     */
+    public function hardRefresh()
+    {
+        $this->conversations = collect();
+        $this->reset(['page', 'canLoadMore']);
+
+    }
+
+    #[On('refresh-chats')]
+    public function refreshChats()
+    {
+        $this->conversations = collect();
+        $this->reset(['page', 'canLoadMore']);
+    }
+
+    /**
+     * Handle the 'chat-deleted' event
+     */
+    #[On('chat-deleted')]
+    public function chatDeleted($conversationId)
+    {
+        $this->conversations = $this->conversations->reject(function ($conversation) use ($conversationId) {
+            return $conversation->id === $conversationId;
+        });
+
+    }
+
+    /**
+     * Handle the 'chat-exited' event
+     */
+    #[On('chat-exited')]
+    public function chatExited($conversationId)
+    {
+        $this->conversations = $this->conversations->reject(function ($conversation) use ($conversationId) {
+            return $conversation->id === $conversationId;
+        });
+
     }
 
     public function refreshComponent($event)
@@ -92,7 +144,7 @@ class Chats extends Component
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
                 'messages',
                 'lastMessage.attachment',
-                'receiver.participantable',
+                'receiverParticipant.participantable',
                 'group.cover', //=> fn($query) => $query->select('id', 'name'),
 
             ])
@@ -123,7 +175,8 @@ class Chats extends Component
         $groupSearchableFields = ['name', 'description'];
         $columnCache = [];
 
-        $query->withoutGlobalScope(WithoutDeletedScope::class)->where(function ($query) use ($searchableFields, $groupSearchableFields, &$columnCache) {
+        //use withDeleted to reverse withoutDeleted in order to make deleted chats appear in search
+        $query->withDeleted()->where(function ($query) use ($searchableFields, $groupSearchableFields, &$columnCache) {
             // Search in participants' participantable fields
             $query->whereHas('participants', function ($subquery) use ($searchableFields, &$columnCache) {
                 $subquery->whereHas('participantable', function ($query2) use ($searchableFields, &$columnCache) {
@@ -166,6 +219,8 @@ class Chats extends Component
         abort_unless(auth()->check(), 401);
         $this->selectedConversationId = request()->conversation_id;
         //$this->loadConversations();
+        $this->conversations = collect();
+
     }
 
     public function render()
@@ -173,6 +228,6 @@ class Chats extends Component
 
         $this->loadConversations();
 
-        return view('wirechat::livewire.chat.chats');
+        return view('wirechat::livewire.chats.chats');
     }
 }

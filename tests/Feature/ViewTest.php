@@ -2,7 +2,7 @@
 
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Chat\Chat;
-use Namu\WireChat\Livewire\Chat\Chats as Chatlist;
+use Namu\WireChat\Livewire\Chats\Chats as Chatlist;
 use Namu\WireChat\Models\Conversation;
 use Workbench\App\Models\User;
 
@@ -60,7 +60,7 @@ test('returns 403(Forbidden) if user doesnt not bleong to conversation', functio
     $conversation = Conversation::factory()->create();
     // dd($conversation);
     $this->actingAs($auth)->get(route(WireChat::viewRouteName(), $conversation->id))
-        ->assertStatus(403);
+        ->assertStatus(403, 'Forbidden');
 
 });
 

@@ -12,7 +12,7 @@
     <header class=" sticky top-0 bg-white  dark:bg-gray-800 z-10 p-2">
         <div class="flex items-center justify-center pb-2">
 
-            <button wire:click="$dispatch('closeModal')" dusk="close_modal_button"
+            <button wire:click="$dispatch('closeChatDialog')" dusk="close_modal_button"
                 class="p-2 ml-0 text-gray-600 hover:dark:bg-gray-700 hover:dark:text-white rounded-full hover:text-gray-800 hover:bg-gray-50">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class=" w-5 w-5">
@@ -65,7 +65,7 @@
                                     <h6 @class(['transition-all truncate group-hover:underline col-span-10' ])>
                                         {{ $loopParticipantIsAuth ? 'You' : $participant->participantable->display_name }}</h6>
                                         @if ($participant->isOwner()|| $participant->isAdmin())
-                                        <span  style="background-color: var(--primary-color);" class=" flex items-center col-span-2 text-white text-xs font-medium ml-auto px-2.5 py-px rounded ">
+                                        <span  style="background-color: var(--wirechat-primary-color);" class=" flex items-center col-span-2 text-white text-xs font-medium ml-auto px-2.5 py-px rounded ">
                                             {{$participant->isOwner()? "Owner":"Admin"}}
                                         </span>
                                         @endif

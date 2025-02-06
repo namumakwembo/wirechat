@@ -2,36 +2,33 @@
 
 namespace Namu\WireChat\Livewire\Chat;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
-//use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Enums\MessageType;
-use Namu\WireChat\Events\BroadcastMessageEvent;
 use Namu\WireChat\Events\MessageCreated;
 use Namu\WireChat\Events\MessageDeleted;
-use Namu\WireChat\Events\NotifyParticipant;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Jobs\NotifyParticipants;
-use Namu\WireChat\Models\Attachment;
+use Namu\WireChat\Livewire\Chats\Chats;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message;
 use Namu\WireChat\Models\Participant;
-use Namu\WireChat\Notifications\NewMessageNotification;
+use Namu\WireChat\Traits\Widget;
 
 class Chat extends Component
 {
+    use Widget;
     use WithFileUploads;
     use WithPagination;
 
+    // public ?Conversation $conversation;
     public $conversation;
 
     public $conversationId;
@@ -59,7 +56,7 @@ class Chat extends Component
     public ?Participant $authParticipant;
 
     // #[Locked]
-    public ?Participant $receiverParticipant;
+    public ?Participant $receiverParticipant = null;
 
     //Theme
     public $replyMessage = null;
@@ -158,7 +155,6 @@ class Chat extends Component
 
             // Dispatch refresh event
             $this->dispatch('refresh')->to(Chats::class);
-
         }
     }
 
@@ -173,8 +169,8 @@ class Chat extends Component
             $this->dispatch('scroll-bottom');
 
             $newMessage = Message::find($event['message']['id']);
+            // dd($newMessage);
 
-            //Make sure message does not belong to auth
             // Make sure message does not belong to auth
             if ($newMessage->sendable_id == auth()->id() && $newMessage->sendable_type == auth()->user()->getMorphClass()) {
                 return null;
@@ -195,16 +191,7 @@ class Chat extends Component
         }
     }
 
-    //   function testable($event)  {
-
-    //     dd($event);
-
-    //   }
-
     /**
-     * Todo: Authorize the property
-     * Todo: or lock it
-     * todo:Check if user can reply to this message
      * Set replyMessage as Message Model
      *  */
     public function setReply(Message $message)
@@ -259,7 +246,6 @@ class Chat extends Component
     {
 
         $this->resetErrorBag(['media', 'files']);
-
     }
 
     public function listenBroadcastedMessage($event)
@@ -286,8 +272,13 @@ class Chat extends Component
         //delete conversation
         $this->conversation->deleteFor(auth()->user());
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+        $this->handleComponentTermination(
+            redirectRoute: route(WireChat::indexRouteName()),
+            events: [
+                'close-chat',
+                Chats::class => ['chat-deleted',  [$this->conversation->id]],
+            ]
+        );
     }
 
     /**
@@ -301,8 +292,15 @@ class Chat extends Component
 
         $this->reset('loadedMessages', 'media', 'files', 'body');
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+        //Dispatach event instead if isWidget
+
+        $this->handleComponentTermination(
+            redirectRoute: route(WireChat::indexRouteName()),
+            events: [
+                'close-chat',
+                Chats::class => 'refresh',
+            ]
+        );
     }
 
     public function exitConversation()
@@ -311,14 +309,23 @@ class Chat extends Component
 
         $auth = auth()->user();
 
+        //make sure conversation is neigher self nor private
+
+        abort_unless($this->conversation->isGroup(), 403, 'Cannot exit self or private conversation');
+
         //make sure owner if group cannot be removed from chat
         abort_if($auth->isOwnerOf($this->conversation), 403, 'Owner cannot exit conversation');
 
         //delete conversation
         $auth->exitConversation($this->conversation);
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+        //Dispatach event instead if isWidget
+        if ($this->isWidget()) {
+            $this->dispatch('close-chat');
+        } else {
+            //redirect to chats page
+            $this->redirectRoute(WireChat::indexRouteName());
+        }
     }
 
     protected function rateLimit()
@@ -337,8 +344,6 @@ class Chat extends Component
      * Send a message  */
     public function sendMessage()
     {
-
-        //dd($this->body);
 
         abort_unless(auth()->check(), 401);
 
@@ -467,7 +472,6 @@ class Chat extends Component
 
             //dispatch event 'refresh ' to chatlist
             $this->dispatch('refresh')->to(Chats::class);
-
         }
 
         //     dd('hoting');
@@ -638,17 +642,15 @@ class Chat extends Component
 
                     //   broadcast(new NotifyParticipant($this->receiverParticipant, $message))->toOthers();
 
+                    // dd('broadcasting');
                     NotifyParticipants::dispatch($this->conversation, $message);
                     //    Notification::send($this->receiver, new NewMessageNotification($message));
 
                 }
-
             } else {
                 // code...
                 NotifyParticipants::dispatch($this->conversation, $message);
-
             }
-
         } catch (\Throwable $th) {
 
             Log::error($th->getMessage());
@@ -722,7 +724,6 @@ class Chat extends Component
         $this->canLoadMore = $this->totalMessageCount > $messages->count();
 
         return $this->loadedMessages;
-
     }
 
     public function placeholder()
@@ -730,40 +731,50 @@ class Chat extends Component
         return view('wirechat::components.placeholders.chat');
     }
 
-    public function mount()
+    public function mount($conversation = null)
     {
-        $this->initializeConversation();
+
+        $this->initializeConversation($conversation);
         $this->initializeParticipants();
         $this->finalizeConversationState();
         $this->loadMessages();
     }
 
-    private function initializeConversation()
+    private function initializeConversation($conversation)
     {
         abort_unless(auth()->check(), 401);
 
-        $this->conversation = Conversation::where('id', $this->conversation)
-            ->firstOr(fn () => abort(404));
+        // Handle different input scenarios
+        if ($conversation instanceof Conversation) {
+            $this->conversation = $conversation;
+        } elseif (is_numeric($conversation)) {
+            // Cast to integer if numeric (handles numeric strings too)
+            $conversationId = (int) $conversation;
+            $this->conversation = Conversation::find($conversationId);
 
+            if (! $this->conversation) {
+                abort(404, 'Conversation not found.'); // Custom error response
+            }
+        } elseif (is_null($conversation)) {
+            abort(422, 'A conversation id is required'); // Custom error for missing input
+        } else {
+            return abort(422, 'Invalid conversation input.'); // Handle invalid input types
+        }
+
+        //$this->conversation = Conversation::where('id', $conversation)->firstOr(fn () => abort(404));
         $this->totalMessageCount = Message::where('conversation_id', $this->conversation->id)->count();
         abort_unless(auth()->user()->belongsToConversation($this->conversation), 403);
-
-        $this->conversationId = $this->conversation->id;
     }
 
     private function initializeParticipants()
     {
         if (in_array($this->conversation->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
             $this->conversation->load('participants');
-            $participants = $this->conversation->participants;
+            $participants = $this->conversation->participants();
 
-            $this->authParticipant = $participants
-                ->where('participantable_id', auth()->id())
-                ->first();
+            $this->authParticipant = $participants->whereParticipantable(auth()->user())->first();
 
-            $this->receiverParticipant = $participants
-                ->where('participantable_id', '!=', auth()->id())
-                ->first();
+            $this->receiverParticipant = $this->conversation->receiverParticipant;
 
             //If conversation is self then receiver is auth;
             if ($this->conversation->type == ConversationType::SELF) {
@@ -779,23 +790,31 @@ class Chat extends Component
         }
     }
 
-    private function finalizeConversationState()
+    public function finalizeConversationState()
     {
 
         $this->conversation->markAsRead();
 
         if ($this->authParticipant) {
+
             $this->authParticipant->update(['last_active_at' => now()]);
 
-            if ($this->authParticipant->hasDeletedConversation(true)) {
+            //If has deletd Conversation and Deletion has expired
+            if ($this->authParticipant->hasDeletedConversation(true) == false) {
                 $this->authParticipant->update(['conversation_deleted_at' => null]);
             }
         }
+
+        //Dispach hideUnreadStatus for conversation if is widget
+        //Only fire event if chat is widget to avoid unecessary event firing
+        // if ($this->isWidget()) {
+        //    // $this->dispatch('refresh')->to(Chats::class);
+        // }
+
     }
 
     public function render()
     {
-        // $this->conversation->turnOnDisappearing(3600);
         return view('wirechat::livewire.chat.chat');
     }
 }

@@ -1,12 +1,3 @@
-@props([
-    'loadedMessages' => $loadedMessages,
-    'receiver' => $receiver,
-    'isGroup' => false,
-    'isPrivate'=>$isPrivate,
-    'authParticipant'=>$authParticipant,
-    "conversation"
-])
-
 
 <main x-data="{
     height: 0,
@@ -14,7 +5,7 @@
     updateScrollPosition: function() {
         // Calculate the difference in height
 
-        newHeight = document.getElementById('conversation').scrollHeight;
+        newHeight = $el.scrollHeight;
 
         {{-- console.log('old height' + height);
         console.log('new height' + document.getElementById('conversation').scrollHeight); --}}
@@ -31,10 +22,18 @@
 
     }"  
         x-init="
-            requestAnimationFrame(() => {
-                this.height = $el.scrollHeight;
-                $el.scrollTop = this.height;
-            });
+
+        setTimeout(() => {
+
+                requestAnimationFrame(() => {
+                    
+                    this.height = $el.scrollHeight;
+                    $el.scrollTop = this.height;
+                });
+
+            }, 300); //! Add delay so height can be update at right time 
+
+     
         "
     @scroll ="
         scrollTop= $el.scrollTop;
@@ -45,14 +44,31 @@
         }
      "
     @update-height.window="
-
         requestAnimationFrame(() => {
             updateScrollPosition();
-        });"
-  
-    id="conversation" x-ref="chatbox"
+          });
+        "
+
+        @scroll-bottom.window="
+        requestAnimationFrame(() => {
+            {{-- overflow-y: hidden; is used to hide the vertical scrollbar initially. --}}
+            $el.style.overflowY='hidden';
+
+
+
+            {{-- scroll the element down --}}
+            $el.scrollTop = $el.scrollHeight;
+
+            {{-- After updating the chat height, overflowY is set back to 'auto', 
+                which allows the browser to determine whether to display the scrollbar 
+                based on the content height.  --}}
+               $el.style.overflowY='auto';
+        });
+    "
+    
+
     x-cloak
-    {{$attributes->merge(['class'=>'flex flex-col h-full relative gap-2 gap-y-4 p-4 md:p-5 lg:p-8  flex-grow  overscroll-contain overflow-x-hidden w-full my-auto'])}}
+     class='flex flex-col h-full  relative gap-2 gap-y-4 p-4 md:p-5 lg:p-8  flex-grow  overscroll-contain overflow-x-hidden w-full my-auto'
     style="contain: content" >
 
 
@@ -87,7 +103,6 @@
                     // keep track of previous message
                     // The ($key -1 ) will get the previous message from loaded
                     // messages since $key is directly linked to $message
-                    // dd($message);
                     if ($key > 0) {
                         $previousMessage = $messageGroup->get($key - 1);
                     }
@@ -237,7 +252,7 @@
                                     {{-- -------------------- --}}
                                     @if ($attachment)
                                         @if (!$belongsToAuth && $isGroup)
-                                            <div style="color:  var(--primary-color);" @class([
+                                            <div style="color:  var(--wirechat-primary-color);" @class([
                                                 'shrink-0 font-medium text-sm sm:text-base',
                                                 // Hide avatar if the next message is from the same user
                                                 'hidden' => $message?->sendable?->is($previousMessage?->sendable),
@@ -247,13 +262,12 @@
                                         @endif
                                         {{-- Attachemnt is Application/ --}}
                                         @if (str()->startsWith($attachment->mime_type, 'application/'))
-                                            <x-wirechat::chat.file  :attachment="$attachment" />
+                                            @include('wirechat::livewire.chat.includes.file', [ 'attachment' => $attachment ])
                                         @endif
 
                                         {{-- Attachemnt is Video/ --}}
                                         @if (str()->startsWith($attachment->mime_type, 'video/'))
-                                            <x-wirechat::chat.video height="max-h-[400px]" :cover="false"
-                                                source="{{ $attachment?->url }}" />
+                                            <x-wirechat::video height="max-h-[400px]" :cover="false" source="{{ $attachment?->url }}" />
                                         @endif
 
                                             {{-- Attachemnt is audio/ --}}
@@ -263,8 +277,7 @@
 
                                         {{-- Attachemnt is image/ --}}
                                         @if (str()->startsWith($attachment->mime_type, 'image/'))
-                                            <x-wirechat::chat.image :previousMessage="$previousMessage" :message="$message"
-                                                :nextMessage="$nextMessage" :belongsToAuth="$belongsToAuth" :attachment="$attachment" />
+                                            @include('wirechat::livewire.chat.includes.image', [ 'previousMessage' => $previousMessage, 'message' => $message, 'nextMessage' => $nextMessage, 'belongsToAuth' => $belongsToAuth, 'attachment' => $attachment ])
                                         @endif
                                     @endif
 
@@ -281,8 +294,7 @@
                                     {{-- -------------------- --}}
 
                                     @if ($message->body && !$isEmoji)
-                                        <x-wirechat::chat.message :previousMessage="$previousMessage" :message="$message" :nextMessage="$nextMessage"
-                                            :belongsToAuth="$belongsToAuth" :isGroup="$isGroup" :attachment="$attachment" />
+                                    @include('wirechat::livewire.chat.includes.message', [ 'previousMessage' => $previousMessage, 'message' => $message, 'nextMessage' => $nextMessage, 'belongsToAuth' => $belongsToAuth, 'isGroup' => $isGroup, 'attachment' => $attachment])
                                     @endif
 
                                 </div>

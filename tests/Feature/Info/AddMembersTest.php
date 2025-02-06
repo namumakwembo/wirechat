@@ -274,7 +274,7 @@ describe('actions test', function () {
 
     });
 
-    test('it dispatches closeModal event after saving ', function () {
+    test('it dispatches closeChatDialog event after saving ', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup('My Group');
 
@@ -287,7 +287,7 @@ describe('actions test', function () {
             ->call('toggleMember', $user->id, $user->getMorphClass())
             ->call('save');
 
-        $request->assertDispatched('closeModal');
+        $request->assertDispatched('closeChatDialog');
 
     });
 

@@ -64,8 +64,9 @@ describe('presence test', function () {
         $request = Livewire::actingAs($auth)->test(Members::class, ['conversation' => $conversation]);
 
         //* since converstaion already have one user which is the auth then default is 1
-        $request
-            ->assertSeeHtml('dusk="close_modal_button"');
+        $request->assertSeeHtml('dusk="close_modal_button"');
+        $request->assertMethodWired('$dispatch(\'closeChatDialog\')');
+
     });
 
     test('it loads members', function () {
@@ -450,37 +451,60 @@ describe('actions test', function () {
             ->assertSee('Micheal');
     });
 
-    test('can send message to user when sendMessage is called', function () {
-        $auth = User::factory()->create();
-        $conversation = $auth->createGroup('My Group');
+    describe('sendMessage: ', function () {
+        test('it redirects to chat route and does not dispatch "closeChatDialog" & "open-chat"  & "close-chat" event when componnet is not Wdiget route after creating conversation ', function () {
+            $auth = User::factory()->create();
+            $conversation = $auth->createGroup('My Group');
 
-        //add participant
-        $user = User::factory()->create(['name' => 'Micheal']);
-        $participant = $conversation->addParticipant($user);
+            //add participant
+            $user = User::factory()->create(['name' => 'Micheal']);
+            $participant = $conversation->addParticipant($user);
 
-        $request = Livewire::actingAs($auth)->test(Members::class, ['conversation' => $conversation]);
-        $request
-            ->call('sendMessage', $participant->id)
-            ->assertRedirect(route(WireChat::viewRouteName(), 2));
-    });
+            $request = Livewire::actingAs($auth)->test(Members::class, ['conversation' => $conversation]);
+            $request
+                ->call('sendMessage', $participant->id)
+                ->assertRedirect(route(WireChat::viewRouteName(), 2))
+                ->assertNotDispatched('close-chat')
+                ->assertNotDispatched('closeChatDialog')
+                ->assertNotDispatched('open-chat');
+        });
 
-    test('it create conversation between auth and user after calling sendMessage', function () {
-        $auth = User::factory()->create();
-        $conversation = $auth->createGroup('My Group');
+        test('it dispatches "closeChatDialog" & "open-chat"  & "close-chat" event and does not redirects to chat route and does not when componnet  is Wdiget route after creating conversation ', function () {
+            $auth = User::factory()->create();
+            $conversation = $auth->createGroup('My Group');
 
-        //add participant
-        $user = User::factory()->create(['name' => 'Micheal']);
-        $participant = $conversation->addParticipant($user);
+            //add participant
+            $user = User::factory()->create(['name' => 'Micheal']);
+            $participant = $conversation->addParticipant($user);
 
-        //assert before
-        expect($auth->hasConversationWith($user))->toBe(false);
+            $request = Livewire::actingAs($auth)->test(Members::class, ['conversation' => $conversation, 'widget' => true]);
+            $request
+                ->call('sendMessage', $participant->id)
+                ->assertNoRedirect(route(WireChat::viewRouteName(), 2))
+                ->assertDispatched('open-chat')
+                ->assertDispatched('closeChatDialog')
+                ->assertNotDispatched('close-chat');
 
-        $request = Livewire::actingAs($auth)->test(Members::class, ['conversation' => $conversation]);
-        $request
-            ->call('sendMessage', $participant->id);
+        });
 
-        //assert after
-        expect($auth->hasConversationWith($user))->toBe(true);
+        test('it create conversation between auth and user after calling sendMessage', function () {
+            $auth = User::factory()->create();
+            $conversation = $auth->createGroup('My Group');
+
+            //add participant
+            $user = User::factory()->create(['name' => 'Micheal']);
+            $participant = $conversation->addParticipant($user);
+
+            //assert before
+            expect($auth->hasConversationWith($user))->toBe(false);
+
+            $request = Livewire::actingAs($auth)->test(Members::class, ['conversation' => $conversation]);
+            $request
+                ->call('sendMessage', $participant->id);
+
+            //assert after
+            expect($auth->hasConversationWith($user))->toBe(true);
+        });
     });
 
     test('calling makeAdmin will make participan admin', function () {

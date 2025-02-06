@@ -3,10 +3,11 @@
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
-use Namu\WireChat\Livewire\Chat\Chats as Chatlist;
+use Namu\WireChat\Livewire\Chats\Chats as Chatlist;
 use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message;
+use Workbench\App\Models\Admin;
 use Workbench\App\Models\User;
 
 ///Auth checks
@@ -143,6 +144,58 @@ test('it doesnt shows dusk="disappearing_messages_icon" if disappearingTurnedOFF
         ->assertDontSeeHtml('dusk="disappearing_messages_icon"');
 });
 
+describe('IsWidget', function () {
+
+    test('it doesnt  have dispatch "openChatWidget" when chats is not widget', function () {
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+        $conversation = $auth->createGroup('My Group');
+
+        $auth->sendMessageTo($conversation, 'hi');
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => false])
+            ->assertDontSeeHtml('dusk="openChatWidgetButton"');
+    });
+
+    test('it  has dispatches "openChatWidget"when chats is widget', function () {
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+        $conversation = $auth->createGroup('My Group');
+
+        $auth->sendMessageTo($conversation, 'hi');
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => true])
+            ->assertSeeHtml('dusk="openChatWidgetButton"');
+    });
+
+    test('it shows redirect home button when chats is NOT widget', function () {
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+        $conversation = $auth->createGroup('My Group');
+
+        $auth->sendMessageTo($conversation, 'hi');
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => false])
+            ->assertSeeHtml('id="redirect-button"');
+    });
+
+    test('it doesnt shows redirect home button when chats is widget', function () {
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+        $conversation = $auth->createGroup('My Group');
+
+        $auth->sendMessageTo($conversation, 'hi');
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => true])
+            ->assertDontSeeHtml('id="redirect-button"');
+    });
+
+});
+
 describe('List', function () {
 
     it('shows label "No conversations yet" items when user does not have chats', function () {
@@ -167,11 +220,45 @@ describe('List', function () {
         $auth->createConversationWith($user2, 'new message');
 
         Livewire::actingAs($auth)->test(Chatlist::class)
-            ->assertSee('iam user 1')
-            ->assertSee('iam user 2')
             ->assertViewHas('conversations', function ($conversations) {
                 return count($conversations) == 2;
             });
+    });
+
+    it('shows chats names when conversations are loaded to Chats component ', function () {
+
+        $auth = User::factory()->create();
+
+        $user1 = User::factory()->create(['name' => 'iam user 1']);
+        $user2 = User::factory()->create(['name' => 'iam user 2']);
+
+        //create conversation with user1
+        $auth->createConversationWith($user1, 'hello');
+
+        //create conversation with user2
+        $auth->createConversationWith($user2, 'new message');
+
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertSee('iam user 1')
+            ->assertSee('iam user 2');
+    });
+
+    it('shows chats names when conversations of Mixed Participant Models are loaded to Chats component ', function () {
+
+        $auth = User::factory()->create();
+
+        $user1 = User::factory()->create(['name' => 'iam user 1']);
+        $user2 = Admin::factory()->create(['name' => 'iam Admin']);
+
+        //create conversation with user1
+        $auth->createConversationWith($user1, 'hello');
+
+        //create conversation with user2
+        $auth->createConversationWith($user2, 'new message');
+
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertSee('iam user 1')
+            ->assertSee('iam Admin');
     });
 
     it('shows suffix (sender name ) if conversation is group and message does not belong to auth', function () {
@@ -210,7 +297,7 @@ describe('List', function () {
             ->assertSee('My Group');
     });
 
-    it('shows suffix (You) if user has a self conversation', function () {
+    it('shows suffix Name (You) if user has a self conversation', function () {
 
         $auth = User::factory()->create(['name' => 'Test']);
 
@@ -218,6 +305,7 @@ describe('List', function () {
         $auth->createConversationWith($auth, 'hello');
 
         Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertSee('Test')
             ->assertSee('(You)')
             ->assertViewHas('conversations', function ($conversations) {
                 return count($conversations) == 1;
@@ -320,7 +408,76 @@ describe('List', function () {
         // dd($conversations,$messages);
 
         Livewire::actingAs($auth)->test(Chatlist::class)
-            ->assertSee('2'); //
+            ->assertSeeHtml('dusk="unreadMessagesDot"');
+    });
+    it('Doesnt show unread message Dot if message does not belong to Auth and is Read', function () {
+
+        $auth = User::factory()->create();
+
+        $user1 = User::factory()->create(['name' => 'iam user 1']);
+
+        Carbon::setTestNowAndTimezone(now()->subSeconds(10));
+        //create conversation with user1
+        $conversation = $auth->createConversationWith($user1, message: 'How are you doing');
+        sleep(1);
+        //here we delay the create messsage so that we can NOT have both messages with the same timestamp
+        //now let's send message to auth
+        $user1->sendMessageTo($auth, message: 'I am good');
+        $user1->sendMessageTo($auth, message: 'kudos');
+
+        //reset time
+        Carbon::setTestNowAndTimezone();
+        $conversation->markAsRead($auth);
+
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertDontSeeHtml('dusk="unreadMessagesDot"');
+    });
+
+    it('still shows unread message Dot even if message belongs to Participant of Different Model', function () {
+
+        $auth = User::factory()->create();
+
+        $user1 = Admin::factory()->create(['name' => 'iam user 1']);
+
+        //create conversation with user1
+        $auth->createConversationWith($user1, message: 'How are you doing');
+        sleep(1);
+        //here we delay the create messsage so that we can NOT have both messages with the same timestamp
+        //now let's send message to auth
+        $user1->sendMessageTo($auth, message: 'I am good');
+        $user1->sendMessageTo($auth, message: 'kudos');
+
+        // dd($conversations,$messages);
+
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertSeeHtml('dusk="unreadMessagesDot"');
+    });
+
+    it('Doesnt shows unread message Dot if message is READ and belongs to Participant of Different Model', function () {
+
+        $auth = User::factory()->create();
+        $user1 = Admin::factory()->create(['name' => 'iam user 1']);
+
+        // Set the initial time for the first message
+        Carbon::setTestNow(now()->subSeconds(20));
+
+        $conversation = $auth->createConversationWith($user1, message: 'How are you doing');
+
+        $user1->sendMessageTo($auth, message: 'I am good');
+
+        // Set the time for marking the conversation as read
+        Carbon::setTestNow(now()->addSeconds(5));
+
+        $conversation->markAsRead($auth);
+
+        // Reset the time to the current moment
+        Carbon::setTestNow();
+
+        // Check unread message count
+        $unreadCount = $conversation->getUnreadCountFor($auth);
+
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertDontSeeHtml('dusk="unreadMessagesDot"');
     });
 
     it('shows message time AS "now"  if less than a minute old', function () {

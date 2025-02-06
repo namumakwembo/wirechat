@@ -6,9 +6,12 @@ use Livewire\Attributes\Validate;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
+use Namu\WireChat\Livewire\Widgets\WireChat as WidgetsWireChat;
+use Namu\WireChat\Traits\Widget;
 
 class NewGroup extends ModalComponent
 {
+    use Widget;
     use WithFileUploads;
 
     public $users;
@@ -130,9 +133,7 @@ class NewGroup extends ModalComponent
         $this->showAddMembers = true;
     }
 
-    /**
-     * Create group
-     */
+    /** * Create group */
     public function create()
     {
 
@@ -152,8 +153,18 @@ class NewGroup extends ModalComponent
             }
         }
 
-        //redirect to view route
-        return redirect()->route(WireChat::viewRouteName(), [$conversation->id]);
+        //close dialog
+        //The froce close is importnat because it will close all dialogs including parents or children
+        $this->forceClose();
+        $this->closeChatDialog();
+
+        //redirect to conversation
+        $this->handleComponentTermination(
+            redirectRoute: route(WireChat::viewRouteName(), [$conversation->id]),
+            events: [
+                WidgetsWireChat::class => ['open-chat',  ['conversation' => $conversation->id]],
+            ]
+        );
 
     }
 

@@ -4,9 +4,13 @@ namespace Namu\WireChat\Livewire\Components;
 
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
+use Namu\WireChat\Livewire\Widgets\WireChat as WidgetsWireChat;
+use Namu\WireChat\Traits\Widget;
 
 class NewChat extends ModalComponent
 {
+    use Widget;
+
     public $users;
 
     public $search;
@@ -49,9 +53,18 @@ class NewChat extends ModalComponent
             $createdConversation = auth()->user()->createConversationWith($model);
 
             if ($createdConversation) {
-                $this->closeModal();
 
-                return redirect()->route('chat', [$createdConversation->id]);
+                //close dialog
+                $this->closeChatDialog();
+
+                //redirect to conversation
+                $this->handleComponentTermination(
+                    redirectRoute: route(WireChat::viewRouteName(), [$createdConversation->id]),
+                    events: [
+                        WidgetsWireChat::class => ['open-chat',  ['conversation' => $createdConversation->id]],
+                    ]
+                );
+
             }
         }
     }
@@ -60,7 +73,6 @@ class NewChat extends ModalComponent
     {
 
         abort_unless(auth()->check(), 401);
-        // abort_unless(WireChat::allowsNewChatModal(),503,'The NewChat feature is currently unavailable.');
     }
 
     public function render()

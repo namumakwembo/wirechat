@@ -67,6 +67,18 @@ describe('Initial page', function () {
         $auth = ModelsUser::factory()->create();
         $request = Livewire::actingAs($auth)->test(NewGroup::class);
         $request->assertSee('Cancel');
+        $request->assertSeeHtml('dusk="cancel_create_new_group_button"');
+        $request->assertMethodWired('$dispatch(\'closeChatDialog\')');
+
+    });
+
+    test('cancel_create_new_group_button_is_set_correctly', function () {
+
+        $auth = ModelsUser::factory()->create(['email_verified_at' => now()]);
+        $request = Livewire::actingAs($auth)->test(NewGroup::class);
+        $request
+            ->assertSeeHtml('dusk="cancel_create_new_group_button"');
+        $request->assertMethodWired('$dispatch(\'closeChatDialog\')');
 
     });
 
@@ -358,7 +370,37 @@ describe('Creteing group', function () {
         expect($conversation->participants->count())->toBe(4);
     });
 
-    it('redirects after creating conversation', function () {
+    it('dispataches Livewire events "closeChatDialog" event after creating Group', function () {
+
+        Config::set('wirechat.max_group_members', 3);
+        $auth = ModelsUser::factory()->create();
+        //create another user
+        $member1 = ModelsUser::factory()->create(['name' => 'Micheal']);
+        $member2 = ModelsUser::factory()->create(['name' => 'Boost']);
+        $member3 = ModelsUser::factory()->create(['name' => 'Ultra']);
+
+        $request = Livewire::actingAs($auth)->test(NewGroup::class);
+        $file = UploadedFile::fake()->create('photo.png');
+
+        $request
+                //add details
+            ->set('name', 'Test Group')
+            ->set('description', 'Description Testing')
+            ->set('photo', $file)
+                //add members
+            ->call('addMember', $member1->id, $member1->getMorphClass())
+            ->call('addMember', $member2->id, $member2->getMorphClass())
+            ->call('addMember', $member3->id, $member3->getMorphClass())
+
+                //create group
+            ->call('create');
+
+        $request->assertDispatched('closeChatDialog');
+
+    });
+
+    it('it redirects and does not dispatach Livewire events "open-chat" events after creating Group if is not Widget', function () {
+
         Config::set('wirechat.max_group_members', 3);
         $auth = ModelsUser::factory()->create();
         //create another user
@@ -384,7 +426,40 @@ describe('Creteing group', function () {
 
         $conversation = Conversation::withoutGlobalScopes()->first();
 
-        $request->assertRedirect(route(WireChat::viewRouteName(), $conversation->id));
+        $request->assertRedirect(route(WireChat::viewRouteName(), $conversation->id))
+            ->assertNotDispatched('open-chat');
+
+    });
+
+    it('it does not redirects but  dispataches Livewire events "open-chat" events after creating group if IS Widget', function () {
+
+        Config::set('wirechat.max_group_members', 3);
+        $auth = ModelsUser::factory()->create();
+        //create another user
+        $member1 = ModelsUser::factory()->create(['name' => 'Micheal']);
+        $member2 = ModelsUser::factory()->create(['name' => 'Boost']);
+        $member3 = ModelsUser::factory()->create(['name' => 'Ultra']);
+
+        $request = Livewire::actingAs($auth)->test(NewGroup::class, ['widget' => true]);
+        $file = UploadedFile::fake()->create('photo.png');
+
+        $request
+                //add details
+            ->set('name', 'Test Group')
+            ->set('description', 'Description Testing')
+            ->set('photo', $file)
+                //add members
+            ->call('addMember', $member1->id, $member1->getMorphClass())
+            ->call('addMember', $member2->id, $member2->getMorphClass())
+            ->call('addMember', $member3->id, $member3->getMorphClass())
+
+                //create group
+            ->call('create');
+
+        $conversation = Conversation::withoutGlobalScopes()->first();
+
+        $request->assertNoRedirect(route(WireChat::viewRouteName(), $conversation->id))
+            ->assertDispatched('open-chat');
 
     });
 

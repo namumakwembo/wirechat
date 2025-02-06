@@ -4,18 +4,18 @@ namespace Namu\WireChat\Livewire\Info;
 
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Locked;
-use Livewire\Attributes\Validate;
-//use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
+use Namu\WireChat\Jobs\DeleteConversationJob;
+use Namu\WireChat\Livewire\Chats\Chats;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
-use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Conversation;
-use Namu\WireChat\Models\Message;
+use Namu\WireChat\Traits\Widget;
 
 class Info extends ModalComponent
 {
+    use Widget;
     use WithFileUploads;
 
     #[Locked]
@@ -171,8 +171,17 @@ class Info extends ModalComponent
         //delete conversation
         $this->conversation->deleteFor(auth()->user());
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+        //redirect to chats page pr
+        //Dispatach event instead if isWidget
+        //handle widget termination
+        $this->handleComponentTermination(
+            redirectRoute: route(WireChat::indexRouteName()),
+            events: [
+                'close-chat',
+                Chats::class => ['chat-deleted',  [$this->conversation->id]],
+            ]
+        );
+
     }
 
     /**
@@ -187,20 +196,30 @@ class Info extends ModalComponent
 
         abort_unless(auth()->user()->isOwnerOf($this->conversation), 403, 'Forbidden: You do not have permission to delete this group.');
 
-        // Ensure all participants are removed before deleting the group
-        $participantCount = $this->conversation->participants
-            ->where('participantable_id', '!=', auth()->id())
-            ->where('type', '!=', ParticipantRole::OWNER)
-            ->where('participantable_type', auth()->user()->getMorphClass())
+        //Ensure all participants are removed before deleting the group
+        $participantCount = $this->conversation->participants()
+            ->withoutParticipantable(auth()->user())
+            ->where('role', '!=', ParticipantRole::OWNER)
             ->count();
 
         abort_unless($participantCount == 0, 403, 'Cannot delete group: Please remove all members before attempting to delete the group.');
 
-        //delete conversation
-        $this->conversation->forceDelete();
+        //Soft Delete conversation
+        $this->conversation->deleteFor(auth()->user());
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+        //handle widget termination
+        $this->handleComponentTermination(
+            redirectRoute: route(WireChat::indexRouteName()),
+            events: [
+                ['close-chat',  ['conversation' => $this->conversation->id]],
+                Chats::class => ['chat-deleted',  [$this->conversation->id]],
+            ]
+        );
+
+        //Dispatch job to delete conversation in backgroud
+        //This is done to not hold up page for user incase of long running prcoess and to also give time for widget to settle avoiding 404 livewire hydrate errors
+        DeleteConversationJob::dispatch($this->conversation);
+
     }
 
     public function exitConversation()
@@ -215,8 +234,13 @@ class Info extends ModalComponent
         //delete conversation
         $auth->exitConversation($this->conversation);
 
-        //redirect to chats page
-        $this->redirectRoute(WireChat::indexRouteName());
+        $this->handleComponentTermination(
+            redirectRoute: route(WireChat::indexRouteName()),
+            events: [
+                'close-chat',
+                Chats::class => ['chat-exited',  [$this->conversation->id]],
+            ]
+        );
     }
 
     public function placeholder()
@@ -248,10 +272,14 @@ class Info extends ModalComponent
     public function render()
     {
 
+        $participant = $this->conversation?->participant(auth()->user());
+
+        //  dd($this->isWidget(),$participant);
+
         // Pass data to the view
         return view('wirechat::livewire.info.info', [
-            'receiver' => $this->conversation->getReceiver(),
-            'participant' => $this->conversation->participant(auth()->user()),
+            'receiver' => $this->conversation?->getReceiver(),
+            'participant' => $participant,
         ]);
     }
 }

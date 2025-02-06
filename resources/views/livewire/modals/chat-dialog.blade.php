@@ -65,7 +65,7 @@
                     //Check if should completley destroy component on close 
                     //Meaning state won't be retained if component is opened again
                     if (this.destroyOnClose === true) {
-                        Livewire.dispatch('destroyWireChatComponent', {
+                        Livewire.dispatch('destroyChatDialog', {
                             id: this.activeDialogComponent
                         });
                     }
@@ -144,7 +144,7 @@
                 init() {
 
                     this.listeners.push(
-                        Livewire.on('closeModal', (data) => {
+                        Livewire.on('closeChatDialog', (data) => {
                             this.closeDialog(data?.force ?? false, data?.skipPreviousModals ?? 0, data
                                 ?.destroySkipped ?? false);
                         })
@@ -168,8 +168,9 @@
     </script>
 
     <div x-data="WireChatDialog()" x-on:close.stop="setShowPropertyTo(false)"
-           x-on:keydown.escape="closeDialogOnEscape({modalType: 'WireChatDialog', event: $event })"
-           x-show="show" class="fixed  inset-0 z-10 overflow-y-auto" style="display: none;">
+           x-on:keydown.escape.stop="closeDialogOnEscape({modalType: 'WireChatDialog', event: $event })"
+            tabindex="0"
+           x-show="show" class="fixed  inset-0 z-50 overflow-y-auto" style="display: none;">
         <div class="flex items-end  justify-center min-h-screen px-4 pt-4 pb-10 text-center sm:block sm:p-0">
             <div x-show="show" x-on:click="closeDialogOnClickAway()" x-transition:enter="ease-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
@@ -189,7 +190,7 @@
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
 
                 class="inline-block  align-bottom  rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:max-w-lg"
-                id="modal-container" x-trap.noscroll.inert="show && showActiveDialogComponent" aria-modal="true">
+                id="chat-dialog-container" x-trap.noscroll.inert="show && showActiveDialogComponent" aria-modal="true">
                 @forelse($dialogComponents as $id => $component)
                     <div  x-show.immediate="activeDialogComponent == '{{ $id }}'" x-ref="{{ $id }}"
                         wire:key="{{ $id }}">

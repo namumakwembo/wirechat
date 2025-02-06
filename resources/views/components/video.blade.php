@@ -1,5 +1,5 @@
 @props([
-    'source'=>'https://cdn.devdojo.com/pines/videos/coast.mp4',
+    'source'=>null,
     'controls'=>true,
     'cover'=>true,
     'height'=>"auto",

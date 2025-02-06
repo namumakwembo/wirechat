@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
+use Namu\WireChat\Models\Scopes\WithoutRemovedMessages;
 use Namu\WireChat\Traits\Actionable;
 
 class Conversation extends Model
@@ -113,7 +115,7 @@ class Conversation extends Model
     {
         $query = Participant::where('participantable_id', $user->id)
             ->where('participantable_type', $user->getMorphClass())
-            ->where('conversation_id', $this->id); // Ensures you're querying for the correct conversation
+            ->where('conversation_id', $this->id); //* Ensures you're querying for the correct conversation
 
         if ($withoutGlobalScopes) {
             $query->withoutGlobalScopes(); // Apply this condition if necessary
@@ -125,96 +127,10 @@ class Conversation extends Model
         return $participant;
     }
 
-    // public function participant(Model $user)
-    // {
-
-    //     $participant = null;
-    //     // If loaded, simply check the existing collection
-    //     if ($this->relationLoaded('participants')) {
-    //         $participant = $this->participants()
-    //             ->withoutGlobalScope('withoutExited')
-    //             ->where('participantable_id', $user->id)
-    //             ->where('participantable_type', get_class($user))
-    //             ->first();
-    //     } else {
-    //         $participant = $this->participants()
-    //             ->withoutGlobalScope('withoutExited')
-
-    //             ->where('participantable_id', $user->id)
-    //             ->where('participantable_type', get_class($user))
-    //             ->first();
-    //     }
-
-    //     return $participant;
-    // }
-
     /**
      * Add a new participant to the conversation.
      *
-     * @param  bool  $revive  =if user was recently deleted by admin or owner then add them back
-     */
-    // public function addParticipant(Model $user, bool $revive = false): Participant
-    // {
-    //     // Check if the participant is already in the conversation
-    //     abort_if(
-    //         $this->participants()
-    //             ->where('participantable_id', $user->id)
-    //             ->where('participantable_type', get_class($user))
-    //             ->exists(),
-    //         422,
-    //         'Participant is already in the conversation.'
-    //     );
-
-    //     #If the conversation is private, ensure it doesn't exceed two participants
-    //     if ($this->isPrivate()) {
-    //         abort_if(
-    //             $this->participants()->count() >= 2,
-    //             422,
-    //             'Private conversations cannot have more than two participants.'
-    //         );
-    //     }
-
-    //     #ensure Self conversations do not have more than 1 participant
-    //     if ($this->isSelf()) {
-    //         abort_if(
-    //             $this->participants()->count() >= 1,
-    //             422,
-    //             'Self conversations cannot have more than 1 participant.'
-    //         );
-    //     }
-
-    //     $participantWithoutScopes = $this->participants()
-    //         ->withoutGlobalScopes()
-    //         ->where('participantable_id', $user->id)
-    //         ->where('participantable_type', get_class($user))
-    //         ->first();
-
-    //     if ($participantWithoutScopes) {
-    //         # abort if exited already exited group
-    //         abort_if($participantWithoutScopes?->hasExited(), 403, 'Cannot add ' . $user->display_name . ' because they left the group');
-
-    //         #reomve removed_by_action if existed
-    //         if ($revive) {
-    //             $participantWithoutScopes->actions()->where('type', Actions::REMOVED_BY_ADMIN)->delete();
-    //         }
-
-    //         return $participantWithoutScopes;
-    //     } else {
-
-    //         #create particicipant
-    //         $participant = $this->participants()->withoutGlobalScopes()->updateOrCreate([
-    //             'participantable_id' => $user->id,
-    //             'participantable_type' => get_class($user),
-    //             'role' => ParticipantRole::PARTICIPANT
-    //         ]);
-
-    //         return $participant;
-    //     }
-    // }
-
-    /**
-     * Add a new participant to the conversation.
-     *
+     * @param Model user the creator of group
      * @param ParticipantRole  a ParticipanRole enum to assign to member
      * @param  bool  $undoAdminRemovalAction  If the user was recently removed by admin, allow re-adding.
      */
@@ -305,7 +221,7 @@ class Conversation extends Model
 
     /**
      * Exclude blank conversations that have no messages at all,
-     * including those that where deleted by the user.
+     * including those that where deleted by the user- meaning .
      */
     public function scopeWithoutBlanks(Builder $builder): void
     {
@@ -313,9 +229,9 @@ class Conversation extends Model
         if ($user) {
 
             $builder->whereHas('messages', function ($q) use ($user) {
-                $q->withoutGlobalScopes()->whereDoesntHave('actions', function ($q) use ($user) {
-                    $q->where('actor_id', '!=', $user->id)
-                        ->where('actor_type', $user->getMorphClass()) // Safe since $user is authenticated
+                /* !we only exclude one scope not all because we dont want to check aginast soft delete messages */
+                $q->withoutGlobalScope(WithoutRemovedMessages::class)->whereDoesntHave('actions', function ($q) use ($user) {
+                    $q->whereActor($user)
                         ->where('type', Actions::DELETE);
                 });
             });
@@ -338,10 +254,9 @@ class Conversation extends Model
 
             // Apply the "without deleted conversations" scope
             $builder->whereHas('participants', function ($query) use ($user, $conversationsTableName) {
-                $query->where('participantable_id', $user->id)
+                $query->whereParticipantable($user)
                     ->whereRaw(" (conversation_cleared_at IS NULL OR conversation_cleared_at < {$conversationsTableName}.updated_at) ");
             });
-
         }
     }
 
@@ -360,17 +275,115 @@ class Conversation extends Model
 
             // Apply the "without deleted conversations" scope
             $builder->whereHas('participants', function ($query) use ($user, $conversationsTableName) {
-                $query->where('participantable_id', $user->id)
+                $query->whereParticipantable($user)
                     ->whereRaw(" (conversation_deleted_at IS NULL OR conversation_deleted_at < {$conversationsTableName}.updated_at) ");
             });
         }
     }
 
-    public function receiver(): HasOne
+    /**
+     * Include conversations that were marked as deleted by the auth participant.
+     */
+    public function scopeWithDeleted(Builder $builder)
     {
+        // Dynamically get the parent model (i.e., the user)
+        $user = auth()->user();
+
+        if ($user) {
+            // Get the table name for conversations dynamically to avoid hardcoding.
+
+            // Apply the "with deleted conversations" scope
+            $builder->whereHas('participants', function ($query) use ($user) {
+                $query->whereParticipantable($user)
+                    ->orWhereNotNull('conversation_deleted_at');
+            });
+        }
+    }
+
+    /**
+     * Get the peer participant in a private or self conversation.
+     *
+     * This method retrieves the other participant in a private conversation
+     * or returns the given reference user for self conversations.
+     *
+     * @param  Model  $reference  The reference user/model to exclude.
+     * @return Participant|null The other participant or null if not applicable.
+     */
+    public function peerParticipant(Model $reference): ?Participant
+    {
+
+        //return null if user does not belong to conversation
+        if (! $reference->belongsToConversation($this)) {
+            return null;
+        }
+
+        if (! in_array($this->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
+            return null;
+        }
+
+        // Check if 'participants' relationship is already loaded to avoid extra queries
+        $participants = $this->relationLoaded('participants')
+        ? $this->participants
+        : $this->participants();
+
+        if ($this->isSelf()) {
+            return $participants->whereParticipantable($reference)->first();
+        }
+
+        return $participants->withoutParticipantable($reference)->first();
+    }
+
+    /**
+     * Get all peer participants in a conversation, excluding the reference user.
+     *
+     * This method retrieves all other participants in a conversation
+     * except for the given reference user.
+     *
+     * @param  Model  $reference  The reference user/model to exclude.
+     * @return Collection<int, ?Participant> A collection of peer participants.
+     */
+    public function peerParticipants(Model $reference): ?Collection
+    {
+
+        //return null if user does not belong to conversation
+        if (! $reference->belongsToConversation($this)) {
+            return null;
+        }
+
+        // Check if 'participants' relationship is already loaded to avoid extra queries
+        $participants = $this->relationLoaded('participants') ? $this->participants : $this->participants();
+
+        return $participants->withoutParticipantable($reference)->get();
+    }
+
+    /**
+     * Get receiver Participant for Private Conversation
+     * will return null for Self Conversation
+     */
+    public function receiverParticipant(): HasOne
+    {
+        $user = auth()->user();
+
         return $this->hasOne(Participant::class)
-            ->where('participantable_id', '!=', auth()->id())
-            ->where('role', 'owner')->whereHas('conversation', function ($query) {
+            ->withoutParticipantable($user)
+            ->where('role', ParticipantRole::OWNER)
+            ->whereHas('conversation', function ($query) {
+                $query->whereIn('type', [ConversationType::PRIVATE]);
+            });
+    }
+
+    /**
+     * Get Auth Participant for Private Conversation
+     * will return Auth for Self Conversation
+     */
+    public function authParticipant(): HasOne
+    {
+        $user = auth()->user();
+
+        return $this->hasOne(Participant::class)
+            ->whereParticipantable($user)
+            ->where('role', ParticipantRole::OWNER)
+            ->whereHas('conversation', function ($query) {
                 $query->whereIn('type', [ConversationType::PRIVATE, ConversationType::SELF]);
             });
     }
@@ -378,36 +391,31 @@ class Conversation extends Model
     /**
      * Get the receiver of the private conversation
      *
+     * @param null
      * */
     public function getReceiver()
     {
-
-        // Check if the conversation is private
-        //  dd($this->type);
+        // Check if the conversation is private or self
         if (! in_array($this->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
             return null;
         }
 
-        // Ensure participants are already loaded (use the loaded relationship, not fresh queries)
-        $participants = $this->participants->where('conversation_id', $this->id);
+        // If it's a self conversation, return the authenticated user
+        if ($this->isSelf()) {
+            return auth()->user();
+        }
 
-        $receiverParticipant = $participants->where('participantable_id', '!=', auth()->id())
-            ->where('participantable_type', auth()->user()->getMorphClass())
-            ->first();
+        // Get participants for the current conversation
+        $participants = $this->participants()->where('conversation_id', $this->id);
 
+        // Try to find the receiver excluding the authenticated user
+        $receiverParticipant = $participants->withoutParticipantable(auth()->user())->first();
         if ($receiverParticipant) {
-            // Return the associated model via the participant's relationship
-
-            //  dd('reacch',$receiverParticipant->participantable);
             return $receiverParticipant->participantable;
         }
 
-        // Check the number of times the user appears as participant (fallback case)
-        $authReceiver = $participants->where('participantable_id', auth()->id())
-            ->where('participantable_type', auth()->user()->getMorphClass())
-            ->first();
-
-        return $authReceiver?->participantable;
+        // If no other participant is found, return the authenticated user as the receiver
+        return auth()->user();
     }
 
     /**
@@ -462,21 +470,20 @@ class Conversation extends Model
             return $this->messages->filter(function ($message) use ($lastReadAt, $user) {
                 // If lastReadAt is null, consider all messages as unread
                 // Also, exclude messages that belong to the user
-                return (! $lastReadAt || $message->created_at > $lastReadAt) &&
-                    $message->sendable_id != $user->id && $message->sendable_type == $user->getMorphClass();
+                return (! $lastReadAt || $message->created_at > $lastReadAt) && ! $message->ownedBy($user);
             });
         }
 
         // Query builder for unread messages
         $query = $this->messages();
-        if ($lastReadAt) {
-            $query->where('created_at', '>', $lastReadAt);
-        }
 
-        // Exclude messages that belong to the user
-        return $query->where('sendable_id', '!=', $user->id)
-            ->where('sendable_type', $user->getMorphClass())
-            ->get(); // Return the collection of unread messages
+        //WORKING
+        $messages = $query->whereIsNotOwnedBy($user)->when($lastReadAt, function ($query) use ($lastReadAt) {
+
+            $query->where('created_at', '>', $lastReadAt);
+        })->get();
+
+        return $messages;
     }
 
     /**
@@ -555,30 +562,29 @@ class Conversation extends Model
         $participant->conversation_deleted_at = Carbon::now();
         $participant->save();
 
+        //Then force delete it
+        if ($this->isSelfConversation($user)) {
+            return $this->forceDelete();
+        }
+
         // Check if the conversation is private or self
-        if ($this->isPrivate() || $this->isSelf()) {
-            //check if conversatin is Self conversation
-            //Then force delete it
-            if ($this->isSelfConversation($user)) {
+        if ($this->isPrivate()) {
+
+            //set variable and default value
+            $deletedByBothParticipants = true;
+
+            // Get Participants
+            //!use make sure to get new query() otherwise participants wont be retrieved correctly
+            $participants = $this->participants()->get();
+
+            // Check if all participants have deleted the conversation
+            $deletedByBothParticipants = $participants->every(function ($participant) {
+                return $participant->hasDeletedConversation(true) == true;
+            });
+
+            // If all participants have deleted the conversation, force delete it
+            if ($deletedByBothParticipants) {
                 $this->forceDelete();
-            } else {
-
-                // Retrieve the other participant in the private conversation
-                $otherParticipant = $this->participants
-                    ->where('participantable_id', '!=', $user->id)
-                    ->where('participantable_type', $user->getMorphClass())
-                    ->first();
-
-                // Return null if the other participant cannot be found
-                if (! $otherParticipant) {
-                    return null;
-                }
-
-                // If both participants have deleted all their messages, delete the conversation permanently
-                if ($participant->hasDeletedConversation() && $otherParticipant->hasDeletedConversation()) {
-                    // dd("deleted");
-                    $this->forceDelete();
-                }
             }
         }
     }
@@ -590,7 +596,7 @@ class Conversation extends Model
     {
         $participant = $this->participant($user);
 
-        return $participant->hasDeletedConversation(true);
+        return $participant->hasDeletedConversation(checkDeletionExpired: true);
     }
 
     public function clearFor(Model $user)
@@ -603,7 +609,7 @@ class Conversation extends Model
     }
 
     /**
-     * Check if the conversation is owned by the  user themselves
+     * Check if the conversation is a self conversations
      */
     public function isSelfConversation(?Model $participant = null): bool
     {

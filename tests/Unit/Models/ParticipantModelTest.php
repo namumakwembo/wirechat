@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Models\Action;
@@ -125,6 +126,81 @@ describe('exitingConversation()', function () {
 
         //assert
         expect($participant->role)->toBe(ParticipantRole::PARTICIPANT);
+    });
+
+});
+
+describe('hasDeletedConversation()', function () {
+
+    it(' returns true if user has Deleted Conversation', function () {
+
+        $auth = User::factory()->create();
+        $user = User::factory()->create(['name' => 'Micheal']);
+
+        $conversation = $auth->createConversationWith($user);
+
+        $conversation->deleteFor($auth);
+
+        //assert
+        expect($auth->hasDeletedConversation($conversation))->toBe(true);
+
+    });
+
+    it('returns true if user has Deleted Conversation even when new messages are sent but parameter :checkDeletionExpired is false ', function () {
+
+        $auth = User::factory()->create();
+        $user = User::factory()->create(['name' => 'Micheal']);
+
+        $conversation = $auth->createConversationWith($user);
+
+        //delete conversation
+        $conversation->deleteFor($auth);
+
+        //send message
+        $user->sendMessageTo($conversation, 'hi');
+
+        //assert
+        expect($auth->hasDeletedConversation($conversation, checkDeletionExpired: false))->toBe(true);
+
+    });
+
+    it('returns FALSe if user has Deleted Conversation but new messages are sent and parameter :checkDeletionExpired is true ', function () {
+        $auth = User::factory()->create();
+        $user = User::factory()->create(['name' => 'Micheal']);
+
+        Carbon::setTestNow(now()->subSecond(20));
+        $conversation = $auth->createConversationWith($user);
+
+        Carbon::setTestNow(now()->addSecond(5));
+
+        //delete conversation
+        $conversation->deleteFor($auth);
+
+        Carbon::setTestNow();
+
+        //send message
+        $user->sendMessageTo($conversation, 'hi');
+
+        //assert
+        expect($auth->hasDeletedConversation($conversation, checkDeletionExpired: true))->toBe(false);
+
+    });
+
+    it('returns false for other user who has not deleted conversation  if one user has Deleted Conversation', function () {
+
+        $auth = User::factory()->create();
+        $user = User::factory()->create(['name' => 'Micheal']);
+
+        $conversation = $auth->createConversationWith($user);
+
+        $participant = $conversation->participant($user);
+
+        //delete conversation
+        $conversation->deleteFor($auth);
+
+        //assert
+        expect($participant->hasDeletedConversation())->toBe(false);
+
     });
 
 });

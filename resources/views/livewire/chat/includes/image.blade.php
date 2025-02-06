@@ -1,13 +1,3 @@
-@props([
-    'previousMessage'=>$previousMessage,
-    'message'=>$message,
-    'nextMessage'=>$nextMessage,
-    'belongsToAuth'=>$belongsToAuth,
-    'attachment'=>$attachment
-
-])
-
-
 <img @class([ 
 
         'max-w-max  h-[200px] min-h-[210px] bg-gray-50/60 dark:bg-gray-700/20   object-scale-down  grow-0 shrink  overflow-hidden  rounded-3xl',

@@ -1,4 +1,4 @@
-<div class="bg-white  min-h-screen dark:bg-inherit overfo opaticy-100 h-full w-full">
+<div class="bg-white dark:bg-inherit overfo opaticy-100   min-h-screen w-full">
     <section class="flex gap-4 z-[10]  items-center p-5 sticky top-0 bg-white dark:bg-gray-900  ">
         <button wire:click="$dispatch('closeChatDrawer')" class="focus:outline-none"> <svg class="w-7 h-7"
                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
@@ -9,7 +9,7 @@
     </section>
 
 
-    <div class="min-h-full h-[500px]">
+    <div class="">
         <section >
 
             <h5 class="w-full text-start py-4 bg-gray-50 dark:bg-gray-950 px-50 px-4">

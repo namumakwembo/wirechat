@@ -1,10 +1,5 @@
 @use("Namu\WireChat\Facades\WireChat")
 
-@props([
-    'receiver' => $receiver,
-    'conversation' => $conversation,
-])
-
 @php
     $group = $conversation->group;
 @endphp
@@ -15,8 +10,17 @@
     <div class="  flex  w-full items-center   px-2 py-2   lg:px-4 gap-2 md:gap-5 ">
 
         {{-- Return --}}
-        <a href="{{route(WireChat::indexRouteName())}}" class=" shrink-0 lg:hidden  dark:text-white" id="chatReturn">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+        <a 
+        @if($this->isWidget())
+            @click="$dispatch('close-chat',{conversation: {{$conversation->id}}})"
+            dusk="return_to_home_button_dispatch"
+        @else
+            href="{{ route(WireChat::indexRouteName(), $conversation->id) }}"
+            dusk="return_to_home_button_link"
+        @endif
+        
+        @class(['shrink-0  cursor-pointer dark:text-white','lg:hidden'=>!$this->isWidget()]) id="chatReturn">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
                 stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
@@ -25,7 +29,7 @@
         {{-- Receiver wirechat::Avatar --}}
         <section class="grid grid-cols-12 w-full">
             <div class="shrink-0 col-span-11 w-full truncate overflow-h-hidden relative">
-                <div wire:click="$dispatch('openChatDrawer', {component: 'info',arguments: { conversation: {{ $conversation->id }} }})"
+                <div wire:click="$dispatch('openChatDrawer', {component: 'info',arguments: { conversation: {{ $conversation->id }} ,widget:  @json($this->isWidget())  }})"
                     class="flex items-center gap-2 cursor-pointer ">
                     <x-wirechat::avatar disappearing="{{$conversation->hasDisappearingTurnedOn()}}" group="{{ $conversation->isGroup() }}"
                         src="{{ $group ? $group?->cover_url : $receiver?->cover_url ?? null }}"
@@ -61,7 +65,7 @@
                     <x-slot name="content">
 
                         <button
-                            wire:click="$dispatch('openChatDrawer', {component: 'info',arguments: { conversation: {{ $conversation->id }} }})"
+                            wire:click="$dispatch('openChatDrawer', {component: 'info',arguments: { conversation: {{ $conversation->id }},widget: @json($this->isWidget())  }})"
                             class="w-full text-start">
 
                             <x-wirechat::dropdown-link>
@@ -71,9 +75,11 @@
                         </button>
 
 
-                        <x-wirechat::dropdown-link href='{{ route(WireChat::indexRouteName()) }}'>
-                            Close Chat
-                        </x-wirechat::dropdown-link>
+                        @if($this->isWidget())
+                        <x-wirechat::dropdown-link  @click="$dispatch('close-chat',{conversation: {{$conversation->id}}})" > Close Chat </x-wirechat::dropdown-link>
+                       @else
+                       <x-wirechat::dropdown-link  href="{{route(WireChat::indexRouteName()) }}" class="shrink-0" > Close Chat </x-wirechat::dropdown-link>
+                       @endif
 
 
                     {{-- Only show delete and clear if conversation is NOT group --}}

@@ -11,7 +11,7 @@
 
             <button
              dusk="close_modal_button"
-             wire:click="$dispatch('closeModal')"
+             wire:click="$dispatch('closeChatDialog')"
                 class="p-2  text-gray-600 hover:dark:bg-gray-700 hover:dark:text-white rounded-full hover:text-gray-800 hover:bg-gray-50">
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor">
@@ -36,12 +36,12 @@
         @if (WireChat::showNewGroupModalButton() && auth()->user()->canCreateGroups())
         <button
   
-         wire:click="$dispatch('openChatDialog', {component: 'new-group'})"
+         wire:click="$dispatch('openChatDialog', {component: 'new-group',arguments: { widget:  @json($this->isWidget())  }})"
          @dusk="open_new_group_modal_button"
          class="flex items-center gap-3 my-4  rounded-lg p-2 w-full border hover:border-gray-300 transition-colors  dark:border-gray-800 dark:hover:border-gray-700   "
 
          >
-        <span        style=" color: var(--primary-color); " class="p-1 bg-gray-100  rounded-full ">
+        <span        style=" color: var(--wirechat-primary-color); " class="p-1 bg-gray-100  rounded-full ">
 
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class=" w-5 h-5">
                 <path fill-rule="evenodd" d="M8.25 6.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 6.709 7.498.75.75 0 0 1-.372.568A12.696 12.696 0 0 1 12 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 0 1-.372-.568 6.787 6.787 0 0 1 1.019-4.38Z" clip-rule="evenodd" />

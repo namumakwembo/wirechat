@@ -8,10 +8,12 @@ use Livewire\Component;
 
 class Index extends Component
 {
-    #[Layout('wirechat::layouts.app')]
+
     #[Title('Chats')]
     public function render()
     {
-        return view('wirechat::livewire.index');
+        return view('wirechat::livewire.index')
+        ->layout(config('wirechat.layout','wirechat::layouts.app'));
+
     }
 }

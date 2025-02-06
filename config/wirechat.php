@@ -42,8 +42,14 @@ return [
     'routes' => [
         'prefix' => '/chats',
         'middleware' => ['web', 'auth'],
-        'guards'=>['web']
+        'guards' => ['web']
     ],
+
+    /**
+     * Default layout for default routes 
+     */
+    'layout' => 'wirechat::layouts.app',
+
 
     /**
      * Features:
@@ -54,6 +60,9 @@ return [
     'allow_chats_search' => true,
     'allow_media_attachments' => true,
     'allow_file_attachments' => true,
+
+
+
 
     /**
      * User Searchable Fields:

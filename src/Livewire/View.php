@@ -26,10 +26,10 @@ class View extends Component
 
     }
 
-    #[Layout('wirechat::layouts.app')]
     #[Title('Chats')]
     public function render()
     {
-        return view('wirechat::livewire.view');
+        return view('wirechat::livewire.view')
+                ->layout(config('wirechat.layout','wirechat::layouts.app'));
     }
 }

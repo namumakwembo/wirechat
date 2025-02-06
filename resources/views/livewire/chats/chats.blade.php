@@ -1,7 +1,7 @@
 @use('Namu\WireChat\Facades\WireChat')
 
 <div 
-x-data="{selectedConversationId:'{{request()->conversation_id??$selectedConversationId}}' }"
+x-data="{selectedConversationId:'{{request()->conversation_id??$selectedConversationId}}'}"
 x-on:open-chat.window="selectedConversationId= $event.detail.conversation; $wire.selectedConversationId= $event.detail.conversation;"
 x-init=" setTimeout(() => {
      conversationElement = document.getElementById('conversation-'+selectedConversationId);
@@ -16,15 +16,15 @@ x-init=" setTimeout(() => {
     @php
         $authUser = auth()->user();
         $authId = $authUser->id;
-        $primaryColor = WireChat::getColor();
-
     @endphp
 
-    {{-- Import header --}}
+    {{-- include header --}}
     @include('wirechat::livewire.chats.includes.header')
 
-    <main x-data {{-- Detect when scrolled to the bottom --}}
+    <main x-data 
+
         @scroll.self.debounce="
+           {{-- Detect when scrolled to the bottom --}}
             // Calculate scroll values
             scrollTop = $el.scrollTop;
             scrollHeight = $el.scrollHeight;
@@ -39,168 +39,25 @@ x-init=" setTimeout(() => {
             "
         class=" overflow-y-auto py-2   grow  h-full relative " style="contain:content">
 
-
-        @if (config('wirechat.allow_chats_search', false) == true)
-            <div x-cloak wire:loading.delay.class.remove="hidden"
-                wire:target="search"class="hidden transition-all duration-300 ">
-                <x-wirechat::loading-spin />
-            </div>
-        @endif
+        {{-- include search if true --}}
+        @includeWhen(config('wirechat.allow_chats_search', false) == true,'wirechat::livewire.chats.includes.search')
 
         @if (count($conversations) > 0)
-            {{-- chatlist  --}}
+        
             <ul wire:loading.delay.long.remove wire:target="search" class="p-2 grid w-full spacey-y-2">
-
                 @foreach ($conversations as $conversation)
-                    @php
-                        //$receiver =$conversation->getReceiver();
-                        $group = $conversation->isGroup() ? $conversation->group : null;
-                        $receiver = $conversation->isGroup() ? null : ($conversation->isPrivate() ? $conversation->receiverParticipant?->participantable : auth()->user());
-                        $lastMessage = $conversation->lastMessage;
-                        //mark isReadByAuth true if user has chat opened
-                        $isReadByAuth = $conversation?->readBy(auth()?->user()) || $selectedConversationId == $conversation->id;
-                        $belongsToAuth = $lastMessage?->belongsToAuth();
-
-                    @endphp
-                    {{-- Chat list item --}}
-                    {{-- We use style here to make it easy for dynamic and safe injection --}}
-                    <li 
-                    x-data="{
-                        conversationID: @js($conversation->id),
-                        showUnreadStatus: @js(!$isReadByAuth),
-                        handleCloseChat($event) {
-                            // Clear the globally selected conversation.
-                            $wire.selectedConversationId = null;
-                            selectedConversationId = null;
-                        }
-                    }"
-                       id="conversation-{{$conversation->id }}"
-                       wire:key="conversation-em-{{$conversation->id}}"
-                       x-on:close-chat.window="handleCloseChat($event)">
-                      
-                        <a
-                        @if ($widget) 
-                        tabindex="0" 
-                        role="button" 
-                        dusk="openChatWidgetButton"
-                        @click="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
-                        @keydown.enter="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
-                        @else
-                        wire:navigate href="{{ route(WireChat::viewRouteName(), $conversation->id) }}"
-                        @endif
-
-                        @style([ 'border-color:var(--wirechat-primary-color)' => $selectedConversationId == $conversation?->id ]) 
-                        class="py-3 flex gap-4 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-sm transition-colors duration-150  relative w-full cursor-pointer px-2"
-                        :class="$wire.selectedConversationId == conversationID && 'bg-gray-50 dark:bg-gray-800 border-r-4  border-opacity-20 border-[var(--wirechat-primary-color)]'"
-                        >
-
-
-                        <div class="shrink-0"  >
-                            <x-wirechat::avatar disappearing="{{ $conversation->hasDisappearingTurnedOn() }}"
-                                group="{{ $conversation->isGroup() }}"
-                                src="{{ $group ? $group?->cover_url : $receiver?->cover_url ?? null }}"
-                                class="w-12 h-12" />
-                        </div>
-
-                        <aside class="grid  grid-cols-12 w-full">
-                            <div class="col-span-10 border-b pb-2 border-gray-100 dark:border-gray-700 relative overflow-hidden truncate leading-5 w-full flex-nowrap p-1">
-
-                                    {{-- name --}}
-                                    <div class="flex gap-1 mb-1 w-full items-center">
-                                        <h6 class="truncate font-medium text-gray-900 dark:text-white">
-                                            {{ $group ? $group?->name : $receiver?->display_name }}
-                                        </h6>
-
-                                        @if ($conversation->isSelfConversation())
-                                            <span class="font-medium dark:text-white">(You)</span>
-                                        @endif
-
-                                    </div>
-
-                                    {{-- Message body --}}
-                                    @if ($lastMessage != null)
-                                        <div class="flex gap-x-2 items-center">
-
-                                            {{-- Only show if AUTH is onwer of message --}}
-                                            @if ($belongsToAuth)
-                                                <span class="font-bold text-xs dark:text-white/90 dark:font-normal">
-                                                    You:
-                                                </span>
-                                            @elseif(!$belongsToAuth && $group !== null)
-                                                <span class="font-bold text-xs dark:text-white/80 dark:font-normal">
-                                                    {{ $lastMessage->sendable?->display_name }}:
-                                                </span>
-                                            @endif
-
-                                            <p @class([
-                                                'truncate text-sm dark:text-white  gap-2 items-center',
-                                                'font-semibold text-black' =>
-                                                    !$isReadByAuth && !$lastMessage?->ownedBy($authUser),
-                                                'font-normal text-gray-600' =>
-                                                    $isReadByAuth && !$lastMessage?->ownedBy($authUser),
-                                                'font-normal text-gray-600' =>
-                                                    $isReadByAuth && $lastMessage?->ownedBy($authUser),
-                                            ])>
-                                                {{ $lastMessage->body != '' ? $lastMessage->body : ($lastMessage->hasAttachment() ? '📎 Attachment' : '') }}
-                                            </p>
-
-                                            <span class="font-medium px-1 text-xs shrink-0 text-gray-800 dark:text-gray-50">
-                                                @if ($lastMessage->created_at->diffInMinutes(now()) < 1)
-                                                    now
-                                                @else
-                                                    {{ $lastMessage->created_at->shortAbsoluteDiffForHumans() }}
-                                                @endif
-                                            </span>
-
-
-                                        </div>
-                                    @endif
-
-                                    </div>
-
-                            {{-- Read status --}}
-                            {{-- Only show if AUTH is NOT onwer of message --}}
-                            @if ($lastMessage != null && !$lastMessage?->ownedBy($authUser) && !$isReadByAuth)
-                                <div x-show="showUnreadStatus" dusk="unreadMessagesDot" class=" col-span-2 flex flex-col text-center my-auto">
-                                    {{-- Dots icon --}}
-                                    <span dusk="unreadDotItem" class="sr-only">unread dot</span>
-                                    <svg @style(['color:var(--wirechat-primary-color)']) xmlns="http://www.w3.org/2000/svg" width="16"
-                                        height="16" fill="currentColor" class="bi bi-dot w-10 h-10 text-blue-500"
-                                        viewBox="0 0 16 16">
-                                        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
-                                    </svg>
-
-                                </div>
-                            @endif
-
-
-                        </aside>
-                      </a>
-
-                    </li>
+                 {{-- include list item --}}
+                  @include('wirechat::livewire.chats.includes.list-item')  
                 @endforeach
 
             </ul>
 
-            {{-- Load more button --}}
-            @if ($canLoadMore)
-                <section wire:loading.remove wire:target="search" class="w-full justify-center flex my-3 ">
-                    <button wire:loading.remove wire:target="loadMore" wire:loading.attr="disabled"
-                        dusk="loadMoreButton" @click="$wire.loadMore()"
-                        class="  text-sm dark:text-white disabled:hover:cursor-not-allowed hover:text-gray-700 transition-colors dark:hover:text-gray-500 dark:gray-200">
-                        Load more
-                    </button>
-
-                    <div wire:loading wire:target="loadMore">
-                        <x-wirechat::loading-spin />
-                    </div>
-                </section>
-            @endif
+            {{-- include load more if true --}}
+             @includeWhen($canLoadMore,'wirechat::livewire.chats.includes.load-more-button')
         @else
             <div class="w-full flex items-center h-full justify-center">
                 <h6 class=" font-bold text-gray-700 dark:text-white">No conversations yet</h6>
             </div>
-
         @endif
     </main>
 

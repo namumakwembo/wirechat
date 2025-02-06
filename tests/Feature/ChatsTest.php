@@ -225,7 +225,7 @@ describe('List', function () {
             });
     });
 
-    it("shows chats names when conversations are loaded to Chats component ", function () {
+    it('shows chats names when conversations are loaded to Chats component ', function () {
 
         $auth = User::factory()->create();
 
@@ -243,8 +243,7 @@ describe('List', function () {
             ->assertSee('iam user 2');
     });
 
-
-    it("shows chats names when conversations of Mixed Participant Models are loaded to Chats component ", function () {
+    it('shows chats names when conversations of Mixed Participant Models are loaded to Chats component ', function () {
 
         $auth = User::factory()->create();
 
@@ -392,8 +391,6 @@ describe('List', function () {
             ->assertDontSee('You:'); //assert not visible
     });
 
-    
-
     it('shows unread message count "2" if message does not belong to user', function () {
 
         $auth = User::factory()->create();
@@ -411,7 +408,7 @@ describe('List', function () {
         // dd($conversations,$messages);
 
         Livewire::actingAs($auth)->test(Chatlist::class)
-            ->assertSeeHtml('dusk="unreadMessagesDot"'); 
+            ->assertSeeHtml('dusk="unreadMessagesDot"');
     });
     it('Doesnt show unread message Dot if message does not belong to Auth and is Read', function () {
 
@@ -421,23 +418,20 @@ describe('List', function () {
 
         Carbon::setTestNowAndTimezone(now()->subSeconds(10));
         //create conversation with user1
-       $conversation= $auth->createConversationWith($user1, message: 'How are you doing');
+        $conversation = $auth->createConversationWith($user1, message: 'How are you doing');
         sleep(1);
         //here we delay the create messsage so that we can NOT have both messages with the same timestamp
         //now let's send message to auth
         $user1->sendMessageTo($auth, message: 'I am good');
         $user1->sendMessageTo($auth, message: 'kudos');
 
-
         //reset time
         Carbon::setTestNowAndTimezone();
         $conversation->markAsRead($auth);
-        
 
         Livewire::actingAs($auth)->test(Chatlist::class)
-            ->assertDontSeeHtml('dusk="unreadMessagesDot"'); 
+            ->assertDontSeeHtml('dusk="unreadMessagesDot"');
     });
-
 
     it('still shows unread message Dot even if message belongs to Participant of Different Model', function () {
 
@@ -456,39 +450,35 @@ describe('List', function () {
         // dd($conversations,$messages);
 
         Livewire::actingAs($auth)->test(Chatlist::class)
-                 ->assertSeeHtml('dusk="unreadMessagesDot"'); 
+            ->assertSeeHtml('dusk="unreadMessagesDot"');
     });
-
 
     it('Doesnt shows unread message Dot if message is READ and belongs to Participant of Different Model', function () {
 
         $auth = User::factory()->create();
         $user1 = Admin::factory()->create(['name' => 'iam user 1']);
-    
+
         // Set the initial time for the first message
         Carbon::setTestNow(now()->subSeconds(20));
 
         $conversation = $auth->createConversationWith($user1, message: 'How are you doing');
-    
- 
+
         $user1->sendMessageTo($auth, message: 'I am good');
-    
-     
+
         // Set the time for marking the conversation as read
         Carbon::setTestNow(now()->addSeconds(5));
 
         $conversation->markAsRead($auth);
-    
+
         // Reset the time to the current moment
         Carbon::setTestNow();
-    
+
         // Check unread message count
         $unreadCount = $conversation->getUnreadCountFor($auth);
 
         Livewire::actingAs($auth)->test(Chatlist::class)
-               ->assertDontSeeHtml('dusk="unreadMessagesDot"'); 
+            ->assertDontSeeHtml('dusk="unreadMessagesDot"');
     });
-    
 
     it('shows message time AS "now"  if less than a minute old', function () {
 

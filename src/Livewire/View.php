@@ -2,7 +2,6 @@
 
 namespace Namu\WireChat\Livewire;
 
-use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Namu\WireChat\Models\Conversation;
@@ -30,6 +29,6 @@ class View extends Component
     public function render()
     {
         return view('wirechat::livewire.view')
-                ->layout(config('wirechat.layout','wirechat::layouts.app'));
+            ->layout(config('wirechat.layout', 'wirechat::layouts.app'));
     }
 }

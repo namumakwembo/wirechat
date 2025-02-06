@@ -2,7 +2,6 @@
 
 namespace Namu\WireChat\Models;
 
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -157,12 +156,12 @@ class Message extends Model
         return $this->parent()->exists();
     }
 
-    function scopeWhereIsNotOwnedBy($query, $user)
+    public function scopeWhereIsNotOwnedBy($query, $user)
     {
 
         $query->where(function ($query) use ($user) {
-            $query->where('sendable_id', "<>", $user->id)
-                ->orWhere('sendable_type', "<>", $user->getMorphClass());
+            $query->where('sendable_id', '<>', $user->id)
+                ->orWhere('sendable_type', '<>', $user->getMorphClass());
         });
 
         // $query->where(function ($query) use ($user) {
@@ -171,6 +170,7 @@ class Message extends Model
         // });
 
     }
+
     /**
      * Delete for
      * This will delete the message only for the auth user meaning other participants will be able to see it
@@ -189,6 +189,7 @@ class Message extends Model
         // If conversation is self, then delete permanently directly
         if ($conversation->isSelf()) {
             $this->forceDelete();
+
             return;
         }
 
@@ -206,9 +207,9 @@ class Message extends Model
             foreach ($conversation->participants as $participant) {
                 $deletedByBothParticipants = $deletedByBothParticipants &&
                     $this->actions()
-                    ->whereActor($participant->participantable)
-                    ->where('type', Actions::DELETE)
-                    ->exists();
+                        ->whereActor($participant->participantable)
+                        ->where('type', Actions::DELETE)
+                        ->exists();
             }
 
             if ($deletedByBothParticipants) {
@@ -217,28 +218,28 @@ class Message extends Model
         }
     }
 
-
     /**
      * Deleting message for everyone   */
-     function deleteForEveryone(Model $user)  {
+    public function deleteForEveryone(Model $user)
+    {
 
         $conversation = $this->conversation;
         $participant = $conversation->participant($user);
-        $message= $this;
+        $message = $this;
 
         // Make sure auth belongs to conversation for this message
-        abort_unless($user->belongsToConversation($conversation), 403,'You do not belong to this conversation');
+        abort_unless($user->belongsToConversation($conversation), 403, 'You do not belong to this conversation');
 
         //make sure user owns message OR allow if is admin in group
-        abort_unless($message->ownedBy($user) || ($participant->isAdmin() && $message->conversation->isGroup()), 403,'You do not have permission to delete this message');
+        abort_unless($message->ownedBy($user) || ($participant->isAdmin() && $message->conversation->isGroup()), 403, 'You do not have permission to delete this message');
 
-         //if message has reply then only-soft delete it
-         if ($message->hasReply()) {
+        //if message has reply then only-soft delete it
+        if ($message->hasReply()) {
             $message->delete();
         } else {
 
             $message->forceDelete();
         }
-        
-     }
+
+    }
 }

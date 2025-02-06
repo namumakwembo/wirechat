@@ -6,8 +6,6 @@ use Livewire\Attributes\Locked;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Chat\Chats;
 
-use function PHPUnit\Framework\isEmpty;
-
 /**
  * Trait Actionable
  */
@@ -27,15 +25,13 @@ trait Widget
         return $this->widget;
     }
 
-
     /**
      * Handle the termination of the component.
-     * 
+     *
      * If the component is a widget, it dispatches events to refresh the chat list
      * and notify the listener to close the chat. Otherwise, it redirects to the chats page.
      */
     public function handleComponentTermination(?string $redirectRoute = null, ?array $events = null)
-
     {
 
         //set redirect route
@@ -46,7 +42,7 @@ trait Widget
         //set events to dispatch on termination
         if ($events == null) {
             $events = [
-                ['close-chat',  ['conversation'=> $this->conversation->id]]
+                ['close-chat',  ['conversation' => $this->conversation->id]],
             ];
         }
         if ($this->isWidget()) {
@@ -58,8 +54,8 @@ trait Widget
         }
     }
 
-    /** 
-     * Dispatch events to the widget components. upon terminatoin   
+    /**
+     * Dispatch events to the widget components. upon terminatoin
      */
     private function dispatchWidgetEvents(array $events): void
     {
@@ -76,10 +72,8 @@ trait Widget
         }
     }
 
-
     /**
-     * A method to dispatch open chat widget 
-     * @param int $conversation
+     * A method to dispatch open chat widget
      */
     public function openChat(int $conversation): void
     {
@@ -87,7 +81,8 @@ trait Widget
     }
 
     /**
-     * A method to dispatch close chat widget 
+     * A method to dispatch close chat widget
+     *
      * @param null
      */
     public function closeChat(): void

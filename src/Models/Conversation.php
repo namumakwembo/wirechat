@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Enums\ParticipantRole;
@@ -128,11 +127,10 @@ class Conversation extends Model
         return $participant;
     }
 
-
-
     /**
      * Add a new participant to the conversation.
-     * @param Model user the creator of group 
+     *
+     * @param Model user the creator of group
      * @param ParticipantRole  a ParticipanRole enum to assign to member
      * @param  bool  $undoAdminRemovalAction  If the user was recently removed by admin, allow re-adding.
      */
@@ -150,7 +148,7 @@ class Conversation extends Model
             abort_if(
                 $participant->hasExited(),
                 403,
-                'Cannot add ' . $user->display_name . ' because they left the group.'
+                'Cannot add '.$user->display_name.' because they left the group.'
             );
 
             // Check if the participant was removed by an admin or owner
@@ -159,7 +157,7 @@ class Conversation extends Model
                 abort_if(
                     ! $undoAdminRemovalAction,
                     403,
-                    'Cannot add ' . $user->display_name . ' because they were removed from the group by an Admin.'
+                    'Cannot add '.$user->display_name.' because they were removed from the group by an Admin.'
                 );
 
                 // If undoAdminRemovalAction is true, remove admin removal actions and return the participant
@@ -297,64 +295,61 @@ class Conversation extends Model
             // Apply the "with deleted conversations" scope
             $builder->whereHas('participants', function ($query) use ($user) {
                 $query->whereParticipantable($user)
-                    ->orWhereNotNull("conversation_deleted_at");
+                    ->orWhereNotNull('conversation_deleted_at');
             });
         }
     }
 
-
     /**
      * Get the peer participant in a private or self conversation.
-     * 
+     *
      * This method retrieves the other participant in a private conversation
      * or returns the given reference user for self conversations.
-     * 
-     * @param Model $reference The reference user/model to exclude.
+     *
+     * @param  Model  $reference  The reference user/model to exclude.
      * @return Participant|null The other participant or null if not applicable.
      */
     public function peerParticipant(Model $reference): ?Participant
     {
 
         //return null if user does not belong to conversation
-        if (!$reference->belongsToConversation($this)) {
+        if (! $reference->belongsToConversation($this)) {
             return null;
         }
 
-        if (!in_array($this->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
+        if (! in_array($this->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
             return null;
         }
 
-             // Check if 'participants' relationship is already loaded to avoid extra queries
-             $participants = $this->relationLoaded('participants')
-             ? $this->participants
-             : $this->participants();
+        // Check if 'participants' relationship is already loaded to avoid extra queries
+        $participants = $this->relationLoaded('participants')
+        ? $this->participants
+        : $this->participants();
 
         if ($this->isSelf()) {
-           return $participants->whereParticipantable($reference)->first();
+            return $participants->whereParticipantable($reference)->first();
         }
-
-   
 
         return $participants->withoutParticipantable($reference)->first();
     }
 
     /**
      * Get all peer participants in a conversation, excluding the reference user.
-     * 
+     *
      * This method retrieves all other participants in a conversation
      * except for the given reference user.
-     * 
-     * @param Model $reference The reference user/model to exclude.
+     *
+     * @param  Model  $reference  The reference user/model to exclude.
      * @return Collection<int, ?Participant> A collection of peer participants.
      */
     public function peerParticipants(Model $reference): ?Collection
     {
 
         //return null if user does not belong to conversation
-        if (!$reference->belongsToConversation($this)) {
+        if (! $reference->belongsToConversation($this)) {
             return null;
         }
-        
+
         // Check if 'participants' relationship is already loaded to avoid extra queries
         $participants = $this->relationLoaded('participants') ? $this->participants : $this->participants();
 
@@ -393,15 +388,15 @@ class Conversation extends Model
             });
     }
 
-
     /**
      * Get the receiver of the private conversation
+     *
      * @param null
      * */
     public function getReceiver()
     {
         // Check if the conversation is private or self
-        if (!in_array($this->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
+        if (! in_array($this->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
             return null;
         }
 
@@ -422,7 +417,6 @@ class Conversation extends Model
         // If no other participant is found, return the authenticated user as the receiver
         return auth()->user();
     }
-
 
     /**
      * Mark the conversation as read for the current authenticated user.
@@ -476,7 +470,7 @@ class Conversation extends Model
             return $this->messages->filter(function ($message) use ($lastReadAt, $user) {
                 // If lastReadAt is null, consider all messages as unread
                 // Also, exclude messages that belong to the user
-                return (! $lastReadAt || $message->created_at > $lastReadAt) && !$message->ownedBy($user);
+                return (! $lastReadAt || $message->created_at > $lastReadAt) && ! $message->ownedBy($user);
             });
         }
 
@@ -568,12 +562,10 @@ class Conversation extends Model
         $participant->conversation_deleted_at = Carbon::now();
         $participant->save();
 
-
         //Then force delete it
         if ($this->isSelfConversation($user)) {
             return $this->forceDelete();
         }
-
 
         // Check if the conversation is private or self
         if ($this->isPrivate()) {
@@ -583,13 +575,11 @@ class Conversation extends Model
 
             // Get Participants
             //!use make sure to get new query() otherwise participants wont be retrieved correctly
-            $participants =  $this->participants()->get();
-
-
+            $participants = $this->participants()->get();
 
             // Check if all participants have deleted the conversation
-            $deletedByBothParticipants = $participants->every(function ($participant) use ($deletedByBothParticipants) {
-                return   $participant->hasDeletedConversation(true) == true;
+            $deletedByBothParticipants = $participants->every(function ($participant) {
+                return $participant->hasDeletedConversation(true) == true;
             });
 
             // If all participants have deleted the conversation, force delete it

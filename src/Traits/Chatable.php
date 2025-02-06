@@ -359,7 +359,7 @@ trait Chatable
         $selfConversationCheck = $participantId === $authenticatedUserId && $participantType === $authenticatedUserType;
 
         // Define the base query for finding conversations
-        $existingConversationQuery = Conversation::whereIn('type', [ConversationType::PRIVATE,ConversationType::SELF]);
+        $existingConversationQuery = Conversation::whereIn('type', [ConversationType::PRIVATE, ConversationType::SELF]);
 
         // If it's a self-conversation, adjust the query to check for two identical participants
         if ($selfConversationCheck) {

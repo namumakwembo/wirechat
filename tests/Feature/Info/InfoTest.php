@@ -52,7 +52,6 @@ describe('presence test', function () {
             ->assertSee('Musa');
     });
 
-
     test('it shows receiver name if conversaton is private and Mixed Model', function () {
         $auth = User::factory()->create(['id' => '345678']);
         $receiver = Admin::factory()->create(['name' => 'Musa']);
@@ -64,7 +63,7 @@ describe('presence test', function () {
     });
 
     test('it shows receiver name if conversaton is self', function () {
-        $auth = User::factory()->create(['id' => '345678','name' => 'John']);
+        $auth = User::factory()->create(['id' => '345678', 'name' => 'John']);
 
         $conversation = $auth->createConversationWith($auth, 'hello');
 
@@ -780,7 +779,7 @@ describe('Deleting Chat', function () {
 
         $conversation = $auth->createConversationWith($receiver);
 
-        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation,'widget'=>false])
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation, 'widget' => false])
             ->call('deleteChat')
             ->assertStatus(200)
             ->assertRedirect(route(WireChat::indexRouteName()))
@@ -792,13 +791,12 @@ describe('Deleting Chat', function () {
     test('it does not push DeleteConversationJob', function () {
         Queue::fake();
 
-
         Carbon::setTestNow(now()->subMinutes(4));
 
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        $conversation = $auth->createConversationWith($receiver,'hello');
+        $conversation = $auth->createConversationWith($receiver, 'hello');
 
         Carbon::setTestNow();
 
@@ -806,23 +804,21 @@ describe('Deleting Chat', function () {
             ->call('deleteChat')
             ->assertStatus(200);
 
-        Queue::assertNotPushed(DeleteConversationJob::class,function($job)use ($conversation){
+        Queue::assertNotPushed(DeleteConversationJob::class, function ($job) use ($conversation) {
 
-          return  $job->conversation->id == $conversation->id;
+            return $job->conversation->id == $conversation->id;
         });
 
     });
 
-
     test('Deleted chat should no longer appear in Chats component when after deleteing Chat', function () {
 
-       
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        $conversation = $auth->createConversationWith($receiver,'hello');
+        $conversation = $auth->createConversationWith($receiver, 'hello');
 
-        //Load Chats component 
+        //Load Chats component
         $CHATLIST = Livewire::actingAs($auth)->test(Chats::class);
 
         //Assert conversation is visible
@@ -830,13 +826,13 @@ describe('Deleting Chat', function () {
             return count($conversation) == 1;
         });
 
-        //Load Info component 
+        //Load Info component
         Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
             ->call('deleteChat')
             ->assertStatus(200);
 
-        //Assert conversation no longer visible 
-        $CHATLIST->dispatch('chat-deleted',$conversation->id)->assertViewHas('conversations', function ($conversation) {
+        //Assert conversation no longer visible
+        $CHATLIST->dispatch('chat-deleted', $conversation->id)->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 0;
         });
     });
@@ -848,7 +844,7 @@ describe('Deleting Chat', function () {
 
         $conversation = $auth->createConversationWith($receiver);
 
-        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation,'widget'=>true])
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation, 'widget' => true])
             ->call('deleteChat')
             ->assertStatus(200)
             ->assertNoRedirect()
@@ -863,7 +859,7 @@ describe('Deleting Chat', function () {
 
         $conversation = $auth->createConversationWith($auth);
 
-        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation,'widget'=>false])
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation, 'widget' => false])
             ->call('deleteChat')
             ->assertStatus(200)
             ->assertNotDispatched('close-chat')
@@ -877,15 +873,13 @@ describe('Deleting Chat', function () {
 
         $conversation = $auth->createConversationWith($auth);
 
-        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation, 'widget'=>'true'])
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation, 'widget' => 'true'])
             ->call('deleteChat')
             ->assertStatus(200)
             ->assertDispatched('close-chat')
             ->assertDispatched('chat-deleted')
             ->assertNoRedirect(route(WireChat::indexRouteName()));
     });
-
-
 
     test('it aborts if conversation is Group', function () {
 
@@ -915,7 +909,7 @@ describe('Deleting Group', function () {
         Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
             ->call('deleteGroup')
             ->assertStatus(200);
-        
+
         expect(Conversation::withoutGlobalScopes()->count())->toBe(0);
     });
 
@@ -938,9 +932,9 @@ describe('Deleting Group', function () {
             ->call('deleteGroup')
             ->assertStatus(200);
 
-        Queue::assertPushed(DeleteConversationJob::class,function($job)use ($conversation){
+        Queue::assertPushed(DeleteConversationJob::class, function ($job) use ($conversation) {
 
-          return  $job->conversation->id == $conversation->id;
+            return $job->conversation->id == $conversation->id;
         });
 
     });
@@ -952,7 +946,6 @@ describe('Deleting Group', function () {
         Carbon::setTestNow(now()->subMinutes(4));
 
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
-
 
         $authParticipant = $conversation->participant($auth);
 
@@ -970,12 +963,11 @@ describe('Deleting Group', function () {
             ->call('deleteGroup')
             ->assertStatus(200);
 
-         //   dd($authParticipant);
+        //   dd($authParticipant);
         //now assert true
         expect($auth->hasDeletedConversation($conversation))->toBe(true);
 
     });
-
 
     test('it does not immediately delete conversation  from database after delete is successful', function () {
         Queue::fake();
@@ -991,7 +983,6 @@ describe('Deleting Group', function () {
 
         expect(Conversation::withoutGlobalScopes()->count())->toBe(1);
     });
-
 
     test('it redirects to index route and Does NOT dispatch  "close-chat"  & "chat-deleted" events after deleting Group conversation when isNotWidget', function () {
 
@@ -1015,14 +1006,13 @@ describe('Deleting Group', function () {
 
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation,'widget'=>true])
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation, 'widget' => true])
             ->call('deleteGroup')
             ->assertStatus(200)
             ->assertNoRedirect(route(WireChat::indexRouteName()))
             ->assertDispatched('close-chat')
             ->assertDispatched('chat-deleted');
     });
-
 
     test('it aborts if conversation is private ', function () {
 
@@ -1037,69 +1027,65 @@ describe('Deleting Group', function () {
             ->assertNoRedirect();
     });
 
-
     test('it removes group from chats list when group is deleted when Info is NOT widget', function () {
 
         Queue::fake();
 
         $auth = User::factory()->create();
 
-
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        $auth->sendMessageTo($conversation,'hello');
+        $auth->sendMessageTo($conversation, 'hello');
 
-        //Load Chats component 
-        $CHATLIST = Livewire::actingAs($auth)->test(Chats::class,['widget'=>true]);
+        //Load Chats component
+        $CHATLIST = Livewire::actingAs($auth)->test(Chats::class, ['widget' => true]);
 
         //Assert conversation is visible
         $CHATLIST->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 1;
         });
 
-        //Load Info component 
+        //Load Info component
         Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
             ->call('deleteGroup')
             ->assertStatus(200);
 
-        //Assert conversation no longer visible 
-        $CHATLIST->dispatch('chat-deleted',$conversation->id)->assertViewHas('conversations', function ($conversation) {
+        //Assert conversation no longer visible
+        $CHATLIST->dispatch('chat-deleted', $conversation->id)->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 0;
         });
     });
 
-
     test('it removes group from chats list when group is deleted when Info is Widget', function () {
 
-           Queue::fake();
-   
-           $auth = User::factory()->create();
-   
-   
-           $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
-   
-           $auth->sendMessageTo($conversation,'hello');
-   
-           //Load Chats component 
-           $CHATLIST = Livewire::actingAs($auth)->test(Chats::class,['widget'=>true]);
-   
-           //Assert conversation is visible
-           $CHATLIST->assertViewHas('conversations', function ($conversation) {
-               return count($conversation) == 1;
-           });
-   
-           //Load Info component 
-           Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation,'widget'=>true])
-               ->call('deleteGroup')
-               ->assertDispatched('chat-deleted')
-               ->assertStatus(200);
-   
-           //Assert conversation no longer visible 
-           $CHATLIST->dispatch('chat-deleted',$conversation->id)->assertViewHas('conversations', function ($conversation) {
-               return count($conversation) == 0;
-           });
-       });
-   
+        Queue::fake();
+
+        $auth = User::factory()->create();
+
+        $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
+
+        $auth->sendMessageTo($conversation, 'hello');
+
+        //Load Chats component
+        $CHATLIST = Livewire::actingAs($auth)->test(Chats::class, ['widget' => true]);
+
+        //Assert conversation is visible
+        $CHATLIST->assertViewHas('conversations', function ($conversation) {
+            return count($conversation) == 1;
+        });
+
+        //Load Info component
+        Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation, 'widget' => true])
+            ->call('deleteGroup')
+            ->assertDispatched('chat-deleted')
+            ->assertStatus(200);
+
+        //Assert conversation no longer visible
+        $CHATLIST->dispatch('chat-deleted', $conversation->id)->assertViewHas('conversations', function ($conversation) {
+            return count($conversation) == 0;
+        });
+    });
+
     test('it aborts if group members is not 0 excluding owner', function () {
 
         $auth = User::factory()->create();
@@ -1198,7 +1184,7 @@ describe('Exiting Chat', function () {
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
         $conversation->addParticipant($user);
-        Livewire::actingAs($user)->test(Info::class, ['conversation' => $conversation,'widget'=>false])
+        Livewire::actingAs($user)->test(Info::class, ['conversation' => $conversation, 'widget' => false])
             ->call('exitConversation')
             ->assertStatus(200)
             ->assertRedirect(route(WireChat::indexRouteName()))
@@ -1215,14 +1201,13 @@ describe('Exiting Chat', function () {
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
         $conversation->addParticipant($user);
-        Livewire::actingAs($user)->test(Info::class, ['conversation' => $conversation,'widget'=>true])
+        Livewire::actingAs($user)->test(Info::class, ['conversation' => $conversation, 'widget' => true])
             ->call('exitConversation')
             ->assertStatus(200)
             ->assertNoRedirect(route(WireChat::indexRouteName()))
             ->assertDispatched('close-chat')
             ->assertDispatched('chat-exited');
     });
-
 
     test('it removes conversatoin from chats list when group is exited', function () {
 
@@ -1233,12 +1218,12 @@ describe('Exiting Chat', function () {
 
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //Add particitpant 
+        //Add particitpant
         $conversation->addParticipant($user);
         //add message
-        $user->sendMessageTo($conversation,'Never let go ');
+        $user->sendMessageTo($conversation, 'Never let go ');
 
-        //Load Chats component 
+        //Load Chats component
         $CHATLIST = Livewire::actingAs($user)->test(Chats::class);
 
         //Assert conversation is visible
@@ -1246,14 +1231,14 @@ describe('Exiting Chat', function () {
             return count($conversation) == 1;
         });
 
-        //Load Info component 
-        Livewire::actingAs($user)->test(Info::class, ['conversation' => $conversation,'widget'=>true])
+        //Load Info component
+        Livewire::actingAs($user)->test(Info::class, ['conversation' => $conversation, 'widget' => true])
             ->call('exitConversation')
             ->assertStatus(200)
             ->assertDispatched('chat-exited');
 
-        //Assert conversation no longer visible 
-        $CHATLIST->dispatch('chat-exited',$conversation->id)->assertViewHas('conversations', function ($conversation) {
+        //Assert conversation no longer visible
+        $CHATLIST->dispatch('chat-exited', $conversation->id)->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 0;
         });
     });
@@ -1275,4 +1260,3 @@ describe('Exiting Chat', function () {
     });
 
 });
- 

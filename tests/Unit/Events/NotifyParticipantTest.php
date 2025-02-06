@@ -63,7 +63,7 @@ describe(' Data verifiction ', function () {
 
             $broadcastOn = $event->broadcastOn();
 
-            //resolve morphClass= 
+            //resolve morphClass=
             $encodedType = MorphClassResolver::encode($participant->participantable_type);
             expect($broadcastOn[0]->name)->toBe('private-participant.'.$encodedType.'.'.$participant->participantable_id);
 

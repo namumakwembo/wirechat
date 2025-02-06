@@ -60,7 +60,7 @@ test('returns 403(Forbidden) if user doesnt not bleong to conversation', functio
     $conversation = Conversation::factory()->create();
     // dd($conversation);
     $this->actingAs($auth)->get(route(WireChat::viewRouteName(), $conversation->id))
-        ->assertStatus(403,'Forbidden');
+        ->assertStatus(403, 'Forbidden');
 
 });
 

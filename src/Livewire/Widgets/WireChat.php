@@ -14,7 +14,6 @@ class WireChat extends Component
 {
     public ?string $activeWireChatWidgetComponent = null;
 
-
     public $selectedConversationId = null;
 
     public array $widgetComponents = [];
@@ -23,7 +22,7 @@ class WireChat extends Component
     {
         $this->widgetComponents = [];
         $this->activeWireChatWidgetComponent = null;
-        $this->selectedConversationId= null;
+        $this->selectedConversationId = null;
     }
 
     public static function modalAttributes(): array
@@ -43,7 +42,6 @@ class WireChat extends Component
 
         // Generate a unique ID using the conversationId and arguments
         $id = md5($component.$conversation.serialize($arguments));
-
 
         // Merge modal attributes with defaults
         $defaultModalAttributes = [
@@ -65,7 +63,7 @@ class WireChat extends Component
         $this->activeWireChatWidgetComponent = $id;
 
         //Set the selected conversationId
-        $this->selectedConversationId= $conversation;
+        $this->selectedConversationId = $conversation;
 
         /*! Changed listener name to activeChatWidgetComponentChanged to not interfere with main modal */
         $this->dispatch('activeChatWidgetComponentChanged', id: $id);

@@ -532,8 +532,6 @@ describe('hasConversationWith() ', function () {
 
     });
 
-
-
     it('returns true if user has conversation with another of different Type', function () {
 
         $auth = User::factory()->create();
@@ -544,7 +542,6 @@ describe('hasConversationWith() ', function () {
         expect($receiver->hasConversationWith($auth))->toBe(true);
 
     });
-
 
     it('returns true if user has conversation themselves', function () {
 
@@ -587,35 +584,27 @@ describe('getUnreadCount()', function () {
 
     });
 
-
     it('returns correct number of unreadMessages for Admin if Conversation model is passed', function () {
 
         $auth = User::factory()->create();
 
-       $conversation= $auth->createGroup('test');
-
-
+        $conversation = $auth->createGroup('test');
 
         $receiver = Admin::factory()->create();
         $OtherAdmin = Admin::factory()->create();
         $OtherUser = User::factory()->create();
 
- 
         $conversation->addParticipant($receiver);
-        $conversation->addParticipant( $OtherAdmin);
-        $conversation->addParticipant( $OtherUser);
-
-
+        $conversation->addParticipant($OtherAdmin);
+        $conversation->addParticipant($OtherUser);
 
         //Authenticate $auth
         $this->actingAs($auth);
 
         //Create conversation
         /// $conversation = Conversation::factory()->withParticipants([$auth, $receiver])->create();
-     
 
-        //Mark as read 
-  
+        //Mark as read
 
         //auth -> receiver
         $auth->sendMessageTo($conversation, message: '1');
@@ -632,58 +621,48 @@ describe('getUnreadCount()', function () {
         $receiver->sendMessageTo($conversation, message: 'From Admin-1');
         $receiver->sendMessageTo($conversation, message: 'From Admin-2');
 
-
         $OtherAdmin->sendMessageTo($conversation, message: 'From OtherAdmin-1');
         $OtherAdmin->sendMessageTo($conversation, message: 'From OtherAdmin-2');
 
-         $OtherUser->sendMessageTo($conversation, message: 'From User-1');
-         $OtherUser->sendMessageTo($conversation, message: 'From User-2');
-
-
+        $OtherUser->sendMessageTo($conversation, message: 'From User-1');
+        $OtherUser->sendMessageTo($conversation, message: 'From User-2');
 
         //Assert number of unread messages for $auth
         expect($auth->getUnreadCount($conversation))->toBe(6);
 
-
-        //verify that all unread messages do not belong to user 
+        //verify that all unread messages do not belong to user
         $unreadMessages = $conversation->unreadMessages($auth);
 
         $allDoNotBelongToAuth = true;
         foreach ($unreadMessages as $message) {
-            $allDoNotBelongToAuth = $allDoNotBelongToAuth && !$message->ownedBy($auth);
+            $allDoNotBelongToAuth = $allDoNotBelongToAuth && ! $message->ownedBy($auth);
         }
-        
-        expect($allDoNotBelongToAuth)->toBe(true);
-        
-    });
 
+        expect($allDoNotBelongToAuth)->toBe(true);
+
+    });
 
     it('returns 0 unreadMessages if auth has read all messages', function () {
 
         $auth = User::factory()->create();
 
-       $conversation= $auth->createGroup('test');
-
-
+        $conversation = $auth->createGroup('test');
 
         $receiver = Admin::factory()->create();
         $OtherAdmin = Admin::factory()->create();
         $OtherUser = User::factory()->create();
 
- 
         $conversation->addParticipant($receiver);
-        $conversation->addParticipant( $OtherAdmin);
-        $conversation->addParticipant( $OtherUser);
-
+        $conversation->addParticipant($OtherAdmin);
+        $conversation->addParticipant($OtherUser);
 
         //time travel
         Carbon::setTestNowAndTimezone(now()->subSeconds(30));
 
-
         //receiver -> auth
         $receiver->sendMessageTo($conversation, message: 'From Admin-1');
         $receiver->sendMessageTo($conversation, message: 'From Admin-2');
-       
+
         // to ->auth
         $OtherAdmin->sendMessageTo($conversation, message: 'From OtherAdmin-1');
         $OtherAdmin->sendMessageTo($conversation, message: 'From OtherAdmin-2');
@@ -691,53 +670,43 @@ describe('getUnreadCount()', function () {
         //move 10 seconds fron last 20 mins
         Carbon::setTestNow(now()->addSeconds(10));
 
-        //mark as read 
+        //mark as read
         $conversation->markAsRead($auth);
 
         //reset fake time
         Carbon::setTestNow();
 
-     //  Carbon::setTestNow(now()->subSeconds(10));
-     //   Carbon::setTestNow(now());
+        //  Carbon::setTestNow(now()->subSeconds(10));
+        //   Carbon::setTestNow(now());
         //  $OtherUser->sendMessageTo($conversation, message: 'From User-1');
         //  $OtherUser->sendMessageTo($conversation, message: 'From User-2');
-
-
-
 
         //Assert number of unread messages for $auth
         expect($auth->getUnreadCount($conversation))->toBe(0);
 
-        
     });
-
 
     it('returns "2" the correct number of unread new unread messages after marking previous messages as read', function () {
 
         $auth = User::factory()->create();
 
-       $conversation= $auth->createGroup('test');
-
-
+        $conversation = $auth->createGroup('test');
 
         $receiver = Admin::factory()->create();
         $OtherAdmin = Admin::factory()->create();
         $OtherUser = User::factory()->create();
 
- 
         $conversation->addParticipant($receiver);
-        $conversation->addParticipant( $OtherAdmin);
-        $conversation->addParticipant( $OtherUser);
-
+        $conversation->addParticipant($OtherAdmin);
+        $conversation->addParticipant($OtherUser);
 
         //time travel
         Carbon::setTestNowAndTimezone(now()->subSeconds(30));
 
-
         //receiver -> auth
         $receiver->sendMessageTo($conversation, message: 'From Admin-1');
         $receiver->sendMessageTo($conversation, message: 'From Admin-2');
-       
+
         // to ->auth
         $OtherAdmin->sendMessageTo($conversation, message: 'From OtherAdmin-1');
         $OtherAdmin->sendMessageTo($conversation, message: 'From OtherAdmin-2');
@@ -745,23 +714,19 @@ describe('getUnreadCount()', function () {
         //move 10 seconds fron last 20 mins
         Carbon::setTestNow(now()->addSeconds(10));
 
-        //mark as read 
+        //mark as read
         $conversation->markAsRead($auth);
 
         //reset fake time
         Carbon::setTestNow();
 
         //New Unread messages
-          $OtherUser->sendMessageTo($conversation, message: 'From User-1');
-         $OtherUser->sendMessageTo($conversation, message: 'From User-2');
-
-
-
+        $OtherUser->sendMessageTo($conversation, message: 'From User-1');
+        $OtherUser->sendMessageTo($conversation, message: 'From User-2');
 
         //Assert number of unread messages for $auth
         expect($auth->getUnreadCount($conversation))->toBe(2);
 
-        
     });
 
     it('returns all unread count if Conversation model is not passed', function () {

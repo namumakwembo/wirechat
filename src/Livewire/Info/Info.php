@@ -2,7 +2,6 @@
 
 namespace Namu\WireChat\Livewire\Info;
 
-
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Locked;
 use Livewire\WithFileUploads;
@@ -16,8 +15,8 @@ use Namu\WireChat\Traits\Widget;
 
 class Info extends ModalComponent
 {
-    use WithFileUploads;
     use Widget;
+    use WithFileUploads;
 
     #[Locked]
     public Conversation $conversation;
@@ -174,12 +173,12 @@ class Info extends ModalComponent
 
         //redirect to chats page pr
         //Dispatach event instead if isWidget
-        #handle widget termination
+        //handle widget termination
         $this->handleComponentTermination(
-            redirectRoute:route(WireChat::indexRouteName()),
-            events:[
+            redirectRoute: route(WireChat::indexRouteName()),
+            events: [
                 'close-chat',
-                 Chats::class => ['chat-deleted',  [$this->conversation->id]]
+                Chats::class => ['chat-deleted',  [$this->conversation->id]],
             ]
         );
 
@@ -197,7 +196,7 @@ class Info extends ModalComponent
 
         abort_unless(auth()->user()->isOwnerOf($this->conversation), 403, 'Forbidden: You do not have permission to delete this group.');
 
-        #Ensure all participants are removed before deleting the group
+        //Ensure all participants are removed before deleting the group
         $participantCount = $this->conversation->participants()
             ->withoutParticipantable(auth()->user())
             ->where('role', '!=', ParticipantRole::OWNER)
@@ -205,20 +204,20 @@ class Info extends ModalComponent
 
         abort_unless($participantCount == 0, 403, 'Cannot delete group: Please remove all members before attempting to delete the group.');
 
-        #Soft Delete conversation
+        //Soft Delete conversation
         $this->conversation->deleteFor(auth()->user());
 
-        #handle widget termination
+        //handle widget termination
         $this->handleComponentTermination(
-                redirectRoute:route(WireChat::indexRouteName()),
-                events:[
-                    ['close-chat',  ['conversation'=> $this->conversation->id]],
-                    Chats::class => ['chat-deleted',  [$this->conversation->id]]
-                ]
-            );
+            redirectRoute: route(WireChat::indexRouteName()),
+            events: [
+                ['close-chat',  ['conversation' => $this->conversation->id]],
+                Chats::class => ['chat-deleted',  [$this->conversation->id]],
+            ]
+        );
 
-        #Dispatch job to delete conversation in backgroud 
-        #This is done to not hold up page for user incase of long running prcoess and to also give time for widget to settle avoiding 404 livewire hydrate errors 
+        //Dispatch job to delete conversation in backgroud
+        //This is done to not hold up page for user incase of long running prcoess and to also give time for widget to settle avoiding 404 livewire hydrate errors
         DeleteConversationJob::dispatch($this->conversation);
 
     }
@@ -235,12 +234,11 @@ class Info extends ModalComponent
         //delete conversation
         $auth->exitConversation($this->conversation);
 
-
         $this->handleComponentTermination(
-            redirectRoute:route(WireChat::indexRouteName()),
-            events:[
+            redirectRoute: route(WireChat::indexRouteName()),
+            events: [
                 'close-chat',
-                 Chats::class => ['chat-exited',  [$this->conversation->id]]
+                Chats::class => ['chat-exited',  [$this->conversation->id]],
             ]
         );
     }
@@ -273,13 +271,10 @@ class Info extends ModalComponent
 
     public function render()
     {
-      
 
         $participant = $this->conversation?->participant(auth()->user());
-    
 
-
-      //  dd($this->isWidget(),$participant);
+        //  dd($this->isWidget(),$participant);
 
         // Pass data to the view
         return view('wirechat::livewire.info.info', [

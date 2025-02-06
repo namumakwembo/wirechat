@@ -20,10 +20,10 @@ use Namu\WireChat\Traits\Widget;
 
 class Members extends ModalComponent
 {
+    use Widget;
     use WithFileUploads;
     use WithPagination;
-    use Widget;
-    
+
     #[Locked]
     public Conversation $conversation;
 
@@ -80,12 +80,11 @@ class Members extends ModalComponent
 
         $conversation = auth()->user()->createConversationWith($participant->participantable);
 
-
         $this->handleComponentTermination(
-            redirectRoute:route(WireChat::viewRouteName(),[$conversation->id]),
-            events:[
+            redirectRoute: route(WireChat::viewRouteName(), [$conversation->id]),
+            events: [
                 WidgetsWireChat::class => ['open-chat',  ['conversation' => $conversation->id]],
-                'closeChatDialog'
+                'closeChatDialog',
             ]
         );
 
@@ -97,7 +96,6 @@ class Members extends ModalComponent
         // $this->dispatch('closeChatDrawer');
         // $this->dispatch('open-chat',conversation: $conversation->id);
         // $this->dispatch('closeModal');
-
 
     }
 

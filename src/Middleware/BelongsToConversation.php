@@ -1,6 +1,6 @@
 <?php
 
-namespace  Namu\WireChat\Middleware;
+namespace Namu\WireChat\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -20,9 +20,9 @@ class BelongsToConversation
         $user = $request->user();
         $conversationId = $request->route('conversation_id');
 
-        $conversation= Conversation::findOrFail($conversationId);
+        $conversation = Conversation::findOrFail($conversationId);
 
-        if (!$user || !$user->belongsToConversation($conversation)
+        if (! $user || ! $user->belongsToConversation($conversation)
         ) {
             abort(403, 'Forbidden');
         }

@@ -207,54 +207,53 @@ class Participant extends Model
         $this->save();
     }
 
-  /**
- * Check if the user has deleted the conversation and if the deletion is still valid.
- *
- * This method checks if the user has marked the conversation as deleted by looking at the `conversation_deleted_at` timestamp.
- * Optionally, it can check if the deletion is still valid by comparing the deletion time with the last update time of the conversation.
- *
- * - If `$checkDeletionExpired` is true, the method checks if the deletion is still valid. A deletion is considered expired
- *   if the conversation has been updated after the user deleted it (e.g., new messages).
- * - If `$checkDeletionExpired` is false, it only checks if the conversation has been deleted, regardless of updates.
- *
- * @param  bool  $checkDeletionExpired  Whether to check if the deletion is still valid.
- * @return bool True if the conversation is deleted (and valid if `$checkDeletionExpired` is true), false otherwise.
- */
-public function hasDeletedConversation(bool $checkDeletionExpired = false): bool
-{
-    // If no deletion timestamp is set, the conversation isn't deleted
-    if ($this->conversation_deleted_at === null) {
-        return false;
+    /**
+     * Check if the user has deleted the conversation and if the deletion is still valid.
+     *
+     * This method checks if the user has marked the conversation as deleted by looking at the `conversation_deleted_at` timestamp.
+     * Optionally, it can check if the deletion is still valid by comparing the deletion time with the last update time of the conversation.
+     *
+     * - If `$checkDeletionExpired` is true, the method checks if the deletion is still valid. A deletion is considered expired
+     *   if the conversation has been updated after the user deleted it (e.g., new messages).
+     * - If `$checkDeletionExpired` is false, it only checks if the conversation has been deleted, regardless of updates.
+     *
+     * @param  bool  $checkDeletionExpired  Whether to check if the deletion is still valid.
+     * @return bool True if the conversation is deleted (and valid if `$checkDeletionExpired` is true), false otherwise.
+     */
+    public function hasDeletedConversation(bool $checkDeletionExpired = false): bool
+    {
+        // If no deletion timestamp is set, the conversation isn't deleted
+        if ($this->conversation_deleted_at === null) {
+            return false;
+        }
+
+        // Get the latest updated_at timestamp for the conversation
+        $conversation = $this->conversation;
+
+        //Expited conversation means hasDeletedConversation should return FALSE
+        if ($checkDeletionExpired) {
+            // Check if the deletion timestamp is older than the last update timestamp (i.e., check if deletion is expired)
+            return $conversation->updated_at > $this->conversation_deleted_at ? false : true;
+        }
+
+        // If not checking expiration, simply return true if the conversation is marked as deleted
+        return true;
     }
-
-    // Get the latest updated_at timestamp for the conversation
-    $conversation = $this->conversation;
-
-     //Expited conversation means hasDeletedConversation should return FALSE
-    if ($checkDeletionExpired) {
-        // Check if the deletion timestamp is older than the last update timestamp (i.e., check if deletion is expired)
-        return   $conversation->updated_at > $this->conversation_deleted_at?false:true;
-    }
-
-    // If not checking expiration, simply return true if the conversation is marked as deleted
-    return true;
-}
-
 
     /**
      * Exclude participant passed as parameter
      */
-    public function  scopeWithoutParticipantable( $query, Model $user): Builder
+    public function scopeWithoutParticipantable($query, Model $user): Builder
     {
 
-     return   $query->where(function ($query) use ($user) {
-                 $query->where('participantable_id', '<>', $user->id)
-                      ->orWhere('participantable_type', '<>', $user->getMorphClass());
+        return $query->where(function ($query) use ($user) {
+            $query->where('participantable_id', '<>', $user->id)
+                ->orWhere('participantable_type', '<>', $user->getMorphClass());
         });
 
-    //  return $query->where(function ($query) use ($user) {
-    //      $query->whereNot('participantable_id', $user->id)
-    //            ->orWhereNot('participantable_type', $user->getMorphClass());
-    //  });
+        //  return $query->where(function ($query) use ($user) {
+        //      $query->whereNot('participantable_id', $user->id)
+        //            ->orWhereNot('participantable_type', $user->getMorphClass());
+        //  });
     }
 }

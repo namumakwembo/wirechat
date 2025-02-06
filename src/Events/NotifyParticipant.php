@@ -49,9 +49,9 @@ class NotifyParticipant implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         $encodedType = MorphClassResolver::encode($this->participant->participantable_type);
-        
+
         return [
-            new PrivateChannel('participant.' . $encodedType . '.' . $this->participant->participantable_id),
+            new PrivateChannel('participant.'.$encodedType.'.'.$this->participant->participantable_id),
         ];
     }
 

@@ -50,7 +50,6 @@ describe(' Data verifiction ', function () {
 
     });
 
-
 });
 
 describe('Actions', function () {
@@ -139,8 +138,6 @@ describe('Actions', function () {
         });
 
     });
-
-
 
     test('it dispatches NotifyParticipant to the right number of MIXED MODEL participnats  except the Auth', function () {
 

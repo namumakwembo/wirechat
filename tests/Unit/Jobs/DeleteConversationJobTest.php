@@ -9,7 +9,6 @@ use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message;
 use Workbench\App\Models\User;
 
-
 test('it deletes conversation succesfully', function () {
 
     // Set up a conversation with disappearing messages
@@ -18,11 +17,9 @@ test('it deletes conversation succesfully', function () {
     // Set test time for 3 days ago
     Carbon::setTestNowAndTimezone(now());
 
-
-
     $conversation = Conversation::factory()->withParticipants([$auth], ParticipantRole::OWNER)->create();
- 
-    $this->assertDatabaseHas((new Conversation())->getTable(), ['id' => $conversation->id]);
+
+    $this->assertDatabaseHas((new Conversation)->getTable(), ['id' => $conversation->id]);
 
     // Run the job to delete expired messages
     DeleteConversationJob::dispatch($conversation);
@@ -30,15 +27,14 @@ test('it deletes conversation succesfully', function () {
     // $job->handle();
 
     // Assert that the old message is deleted
-    $this->assertDatabaseMissing((new Conversation())->getTable(), ['id' => $conversation->id]);
+    $this->assertDatabaseMissing((new Conversation)->getTable(), ['id' => $conversation->id]);
 });
-
 
 test('delay is 60 seconds', function () {
 
     Bus::fake();
     Carbon::setTestNowAndTimezone(now());
-    
+
     $auth = User::factory()->create();
     $receiver = User::factory()->create(['name' => 'John']);
     $conversation = $auth->sendMessageTo($receiver, 'hello')->conversation;

@@ -130,7 +130,6 @@ describe('exitingConversation()', function () {
 
 });
 
-
 describe('hasDeletedConversation()', function () {
 
     it(' returns true if user has Deleted Conversation', function () {
@@ -141,8 +140,6 @@ describe('hasDeletedConversation()', function () {
         $conversation = $auth->createConversationWith($user);
 
         $conversation->deleteFor($auth);
-
-
 
         //assert
         expect($auth->hasDeletedConversation($conversation))->toBe(true);
@@ -156,17 +153,14 @@ describe('hasDeletedConversation()', function () {
 
         $conversation = $auth->createConversationWith($user);
 
-
-        //delete conversation 
+        //delete conversation
         $conversation->deleteFor($auth);
 
-
         //send message
-        $user->sendMessageTo($conversation,'hi');
-
+        $user->sendMessageTo($conversation, 'hi');
 
         //assert
-        expect($auth->hasDeletedConversation($conversation,checkDeletionExpired:false))->toBe(true);
+        expect($auth->hasDeletedConversation($conversation, checkDeletionExpired: false))->toBe(true);
 
     });
 
@@ -174,25 +168,21 @@ describe('hasDeletedConversation()', function () {
         $auth = User::factory()->create();
         $user = User::factory()->create(['name' => 'Micheal']);
 
-         Carbon::setTestNow(now()->subSecond(20));
+        Carbon::setTestNow(now()->subSecond(20));
         $conversation = $auth->createConversationWith($user);
-
 
         Carbon::setTestNow(now()->addSecond(5));
 
-
-        //delete conversation 
+        //delete conversation
         $conversation->deleteFor($auth);
-
 
         Carbon::setTestNow();
 
         //send message
-        $user->sendMessageTo($conversation,'hi');
-
+        $user->sendMessageTo($conversation, 'hi');
 
         //assert
-        expect($auth->hasDeletedConversation($conversation,checkDeletionExpired:true))->toBe(false);
+        expect($auth->hasDeletedConversation($conversation, checkDeletionExpired: true))->toBe(false);
 
     });
 
@@ -203,23 +193,15 @@ describe('hasDeletedConversation()', function () {
 
         $conversation = $auth->createConversationWith($user);
 
-
         $participant = $conversation->participant($user);
 
-
-        //delete conversation 
+        //delete conversation
         $conversation->deleteFor($auth);
-
-
-
 
         //assert
         expect($participant->hasDeletedConversation())->toBe(false);
 
     });
-
-
-  
 
 });
 

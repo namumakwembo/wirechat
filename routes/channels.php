@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Broadcast;
 use Namu\WireChat\Helpers\MorphClassResolver;
 use Namu\WireChat\Models\Conversation;
@@ -29,14 +28,12 @@ Broadcast::channel('conversation.{conversationId}', function ($user, int $conver
 
     return false; // Deny access to the channel
 
-}
-, 
-[
-'guards' => config('wirechat.routes.guards',['web']),
-'middleware'=>config('wirechat.routes.middleware',['web','auth'])
-]
+},
+    [
+        'guards' => config('wirechat.routes.guards', ['web']),
+        'middleware' => config('wirechat.routes.middleware', ['web', 'auth']),
+    ]
 );
-
 
 Broadcast::channel('participant.{encodedType}.{id}', function ($user, $encodedType, $id) {
     // Decode the encoded type to get the raw value.
@@ -44,6 +41,6 @@ Broadcast::channel('participant.{encodedType}.{id}', function ($user, $encodedTy
 
     return $user->id == $id && $user->getMorphClass() == $morphType;
 }, [
-    'guards'     => config('wirechat.routes.guards', ['web']),
-    'middleware' => config('wirechat.routes.middleware', ['web', 'auth'])
+    'guards' => config('wirechat.routes.guards', ['web']),
+    'middleware' => config('wirechat.routes.middleware', ['web', 'auth']),
 ]);

@@ -3,12 +3,12 @@
 namespace Namu\WireChat\Livewire\Chats;
 
 use Illuminate\Support\Facades\Schema;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Namu\WireChat\Facades\WireChat;
+use Namu\WireChat\Helpers\MorphClassResolver;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Traits\Widget;
-use Livewire\Attributes\On;
-use Namu\WireChat\Helpers\MorphClassResolver;
 
 class Chats extends Component
 {
@@ -24,14 +24,13 @@ class Chats extends Component
 
     public $selectedConversationId;
 
-  
     public function getListeners()
     {
         $user = auth()->user();
         $encodedType = MorphClassResolver::encode($user->getMorphClass());
         $userId = $user->id;
-    
-       // dd($encodedType,$userId);
+
+        // dd($encodedType,$userId);
         return [
             'refresh' => '$refresh',
             'hardRefresh',
@@ -40,22 +39,22 @@ class Chats extends Component
         ];
     }
 
-    
-   /**
-    *  Used to force hat list to reset all data as if it was newly opened
-    */
-   public  function hardRefresh()  {
+    /**
+     *  Used to force hat list to reset all data as if it was newly opened
+     */
+    public function hardRefresh()
+    {
         $this->conversations = collect();
         $this->reset(['page', 'canLoadMore']);
-        
+
     }
 
     #[On('refresh-chats')]
-    public  function refreshChats()  {
-            $this->conversations = collect();
-            $this->reset(['page', 'canLoadMore']);
+    public function refreshChats()
+    {
+        $this->conversations = collect();
+        $this->reset(['page', 'canLoadMore']);
     }
-
 
     /**
      * Handle the 'chat-deleted' event
@@ -66,7 +65,7 @@ class Chats extends Component
         $this->conversations = $this->conversations->reject(function ($conversation) use ($conversationId) {
             return $conversation->id === $conversationId;
         });
-        
+
     }
 
     /**
@@ -78,10 +77,8 @@ class Chats extends Component
         $this->conversations = $this->conversations->reject(function ($conversation) use ($conversationId) {
             return $conversation->id === $conversationId;
         });
-        
-    }
 
-    
+    }
 
     public function refreshComponent($event)
     {
@@ -213,7 +210,7 @@ class Chats extends Component
         abort_unless(auth()->check(), 401);
         $this->selectedConversationId = request()->conversation_id;
         //$this->loadConversations();
-        $this->conversations=collect();
+        $this->conversations = collect();
 
     }
 

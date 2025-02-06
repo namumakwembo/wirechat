@@ -11,8 +11,8 @@ use Namu\WireChat\Traits\Widget;
 
 class NewGroup extends ModalComponent
 {
-    use WithFileUploads;
     use Widget;
+    use WithFileUploads;
 
     public $users;
 
@@ -160,9 +160,9 @@ class NewGroup extends ModalComponent
 
         //redirect to conversation
         $this->handleComponentTermination(
-            redirectRoute:route(WireChat::viewRouteName(),[$conversation->id]),
-            events:[
-                WidgetsWireChat::class => ['open-chat',  ['conversation' => $conversation->id]]
+            redirectRoute: route(WireChat::viewRouteName(), [$conversation->id]),
+            events: [
+                WidgetsWireChat::class => ['open-chat',  ['conversation' => $conversation->id]],
             ]
         );
 

@@ -1,9 +1,6 @@
 <?php
 
-use App\Livewire\Test;
 use Illuminate\Support\Facades\Route;
-use Namu\WireChat\Livewire\Chat\Chat;
-use Namu\WireChat\Livewire\Chat\Chats;
 use Namu\WireChat\Livewire\Index;
 use Namu\WireChat\Livewire\View;
 

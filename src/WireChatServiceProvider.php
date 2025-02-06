@@ -10,16 +10,16 @@ use Namu\WireChat\Console\Commands\InstallWireChat;
 use Namu\WireChat\Facades\WireChat as FacadesWireChat;
 use Namu\WireChat\Livewire\Chat\Chat;
 use Namu\WireChat\Livewire\Chats\Chats;
-use Namu\WireChat\Livewire\Index;
-use Namu\WireChat\Livewire\View;
 use Namu\WireChat\Livewire\Components\NewChat;
 use Namu\WireChat\Livewire\Components\NewGroup;
 use Namu\WireChat\Livewire\Group\Permissions;
+use Namu\WireChat\Livewire\Index;
 use Namu\WireChat\Livewire\Info\AddMembers;
 use Namu\WireChat\Livewire\Info\Info;
 use Namu\WireChat\Livewire\Info\Members;
 use Namu\WireChat\Livewire\Modals\ChatDialog;
 use Namu\WireChat\Livewire\Modals\ChatDrawer;
+use Namu\WireChat\Livewire\View;
 use Namu\WireChat\Livewire\Widgets\WireChat;
 use Namu\WireChat\Middleware\BelongsToConversation;
 use Namu\WireChat\Services\WireChatService;
@@ -27,9 +27,6 @@ use Namu\WireChat\View\Components\ChatBox\Image;
 
 class WireChatServiceProvider extends ServiceProvider
 {
-
-
-    
     public function boot()
     {
 
@@ -47,7 +44,6 @@ class WireChatServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'wirechat');
 
-
         //publish config
         $this->publishes([
             __DIR__.'/../config/wirechat.php' => config_path('wirechat.php'),
@@ -58,16 +54,14 @@ class WireChatServiceProvider extends ServiceProvider
             __DIR__.'/../database/migrations' => database_path('migrations'),
         ], 'wirechat-migrations');
 
-
         //publish views
         if ($this->app->runningInConsole()) {
             // Publish views
             $this->publishes([
-              __DIR__.'/../resources/views' => resource_path('views/vendor/wirechat'),
+                __DIR__.'/../resources/views' => resource_path('views/vendor/wirechat'),
             ], 'wirechat-views');
-          
-          }
-          
+
+        }
 
         /* Load channel routes */
         $this->loadRoutesFrom(__DIR__.'/../routes/channels.php');
@@ -77,7 +71,6 @@ class WireChatServiceProvider extends ServiceProvider
 
         //load styles
         $this->loadStyles();
-
 
         //load middleware
         $this->registerMiddlewares();
@@ -125,28 +118,29 @@ class WireChatServiceProvider extends ServiceProvider
 
     }
 
-    protected function registerMiddlewares(){
+    protected function registerMiddlewares()
+    {
 
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware('belongsToConversation', BelongsToConversation::class);
 
     }
 
-
-    //load assets 
-    protected function loadAssets(){
+    //load assets
+    protected function loadAssets()
+    {
 
         Blade::directive('wirechatAssets', function () {
-        return "<?php 
+            return "<?php 
                 echo Blade::render('@livewire(\'chat-dialog\')');
                 echo Blade::render('<x-wirechat::toast/>');
                 ?>";
         });
     }
 
-
-     //load assets 
-     protected function loadStyles(){
+    //load assets
+    protected function loadStyles()
+    {
 
         $primaryColor = FacadesWireChat::getColor();
         Blade::directive('wirechatStyles', function () use ($primaryColor) {
@@ -159,6 +153,4 @@ class WireChatServiceProvider extends ServiceProvider
             EOT; ?>";
         });
     }
-
-  
 }

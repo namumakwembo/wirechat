@@ -59,9 +59,9 @@ class NewChat extends ModalComponent
 
                 //redirect to conversation
                 $this->handleComponentTermination(
-                    redirectRoute:route(WireChat::viewRouteName(),[$createdConversation->id]),
-                    events:[
-                        WidgetsWireChat::class => ['open-chat',  ['conversation' => $createdConversation->id]]
+                    redirectRoute: route(WireChat::viewRouteName(), [$createdConversation->id]),
+                    events: [
+                        WidgetsWireChat::class => ['open-chat',  ['conversation' => $createdConversation->id]],
                     ]
                 );
 

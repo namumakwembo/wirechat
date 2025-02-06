@@ -3,7 +3,6 @@
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Message;
@@ -49,8 +48,6 @@ it('returns correct attachment ', function () {
     //dd($message->sendable);
     expect($message->attachment->id)->toBe($attachment->id);
 });
-
-
 
 // it('returns reads count', function () {
 //     $auth = User::factory()->create();
@@ -152,7 +149,6 @@ describe('DeleteFor Everyone', function () {
         //save photo to disk
         $path = $attachment->store(config('wirechat.attachments.storage_folder', 'attachments'), config('wirechat.attachments.storage_disk', 'public'));
 
-
         $this->actingAs($auth);
         //create attachment
 
@@ -172,24 +168,19 @@ describe('DeleteFor Everyone', function () {
         // Assert the file was stored...
         Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->assertExists($attachment->file_path);
 
-
         //assert
         expect($message->attachment->id)->toBe($attachment->id);
-
 
         expect(Message::where('conversation_id', $message->conversation_id)->withoutGlobalScopes()->count())->toBe(1);
         expect($message->attachment()->count())->toBe(1);
         //delete message
         $message->forceDelete();
 
-
         expect(Message::where('conversation_id', $message->conversation_id)->withoutGlobalScopes()->count())->toBe(0);
         expect($message->attachment()->count())->toBe(0);
         //assert
         Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->assertMissing($attachment->file_path);
     });
-
-
 
     it('aborts 403 AND does not delete message if user does not belong to conversation  before deletingForEveryone', function () {
 
@@ -203,13 +194,12 @@ describe('DeleteFor Everyone', function () {
         $message1 = $auth->sendMessageTo($conversation, 'hello-1');
 
         //assert exists in database
-        $this->assertDatabaseHas((new Message())->getTable(), ['id' => $message1->id]);
+        $this->assertDatabaseHas((new Message)->getTable(), ['id' => $message1->id]);
 
         $message1->deleteForEveryone(User::factory()->create());
 
-        $this->assertDatabaseHas((new Message())->getTable(), ['id' => $message1->id]);
+        $this->assertDatabaseHas((new Message)->getTable(), ['id' => $message1->id]);
     })->throws(Exception::class);
-
 
     it('aborts 403 AND does not delete message if user does not own message  before deletingForEveryone', function () {
 
@@ -223,13 +213,12 @@ describe('DeleteFor Everyone', function () {
         $message1 = $auth->sendMessageTo($conversation, 'hello-1');
 
         //assert exists in database
-        $this->assertDatabaseHas((new Message())->getTable(), ['id' => $message1->id]);
+        $this->assertDatabaseHas((new Message)->getTable(), ['id' => $message1->id]);
 
         $message1->deleteForEveryone($receiver);
 
-        $this->assertDatabaseHas((new Message())->getTable(), ['id' => $message1->id]);
+        $this->assertDatabaseHas((new Message)->getTable(), ['id' => $message1->id]);
     })->throws(Exception::class, 'You do not have permission to delete this message');
-
 
     it('deletes if User owns messag when deletingForEveryone', function () {
 
@@ -243,14 +232,12 @@ describe('DeleteFor Everyone', function () {
         $message1 = $auth->sendMessageTo($conversation, 'hello-1');
 
         //assert exists in database
-        $this->assertDatabaseHas((new Message())->getTable(), ['id' => $message1->id]);
+        $this->assertDatabaseHas((new Message)->getTable(), ['id' => $message1->id]);
 
         $message1->deleteForEveryone($auth);
 
-        $this->assertDatabaseMissing((new Message())->getTable(), ['id' => $message1->id]);
+        $this->assertDatabaseMissing((new Message)->getTable(), ['id' => $message1->id]);
     });
-
-
 
     it('still deletes if User does not own message but is Admin and Conversation is Group', function () {
 
@@ -262,7 +249,7 @@ describe('DeleteFor Everyone', function () {
         //create group
         $conversation = $receiver->createGroup('Text');
 
-        //add participants 
+        //add participants
         $conversation->addParticipant($auth, ParticipantRole::ADMIN);
         $conversation->addParticipant($randomUser);
 
@@ -270,13 +257,12 @@ describe('DeleteFor Everyone', function () {
         $message1 = $randomUser->sendMessageTo($conversation, 'hello-1');
 
         //assert exists in database
-        $this->assertDatabaseHas((new Message())->getTable(), ['id' => $message1->id]);
-
+        $this->assertDatabaseHas((new Message)->getTable(), ['id' => $message1->id]);
 
         //Atempf for admin to delete
         $message1->deleteForEveryone($auth);
 
-        $this->assertDatabaseMissing((new Message())->getTable(), ['id' => $message1->id]);
+        $this->assertDatabaseMissing((new Message)->getTable(), ['id' => $message1->id]);
     });
 });
 
@@ -405,16 +391,13 @@ describe('DeleteForMe', function () {
         //delete message
         $message1->deleteFor($auth);
 
-
         //assert the message count for auth user is 0 After Delete
         expect($conversation->messages()->count())->toBe(0);
 
-
         //assert message exists in database
-        $this->assertDatabaseCount((new Message())->getTable(), $message1->id);
+        $this->assertDatabaseCount((new Message)->getTable(), $message1->id);
         expect($conversation->messages()->withoutGlobalScopes()->count())->toBe(1);
     });
-
 
     test('Other Logged in users of Same Model  can still see messages even if Auth deletes For me', function () {
         $auth = User::factory()->create();
@@ -429,13 +412,11 @@ describe('DeleteForMe', function () {
         //delete message
         $message1->deleteFor($auth);
 
-
         //authenticate as auth
         $this->actingAs($auth);
 
         //assert auth can see message
         expect($conversation->messages()->count())->toBe(0);
-
 
         //authenticate as receiver
         $this->actingAs($receiver);
@@ -457,13 +438,11 @@ describe('DeleteForMe', function () {
         //delete message
         $message1->deleteFor($auth);
 
-
         //authenticate as auth
         $this->actingAs($auth);
 
         //assert auth can see message
         expect($conversation->messages()->count())->toBe(0);
-
 
         //authenticate as receiver
         $this->actingAs($receiver);
@@ -482,22 +461,18 @@ describe('DeleteForMe', function () {
         //send to receiver
         $message1 = $auth->sendMessageTo($receiver, 'hello-1');
 
-
-
-
         //authenticate as auth
         $this->actingAs($auth);
         $message1->deleteFor($auth);
 
         //assert exists in database
-        $this->assertDatabaseHas((new Message())->getTable(), ['id' => $message1->id]);
-
+        $this->assertDatabaseHas((new Message)->getTable(), ['id' => $message1->id]);
 
         //authenticate as receiver
         $this->actingAs($receiver);
         $message1->deleteFor($receiver);
 
-        $this->assertDatabaseMissing((new Message())->getTable(), ['id' => $message1->id]);
+        $this->assertDatabaseMissing((new Message)->getTable(), ['id' => $message1->id]);
     });
 
     it('It deletes message permanetly if conversation is Self', function () {
@@ -511,16 +486,15 @@ describe('DeleteForMe', function () {
         $message1 = $auth->sendMessageTo($conversation, 'hello-1');
 
         //assert exists in database
-        $this->assertDatabaseHas((new Message())->getTable(), ['id' => $message1->id]);
+        $this->assertDatabaseHas((new Message)->getTable(), ['id' => $message1->id]);
 
         $message1->deleteFor($auth);
 
-        $this->assertDatabaseMissing((new Message())->getTable(), ['id' => $message1->id]);
+        $this->assertDatabaseMissing((new Message)->getTable(), ['id' => $message1->id]);
     });
 });
 
 describe('excludeDeletedScope', function () {
-
 
     it('it excludes messages created before participant\s conversation_cleared_at is filled', function () {
         $auth = User::factory()->create();
@@ -533,7 +507,7 @@ describe('excludeDeletedScope', function () {
 
         //send to receiver
 
-        $conversation =  $auth->sendMessageTo($receiver, 'hello-1')->conversation;
+        $conversation = $auth->sendMessageTo($receiver, 'hello-1')->conversation;
         $auth->sendMessageTo($receiver, 'hello-2');
         $auth->sendMessageTo($receiver, 'hello-3');
 
@@ -551,18 +525,14 @@ describe('excludeDeletedScope', function () {
         //RESET TIME
         Carbon::setTestNow();
 
-
-        //set deleted at for participant 
+        //set deleted at for participant
         $participant = $conversation->participant($auth);
         $participant->update(['conversation_cleared_at' => now()]);
-
-
 
         //assert count
         $messages = Message::where('conversation_id', $message->conversation_id)->get();
         expect($messages->count())->toBe(0);
     });
-
 
     it('Other users can still accesss messages despite other user participant\s conversation_cleared_at is filled', function () {
         $auth = User::factory()->create();
@@ -575,7 +545,7 @@ describe('excludeDeletedScope', function () {
 
         //send to receiver
 
-        $conversation =  $auth->sendMessageTo($receiver, 'hello-1')->conversation;
+        $conversation = $auth->sendMessageTo($receiver, 'hello-1')->conversation;
         $auth->sendMessageTo($receiver, 'hello-2');
         $auth->sendMessageTo($receiver, 'hello-3');
 
@@ -593,12 +563,9 @@ describe('excludeDeletedScope', function () {
         //RESET TIME
         Carbon::setTestNow();
 
-
-        //set deleted at for participant 
+        //set deleted at for participant
         $participant = $conversation->participant($auth);
         $participant->update(['conversation_cleared_at' => now()]);
-
-
 
         //assert count
         $messages = Message::where('conversation_id', $message->conversation_id)->get();
@@ -616,7 +583,7 @@ describe('excludeDeletedScope', function () {
 
         //send to receiver
 
-        $conversation =  $auth->sendMessageTo($receiver, 'hello-1')->conversation;
+        $conversation = $auth->sendMessageTo($receiver, 'hello-1')->conversation;
         $auth->sendMessageTo($receiver, 'hello-2');
         $auth->sendMessageTo($receiver, 'hello-3');
 
@@ -634,12 +601,9 @@ describe('excludeDeletedScope', function () {
         //RESET TIME
         Carbon::setTestNow();
 
-
-        //set deleted at for participant 
+        //set deleted at for participant
         $participant = $conversation->participant($auth);
         $participant->update(['conversation_cleared_at' => now()]);
-
-
 
         //assert count
         $messages = Message::where('conversation_id', $message->conversation_id)->get();
@@ -657,7 +621,7 @@ describe('excludeDeletedScope', function () {
 
         //send to receiver
 
-        $conversation =  $auth->sendMessageTo($receiver, 'hello-1')->conversation;
+        $conversation = $auth->sendMessageTo($receiver, 'hello-1')->conversation;
         $auth->sendMessageTo($receiver, 'hello-2');
         $auth->sendMessageTo($receiver, 'hello-3');
 
@@ -671,15 +635,12 @@ describe('excludeDeletedScope', function () {
         $messages = Message::where('conversation_id', $message->conversation_id)->get();
         expect($messages->count())->toBe(6);
 
-
         //RESET TIME
         Carbon::setTestNow();
 
-
-        //set deleted at for participant 
+        //set deleted at for participant
         $participant = $conversation->participant($auth);
         $participant->update(['conversation_deleted_at' => now()]);
-
 
         //assert count
         $messages = Message::where('conversation_id', $message->conversation_id)->get();
@@ -697,7 +658,7 @@ describe('excludeDeletedScope', function () {
 
         //send to receiver
 
-        $conversation =  $auth->sendMessageTo($receiver, 'hello-1')->conversation;
+        $conversation = $auth->sendMessageTo($receiver, 'hello-1')->conversation;
         $auth->sendMessageTo($receiver, 'hello-2');
         $auth->sendMessageTo($receiver, 'hello-3');
 
@@ -712,24 +673,20 @@ describe('excludeDeletedScope', function () {
         $messages = Message::where('conversation_id', $message->conversation_id)->get();
         expect($messages->count())->toBe(6);
 
-
         //RESET TIME
         Carbon::setTestNow();
 
-
-        //set deleted at for participant 
+        //set deleted at for participant
         $participant = $conversation->participant($auth);
         $participant->update(['conversation_deleted_at' => now()]);
-
 
         //assert count
         $messages = Message::where('conversation_id', $message->conversation_id)->get();
         expect($messages->count())->toBe(6);
     });
 
-
     //With Deleted Action
-  
+
     it('it excludes individual messages with deleted action', function () {
         $auth = User::factory()->create();
         $this->actingAs($auth);
@@ -741,7 +698,7 @@ describe('excludeDeletedScope', function () {
 
         //send to receiver
 
-        $conversation =  $auth->sendMessageTo($receiver, 'hello-1')->conversation;
+        $conversation = $auth->sendMessageTo($receiver, 'hello-1')->conversation;
         $auth->sendMessageTo($receiver, 'hello-2');
         $auth->sendMessageTo($receiver, 'hello-3')->deleteFor($auth);
 
@@ -770,7 +727,7 @@ describe('excludeDeletedScope', function () {
 
         //send to receiver
 
-        $conversation =  $auth->sendMessageTo($receiver, 'hello-1')->conversation;
+        $conversation = $auth->sendMessageTo($receiver, 'hello-1')->conversation;
         $auth->sendMessageTo($receiver, 'hello-2');
         $auth->sendMessageTo($receiver, 'hello-3')->deleteFor($auth);
 
@@ -799,7 +756,7 @@ describe('excludeDeletedScope', function () {
 
         //send to receiver
 
-        $conversation =  $auth->sendMessageTo($receiver, 'hello-1')->conversation;
+        $conversation = $auth->sendMessageTo($receiver, 'hello-1')->conversation;
         $auth->sendMessageTo($receiver, 'hello-2');
         $auth->sendMessageTo($receiver, 'hello-3')->deleteFor($auth);
 
@@ -828,7 +785,7 @@ describe('excludeDeletedScope', function () {
 
         //send to receiver
 
-        $conversation =  $auth->sendMessageTo($receiver, 'hello-1')->conversation;
+        $conversation = $auth->sendMessageTo($receiver, 'hello-1')->conversation;
         $auth->sendMessageTo($receiver, 'hello-2');
         $auth->sendMessageTo($receiver, 'hello-3')->deleteFor($auth);
 
@@ -845,8 +802,5 @@ describe('excludeDeletedScope', function () {
         expect($messages->count())->toBe(6);
 
     });
-
-
-
 
 });

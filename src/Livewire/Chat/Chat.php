@@ -28,7 +28,7 @@ class Chat extends Component
     use WithFileUploads;
     use WithPagination;
 
-   // public ?Conversation $conversation;
+    // public ?Conversation $conversation;
     public $conversation;
 
     public $conversationId;
@@ -68,8 +68,8 @@ class Chat extends Component
 
         return [
             'refresh' => '$refresh',
-            'echo-private:conversation.' . $conversationId . ',.Namu\\WireChat\\Events\\MessageCreated' => 'appendNewMessage',
-            'echo-private:conversation.' . $conversationId . ',.Namu\\WireChat\\Events\\MessageDeleted' => 'removeDeletedMessage',
+            'echo-private:conversation.'.$conversationId.',.Namu\\WireChat\\Events\\MessageCreated' => 'appendNewMessage',
+            'echo-private:conversation.'.$conversationId.',.Namu\\WireChat\\Events\\MessageDeleted' => 'removeDeletedMessage',
 
             //  'echo-private:conversation.' .$this->conversation->id. ',.Namu\\WireChat\\Events\\MessageDeleted' => 'removeDeletedMessage',
         ];
@@ -224,10 +224,10 @@ class Chat extends Component
         $this->conversation->deleteFor(auth()->user());
 
         $this->handleComponentTermination(
-            redirectRoute:route(WireChat::indexRouteName()),
-            events:[
+            redirectRoute: route(WireChat::indexRouteName()),
+            events: [
                 'close-chat',
-                 Chats::class => ['chat-deleted',  [$this->conversation->id]]
+                Chats::class => ['chat-deleted',  [$this->conversation->id]],
             ]
         );
     }
@@ -246,10 +246,10 @@ class Chat extends Component
         //Dispatach event instead if isWidget
 
         $this->handleComponentTermination(
-            redirectRoute:route(WireChat::indexRouteName()),
-            events:[
+            redirectRoute: route(WireChat::indexRouteName()),
+            events: [
                 'close-chat',
-                 Chats::class => 'refresh'
+                Chats::class => 'refresh',
             ]
         );
     }
@@ -283,12 +283,12 @@ class Chat extends Component
     {
         $perMinute = 60;
 
-        if (RateLimiter::tooManyAttempts('send-message:' . auth()->id(), $perMinute)) {
+        if (RateLimiter::tooManyAttempts('send-message:'.auth()->id(), $perMinute)) {
 
             return abort(429, 'Too many attempts!, Please slow down');
         }
 
-        RateLimiter::increment('send-message:' . auth()->id());
+        RateLimiter::increment('send-message:'.auth()->id());
     }
 
     /**
@@ -669,7 +669,7 @@ class Chat extends Component
         // Calculate whether more messages can be loaded
         // Group the messages
         $this->loadedMessages = $messages
-            ->groupBy(fn($message) => $this->messageGroupKey($message))  // Grouping by custom logic
+            ->groupBy(fn ($message) => $this->messageGroupKey($message))  // Grouping by custom logic
             ->map->values();  // Re-index each group
 
         $this->canLoadMore = $this->totalMessageCount > $messages->count();
@@ -703,13 +703,13 @@ class Chat extends Component
             $conversationId = (int) $conversation;
             $this->conversation = Conversation::find($conversationId);
 
-            if (!$this->conversation) {
-                abort(404, "Conversation not found."); // Custom error response
+            if (! $this->conversation) {
+                abort(404, 'Conversation not found.'); // Custom error response
             }
         } elseif (is_null($conversation)) {
-            abort(422, "A conversation id is required"); // Custom error for missing input
+            abort(422, 'A conversation id is required'); // Custom error for missing input
         } else {
-           return abort(422, "Invalid conversation input."); // Handle invalid input types
+            return abort(422, 'Invalid conversation input.'); // Handle invalid input types
         }
 
         //$this->conversation = Conversation::where('id', $conversation)->firstOr(fn () => abort(404));
@@ -756,9 +756,8 @@ class Chat extends Component
             }
         }
 
-
         //Dispach hideUnreadStatus for conversation if is widget
-        //Only fire event if chat is widget to avoid unecessary event firing 
+        //Only fire event if chat is widget to avoid unecessary event firing
         // if ($this->isWidget()) {
         //    // $this->dispatch('refresh')->to(Chats::class);
         // }

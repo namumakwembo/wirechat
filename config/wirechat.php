@@ -42,14 +42,14 @@ return [
     'routes' => [
         'prefix' => '/chats',
         'middleware' => ['web', 'auth'],
-        'guards' => ['web']
+        'guards' => ['web'],
     ],
 
     /**
      * Layout:
-     * Specifies the view that will be used as the layout when rendering Wirechat components  
-     * via the default routes (e.g., /chats and /chats/{id}).  
-     * The returned view will serve as the parent layout, where the component content  
+     * Specifies the view that will be used as the layout when rendering Wirechat components
+     * via the default routes (e.g., /chats and /chats/{id}).
+     * The returned view will serve as the parent layout, where the component content
      * will be rendered into the $slot.
      */
     'layout' => 'wirechat::layouts.app',
@@ -63,9 +63,6 @@ return [
     'allow_chats_search' => true,
     'allow_media_attachments' => true,
     'allow_file_attachments' => true,
-
-
-
 
     /**
      * User Searchable Fields:

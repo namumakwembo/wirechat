@@ -6,9 +6,6 @@ class MorphClassResolver
 {
     /**
      * Encodes the given raw type using hexadecimal encoding.
-     *
-     * @param  string  $rawType
-     * @return string
      */
     public static function encode(string $rawType): string
     {
@@ -18,7 +15,6 @@ class MorphClassResolver
     /**
      * Decodes the given hex-encoded type back to its raw string.
      *
-     * @param  string  $encodedType
      * @return string|false
      */
     public static function decode(string $encodedType)

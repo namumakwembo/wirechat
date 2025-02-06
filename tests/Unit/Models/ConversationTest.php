@@ -192,7 +192,6 @@ describe('getUnreadCountFor()', function () {
         expect($conversation->getUnreadCountFor($auth))->toBe(4);
     });
 
-
     it('returns unread messages count for the specified user of Mixed Types', function () {
 
         $auth = User::factory()->create();
@@ -452,7 +451,6 @@ describe('deleteFor()', function () {
 
     it('permanetenly deletes the conversation if both Participants of Same Model in a private conversation has deleted conversation WITHOUT any new messages', function () {
 
-       
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
@@ -472,18 +470,16 @@ describe('deleteFor()', function () {
         $this->actingAs($auth);
         $conversation->deleteFor($auth);
 
-
         Carbon::setTestNow();
         //Authenticate and delete 2
         $this->actingAs($receiver);
         $conversation->deleteFor($receiver);
 
-        $this->assertDatabaseMissing((new Conversation())->getTable(), ['id'=>$conversation->id]);
+        $this->assertDatabaseMissing((new Conversation)->getTable(), ['id' => $conversation->id]);
     });
 
     it('does not permanetenly delete the conversation even if both Participants of Same Model in a private conversation has deleted deleted BUT convefsation has new messages', function () {
 
-       
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
@@ -492,27 +488,21 @@ describe('deleteFor()', function () {
         //Send to receiver
         $conversation = $auth->sendMessageTo($receiver, 'hello-4')->conversation;
 
-
         Carbon::setTestNow(now()->addSeconds(5));
-
-
 
         //Auth Delete
         $conversation->deleteFor($auth);
 
-
         Carbon::setTestNow(now()->addSeconds(5));
-
 
         $auth->sendMessageTo($receiver, 'hello75'); //Send new message
 
         Carbon::setTestNow();
- 
+
         //Recevier Delete
         $conversation->deleteFor($receiver);
 
-
-        $this->assertDatabaseHas((new Conversation())->getTable(), ['id'=>$conversation->id]);
+        $this->assertDatabaseHas((new Conversation)->getTable(), ['id' => $conversation->id]);
     });
 
     it('permanetenly deletes the conversation if both participants of Different Models ie(Admin/User) delete it CONSEQUTIVELY without any anew messages ', function () {
@@ -520,8 +510,7 @@ describe('deleteFor()', function () {
         $auth = User::factory()->create();
         $admin = Admin::factory()->create();
 
-
-        //Travel back 
+        //Travel back
         Carbon::setTestNow(now()->subSeconds(20));
 
         $conversation = $auth->createConversationWith($admin, 'hello-4');
@@ -529,20 +518,17 @@ describe('deleteFor()', function () {
         Carbon::setTestNow(now()->addSeconds(5));
         $conversation->deleteFor($auth);
 
-
-
         //Reset Time
         Carbon::setTestNow();
 
         //Authenticate and delete 2
         $conversation->deleteFor($admin);
 
-        $this->assertDatabaseMissing((new Conversation())->getTable(), ['id'=>$conversation->id]);
+        $this->assertDatabaseMissing((new Conversation)->getTable(), ['id' => $conversation->id]);
     });
 
     it('does not permanetenly delete the conversation even if both Participants of Mixed Model in a private conversation has deleted deleted BUT convefsation has new messages', function () {
 
-       
         $auth = User::factory()->create();
         $receiver = Admin::factory()->create();
 
@@ -563,7 +549,7 @@ describe('deleteFor()', function () {
 
         $conversation->deleteFor($receiver);
 
-        $this->assertDatabaseHas((new Conversation())->getTable(), ['id'=>$conversation->id]);
+        $this->assertDatabaseHas((new Conversation)->getTable(), ['id' => $conversation->id]);
     });
 
     it('completely deletes the conversation if conversation is self conversation with initiator(User)', function () {
@@ -710,8 +696,7 @@ describe('ClearFor()', function () {
         expect($auth->conversations()->count())->toBe(3);
     });
 
-
-       it('cleared conversation of Mixed Models still appear in query', function () {
+    it('cleared conversation of Mixed Models still appear in query', function () {
 
         //Dusk to
         $auth = User::factory()->create();
@@ -877,7 +862,7 @@ describe('ClearFor()', function () {
         expect($auth->conversations()->withoutCleared()->count())->toBe(3);
     });
 
-       it('removes cleared conversations from query if withoutCleared() is used In Mixed Models', function () {
+    it('removes cleared conversations from query if withoutCleared() is used In Mixed Models', function () {
 
         //Dusk to
         $auth = User::factory()->create();
@@ -908,7 +893,6 @@ describe('ClearFor()', function () {
 
 });
 
- 
 describe('WithoutBlanks()', function () {
 
     it('it filters out blank messages when ->withoutBlanks() used ', function () {
@@ -923,18 +907,15 @@ describe('WithoutBlanks()', function () {
         //create conversation with message
         Carbon::setTestNow(now()->subSeconds(10));
 
-        $user= User::factory()->create(['name' => 'john']);
+        $user = User::factory()->create(['name' => 'john']);
         $messsage = $auth->sendMessageTo($user, 'hello-3');
         $messsag2 = $auth->sendMessageTo($user, 'hello-3');
-
-
 
         //reset timer
         Carbon::setTestNow(now()->addSeconds(5));
 
         $messsage->deleteFor($auth);
         $messsag2->deleteFor($auth);
-
 
         Carbon::setTestNow();
 
@@ -956,24 +937,21 @@ describe('WithoutBlanks()', function () {
         //create conversation with message
         Carbon::setTestNow(now()->subSeconds(10));
 
-        $user= User::factory()->create(['name' => 'john']);
+        $user = User::factory()->create(['name' => 'john']);
         $messsage = $auth->sendMessageTo($user, 'hello-3');
         $messsag2 = $auth->sendMessageTo($user, 'hello-3');
 
-
         //create soft deleted message
 
-        $conversation=$messsag2->conversation;
+        $conversation = $messsag2->conversation;
 
-        Message::factory()->sender($auth)->create(['conversation_id'=>$conversation->id,'deleted_at'=>now()]);
-
+        Message::factory()->sender($auth)->create(['conversation_id' => $conversation->id, 'deleted_at' => now()]);
 
         //reset timer
         Carbon::setTestNow(now()->addSeconds(5));
 
         $messsage->deleteFor($auth);
         $messsag2->deleteFor($auth);
-
 
         Carbon::setTestNow();
 
@@ -982,7 +960,6 @@ describe('WithoutBlanks()', function () {
         expect($auth->conversations()->withoutBlanks()->count())->toBe(0);
 
     });
-
 
     it('it retrives conversation for other who did not delete all individual messages when ->withoutBlanks() used ', function () {
 
@@ -996,18 +973,15 @@ describe('WithoutBlanks()', function () {
         //create conversation with message
         Carbon::setTestNow(now()->subSeconds(10));
 
-        $user= User::factory()->create(['name' => 'john']);
+        $user = User::factory()->create(['name' => 'john']);
         $messsage = $auth->sendMessageTo($user, 'hello-3');
         $messsag2 = $auth->sendMessageTo($user, 'hello-3');
-
-
 
         //reset timer
         Carbon::setTestNow(now()->addSeconds(5));
 
         $messsage->deleteFor($auth);
         $messsag2->deleteFor($auth);
-
 
         Carbon::setTestNow();
 
@@ -1016,7 +990,6 @@ describe('WithoutBlanks()', function () {
         expect($auth->conversations()->withoutBlanks()->count())->toBe(1);
 
     });
-
 
     test('With Mixed Participants ,it retrives conversation for other who did not delete all individual messages when ->withoutBlanks() used ', function () {
 
@@ -1030,18 +1003,15 @@ describe('WithoutBlanks()', function () {
         //create conversation with message
         Carbon::setTestNow(now()->subSeconds(10));
 
-        $user= Admin::factory()->create(['name' => 'john']);
+        $user = Admin::factory()->create(['name' => 'john']);
         $messsage = $auth->sendMessageTo($user, 'hello-3');
         $messsag2 = $auth->sendMessageTo($user, 'hello-3');
-
-
 
         //reset timer
         Carbon::setTestNow(now()->addSeconds(5));
 
         $messsage->deleteFor($auth);
         $messsag2->deleteFor($auth);
-
 
         Carbon::setTestNow();
 
@@ -1064,18 +1034,15 @@ describe('WithoutBlanks()', function () {
         //create conversation with message
         Carbon::setTestNow(now()->subSeconds(10));
 
-        $user= User::factory()->create(['name' => 'john']);
+        $user = User::factory()->create(['name' => 'john']);
         $messsage = $auth->sendMessageTo($user, 'hello-3');
         $messsag2 = $auth->sendMessageTo($user, 'hello-3');
-
-
 
         //reset timer
         Carbon::setTestNow(now()->addSeconds(5));
 
         $messsage->deleteFor($auth);
         $messsag2->deleteFor($auth);
-
 
         Carbon::setTestNow();
 
@@ -1084,9 +1051,6 @@ describe('WithoutBlanks()', function () {
         expect($auth->conversations()->count())->toBe(4);
 
     });
-
-
-
 
     it('it filters out blank messages when ->withoutBlanks() used with Mixed Participants Models ', function () {
 
@@ -1098,11 +1062,10 @@ describe('WithoutBlanks()', function () {
         $auth->createConversationWith(Admin::factory()->create())->conversation;
         $auth->createConversationWith(User::factory()->create())->conversation;
 
-  
         Carbon::setTestNow();
         //Assert Count
         $this->actingAs($auth);
-     
+
         expect($auth->conversations()->withoutBlanks()->count())->toBe(0);
 
     });
@@ -1116,15 +1079,13 @@ describe('WithoutBlanks()', function () {
         $auth->createConversationWith(Admin::factory()->create())->conversation;
         $auth->createConversationWith(User::factory()->create())->conversation;
 
-  
         Carbon::setTestNow();
         //Assert Count
         $this->actingAs($auth);
-     
+
         expect($auth->conversations()->count())->toBe(3);
 
     });
-
 
     it('it filters out blank messages when ->withoutBlanks() in Mixed Model Participants used Exept those with filter Deleted Actions(as in Conversation is not blank if user has deleted only some messages) ', function () {
 
@@ -1137,10 +1098,9 @@ describe('WithoutBlanks()', function () {
         $auth->createConversationWith(User::factory()->create())->conversation;
 
         //create conversation with message
-        $user= User::factory()->create(['name' => 'john']);
+        $user = User::factory()->create(['name' => 'john']);
         $messsage = $auth->sendMessageTo($user, 'hello-3');
         $messsag2 = $auth->sendMessageTo($user, 'hello-3');
-
 
         //reset timer
         Carbon::setTestNow(now()->addSeconds(5));
@@ -1155,7 +1115,6 @@ describe('WithoutBlanks()', function () {
 
     });
 
-
 });
 
 describe('WithoutDeleted()', function () {
@@ -1163,115 +1122,98 @@ describe('WithoutDeleted()', function () {
     it('retrieves all conversations even deleted when  withoutDeleted local scope is not used', function () {
         $auth = User::factory()->create();
 
-      //create conversation with message
-      Carbon::setTestNow(now()->subSeconds(10));
-         //create conversations
-         $conversation1= $auth->createConversationWith(User::factory()->create());
-         $conversation2= $auth->createConversationWith(User::factory()->create());
-         $conversation3 = $auth->createConversationWith(User::factory()->create());
- 
+        //create conversation with message
+        Carbon::setTestNow(now()->subSeconds(10));
+        //create conversations
+        $conversation1 = $auth->createConversationWith(User::factory()->create());
+        $conversation2 = $auth->createConversationWith(User::factory()->create());
+        $conversation3 = $auth->createConversationWith(User::factory()->create());
 
-         //delete conversations
-
+        //delete conversations
 
         //reset timer
         Carbon::setTestNow();
 
-         $conversation2->deleteFor($auth);
+        $conversation2->deleteFor($auth);
 
         //Authenticate
         $this->actingAs($auth);
 
         expect($auth->conversations->count())->toBe(3);
 
-     
     });
-
 
     test('With mixed Paricipnats model it retrieves all conversations even deleted when  withoutDeleted local scope is not used', function () {
         $auth = User::factory()->create();
 
-      //create conversation with message
-      Carbon::setTestNow(now()->subSeconds(10));
-         //create conversations
-         $conversation1= $auth->createConversationWith(User::factory()->create());
-         $conversation2= $auth->createConversationWith(Admin::factory()->create());
-         $conversation3 = $auth->createConversationWith(Admin::factory()->create());
- 
+        //create conversation with message
+        Carbon::setTestNow(now()->subSeconds(10));
+        //create conversations
+        $conversation1 = $auth->createConversationWith(User::factory()->create());
+        $conversation2 = $auth->createConversationWith(Admin::factory()->create());
+        $conversation3 = $auth->createConversationWith(Admin::factory()->create());
 
-         //delete conversations
-
+        //delete conversations
 
         //reset timer
         Carbon::setTestNow();
 
-         $conversation2->deleteFor($auth);
+        $conversation2->deleteFor($auth);
 
         //Authenticate
         $this->actingAs($auth);
 
         expect($auth->conversations->count())->toBe(3);
 
-     
     });
-
 
     it('exludes deleted conversation when  withoutDeleted local scope is used', function () {
         $auth = User::factory()->create();
 
-      //create conversation with message
-      Carbon::setTestNow(now()->subSeconds(10));
-         //create conversations
-         $conversation1= $auth->createConversationWith(User::factory()->create());
-         $conversation2= $auth->createConversationWith(User::factory()->create());
-         $conversation3 = $auth->createConversationWith(User::factory()->create());
- 
+        //create conversation with message
+        Carbon::setTestNow(now()->subSeconds(10));
+        //create conversations
+        $conversation1 = $auth->createConversationWith(User::factory()->create());
+        $conversation2 = $auth->createConversationWith(User::factory()->create());
+        $conversation3 = $auth->createConversationWith(User::factory()->create());
 
-         //delete conversations
-
+        //delete conversations
 
         //reset timer
         Carbon::setTestNow();
 
-         $conversation2->deleteFor($auth);
+        $conversation2->deleteFor($auth);
 
         //Authenticate
         $this->actingAs($auth);
 
         expect($auth->conversations()->withoutDeleted()->count())->toBe(2);
 
-     
     });
-
 
     Test('With Mixed Participnats exludes deleted conversation when  withoutDeleted local scope is used', function () {
         $auth = User::factory()->create();
 
-      //create conversation with message
-      Carbon::setTestNow(now()->subSeconds(10));
-         //create conversations
-         $conversation1= $auth->createConversationWith(Admin::factory()->create());
-         $conversation2= $auth->createConversationWith(Admin::factory()->create());
-         $conversation3 = $auth->createConversationWith(User::factory()->create());
- 
+        //create conversation with message
+        Carbon::setTestNow(now()->subSeconds(10));
+        //create conversations
+        $conversation1 = $auth->createConversationWith(Admin::factory()->create());
+        $conversation2 = $auth->createConversationWith(Admin::factory()->create());
+        $conversation3 = $auth->createConversationWith(User::factory()->create());
 
-         //delete conversations
-
+        //delete conversations
 
         //reset timer
         Carbon::setTestNow();
 
-         $conversation2->deleteFor($auth);
+        $conversation2->deleteFor($auth);
 
         //Authenticate
         $this->actingAs($auth);
 
         expect($auth->conversations()->withoutDeleted()->count())->toBe(2);
 
-     
     });
-  
-  
 
 });
 
@@ -1280,128 +1222,113 @@ describe('WithDeleted()', function () {
     it('retrieves all conversations even deleted when  withDeleted() local scope is not used', function () {
         $auth = User::factory()->create();
 
-      //create conversation with message
-      Carbon::setTestNow(now()->subSeconds(10));
-         //create conversations
-         $conversation1= $auth->createConversationWith(User::factory()->create());
-         $conversation2= $auth->createConversationWith(User::factory()->create());
-         $conversation3 = $auth->createConversationWith(User::factory()->create());
- 
+        //create conversation with message
+        Carbon::setTestNow(now()->subSeconds(10));
+        //create conversations
+        $conversation1 = $auth->createConversationWith(User::factory()->create());
+        $conversation2 = $auth->createConversationWith(User::factory()->create());
+        $conversation3 = $auth->createConversationWith(User::factory()->create());
 
-         //delete conversations
-
+        //delete conversations
 
         //reset timer
         Carbon::setTestNow();
 
-         $conversation2->deleteFor($auth);
+        $conversation2->deleteFor($auth);
 
         //Authenticate
         $this->actingAs($auth);
 
         expect($auth->conversations->count())->toBe(3);
 
-     
     });
-
 
     test('With mixed Paricipnats model it retrieves all conversations even deleted when  withDeleted() local scope is not used', function () {
         $auth = User::factory()->create();
 
-      //create conversation with message
-      Carbon::setTestNow(now()->subSeconds(10));
-         //create conversations
-         $conversation1= $auth->createConversationWith(User::factory()->create());
-         $conversation2= $auth->createConversationWith(Admin::factory()->create());
-         $conversation3 = $auth->createConversationWith(Admin::factory()->create());
- 
+        //create conversation with message
+        Carbon::setTestNow(now()->subSeconds(10));
+        //create conversations
+        $conversation1 = $auth->createConversationWith(User::factory()->create());
+        $conversation2 = $auth->createConversationWith(Admin::factory()->create());
+        $conversation3 = $auth->createConversationWith(Admin::factory()->create());
 
-         //delete conversations
-
+        //delete conversations
 
         //reset timer
         Carbon::setTestNow();
 
-         $conversation2->deleteFor($auth);
+        $conversation2->deleteFor($auth);
 
         //Authenticate
         $this->actingAs($auth);
 
         expect($auth->conversations->count())->toBe(3);
 
-     
     });
-
 
     it('exludes deleted conversation when  withoutDeleted local scope is used', function () {
         $auth = User::factory()->create();
 
-      //create conversation with message
-      Carbon::setTestNow(now()->subSeconds(10));
-         //create conversations
-         $conversation1= $auth->createConversationWith(User::factory()->create());
-         $conversation2= $auth->createConversationWith(User::factory()->create());
-         $conversation3 = $auth->createConversationWith(User::factory()->create());
- 
+        //create conversation with message
+        Carbon::setTestNow(now()->subSeconds(10));
+        //create conversations
+        $conversation1 = $auth->createConversationWith(User::factory()->create());
+        $conversation2 = $auth->createConversationWith(User::factory()->create());
+        $conversation3 = $auth->createConversationWith(User::factory()->create());
 
-         //delete conversations
-
+        //delete conversations
 
         //reset timer
         Carbon::setTestNow();
 
-         $conversation2->deleteFor($auth);
+        $conversation2->deleteFor($auth);
 
         //Authenticate
         $this->actingAs($auth);
 
         // Test withoutDeleted scope
-    $withoutDeletedConversations = $auth->conversations()->withoutDeleted()->get();
-    expect($withoutDeletedConversations->count())->toBe(2);
+        $withoutDeletedConversations = $auth->conversations()->withoutDeleted()->get();
+        expect($withoutDeletedConversations->count())->toBe(2);
 
-    // Test withDeleted scope
-    $withDeletedConversations = $auth->conversations()->withDeleted()->get();
-    expect($withDeletedConversations->count())->toBe(3);
-     
+        // Test withDeleted scope
+        $withDeletedConversations = $auth->conversations()->withDeleted()->get();
+        expect($withDeletedConversations->count())->toBe(3);
+
     });
-
 
     Test('With Mixed Participnats exludes deleted conversation when  withoutDeleted local scope is used', function () {
         $auth = User::factory()->create();
 
-      //create conversation with message
-      Carbon::setTestNow(now()->subSeconds(10));
-         //create conversations
-         $conversation1= $auth->createConversationWith(Admin::factory()->create());
-         $conversation2= $auth->createConversationWith(Admin::factory()->create());
-         $conversation3 = $auth->createConversationWith(User::factory()->create());
- 
+        //create conversation with message
+        Carbon::setTestNow(now()->subSeconds(10));
+        //create conversations
+        $conversation1 = $auth->createConversationWith(Admin::factory()->create());
+        $conversation2 = $auth->createConversationWith(Admin::factory()->create());
+        $conversation3 = $auth->createConversationWith(User::factory()->create());
 
-         //delete conversations
-
+        //delete conversations
 
         //reset timer
         Carbon::setTestNow();
 
-         $conversation2->deleteFor($auth);
+        $conversation2->deleteFor($auth);
 
         //Authenticate
-          //Authenticate
-          $this->actingAs($auth);
+        //Authenticate
+        $this->actingAs($auth);
 
-          $withoutDeletedConversations  = $auth->conversations;
-  
-          // Test withoutDeleted scope
-    $withoutDeletedConversations = $auth->conversations()->withoutDeleted()->get();
-    expect($withoutDeletedConversations->count())->toBe(2);
+        $withoutDeletedConversations = $auth->conversations;
 
-    // Test withDeleted scope
-    $withDeletedConversations = $auth->conversations()->withDeleted()->get();
-    expect($withDeletedConversations->count())->toBe(3);
-     
+        // Test withoutDeleted scope
+        $withoutDeletedConversations = $auth->conversations()->withoutDeleted()->get();
+        expect($withoutDeletedConversations->count())->toBe(2);
+
+        // Test withDeleted scope
+        $withDeletedConversations = $auth->conversations()->withDeleted()->get();
+        expect($withDeletedConversations->count())->toBe(3);
+
     });
-  
-  
 
 });
 
@@ -1517,23 +1444,19 @@ describe('recieverParticipant()', function () {
         $auth = User::factory()->create();
         $otherUser = User::factory()->create();
 
-
         $conversation = $auth->createConversationWith($otherUser);
 
         //log in as $auth
         $this->actingAs($auth);
 
-         //get receiver 
-         $receiver= $conversation->receiverParticipant;
+        //get receiver
+        $receiver = $conversation->receiverParticipant;
 
-
-      //   dd($receiver->participantable,$otherUser);
-
+        //   dd($receiver->participantable,$otherUser);
 
         expect($receiver->participantable->id)->toBe($otherUser->id);
         expect($receiver->participantable->getMorphClass())->toBe($otherUser->getMorphClass());
         expect($receiver->participantable->name)->toBe($otherUser->name);
-
 
     });
 
@@ -1542,23 +1465,19 @@ describe('recieverParticipant()', function () {
         $auth = User::factory()->create();
         $otherUser = Admin::factory()->create();
 
-
         $conversation = $auth->createConversationWith($otherUser);
 
         //log in as $auth
         $this->actingAs($auth);
 
-         //get receiver 
-         $receiver= $conversation->receiverParticipant;
+        //get receiver
+        $receiver = $conversation->receiverParticipant;
 
-
-      //   dd($receiver->participantable,$otherUser);
-
+        //   dd($receiver->participantable,$otherUser);
 
         expect($receiver->participantable->id)->toBe($otherUser->id);
         expect($receiver->participantable->getMorphClass())->toBe($otherUser->getMorphClass());
         expect($receiver->participantable->name)->toBe($otherUser->name);
-
 
     });
 
@@ -1566,19 +1485,15 @@ describe('recieverParticipant()', function () {
 
         $auth = User::factory()->create();
 
-
-
         $conversation = $auth->createConversationWith($auth);
 
         //log in as $auth
         $this->actingAs($auth);
 
-         //get receiver 
-         $receiver= $conversation->receiverParticipant;
-
+        //get receiver
+        $receiver = $conversation->receiverParticipant;
 
         expect($receiver)->toBe(null);
-
 
     });
 
@@ -1596,13 +1511,12 @@ describe('authParticipant()', function () {
         //log in as $auth
         $this->actingAs($auth);
 
-         //get receiver 
-         $authParticipant= $conversation->authParticipant;
+        //get receiver
+        $authParticipant = $conversation->authParticipant;
 
         expect($authParticipant->participantable->id)->toBe($auth->id);
         expect($authParticipant->participantable->getMorphClass())->toBe($auth->getMorphClass());
         expect($authParticipant->participantable->name)->toBe($auth->name);
-
 
     });
 
@@ -1616,13 +1530,12 @@ describe('authParticipant()', function () {
         //log in as $auth
         $this->actingAs($auth);
 
-         //get receiver 
-         $authParticipant= $conversation->authParticipant;
+        //get receiver
+        $authParticipant = $conversation->authParticipant;
 
         expect($authParticipant->participantable->id)->toBe($auth->id);
         expect($authParticipant->participantable->getMorphClass())->toBe($auth->getMorphClass());
         expect($authParticipant->participantable->name)->toBe($auth->name);
-
 
     });
 
@@ -1630,21 +1543,16 @@ describe('authParticipant()', function () {
 
         $auth = User::factory()->create();
 
-
-
         $conversation = $auth->createConversationWith($auth);
 
         //log in as $auth
         $this->actingAs($auth);
 
-
-         $authParticipant= $conversation->authParticipant;
+        $authParticipant = $conversation->authParticipant;
 
         expect($authParticipant->participantable->id)->toBe($auth->id);
         expect($authParticipant->participantable->getMorphClass())->toBe($auth->getMorphClass());
         expect($authParticipant->participantable->name)->toBe($auth->name);
-
-
 
     });
 
@@ -1659,17 +1567,14 @@ describe('peerParticipant()', function () {
 
         $conversation = $auth->createConversationWith($otherUser);
 
-
-         //get receiver 
-         $peerParticipant= $conversation->peerParticipant(reference:$auth);
+        //get receiver
+        $peerParticipant = $conversation->peerParticipant(reference: $auth);
 
         expect($peerParticipant->participantable->id)->toBe($otherUser->id);
         expect($peerParticipant->participantable->getMorphClass())->toBe($otherUser->getMorphClass());
         expect($peerParticipant->participantable->name)->toBe($otherUser->name);
 
-
     });
-
 
     it('it gets correct peer particiapnt in the conversaiton in a private conversation  of Mixed Models', function () {
 
@@ -1678,17 +1583,14 @@ describe('peerParticipant()', function () {
 
         $conversation = $auth->createConversationWith($otherUser);
 
-
-         //get receiver 
-         $peerParticipant= $conversation->peerParticipant(reference:$auth);
+        //get receiver
+        $peerParticipant = $conversation->peerParticipant(reference: $auth);
 
         expect($peerParticipant->participantable->id)->toBe($otherUser->id);
         expect($peerParticipant->participantable->getMorphClass())->toBe($otherUser->getMorphClass());
         expect($peerParticipant->participantable->name)->toBe($otherUser->name);
 
-
     });
-
 
     it('it gets correct peer particiapnt in the conversaiton in a self conversation ', function () {
 
@@ -1696,17 +1598,14 @@ describe('peerParticipant()', function () {
         $otherUser = User::factory()->create();
 
         $conversation = $auth->createConversationWith($auth);
-         //get receiver 
-         $peerParticipant= $conversation->peerParticipant(reference:$auth);
-
+        //get receiver
+        $peerParticipant = $conversation->peerParticipant(reference: $auth);
 
         expect($peerParticipant->participantable->id)->toBe($auth->id);
         expect($peerParticipant->participantable->getMorphClass())->toBe($auth->getMorphClass());
         expect($peerParticipant->participantable->name)->toBe($auth->name);
 
-
     });
-
 
     it('it returns null if reference does not belong to conversation  ', function () {
 
@@ -1716,12 +1615,11 @@ describe('peerParticipant()', function () {
 
         $conversation = $auth->createConversationWith($otherUser);
 
-         $peerParticipant= $conversation->peerParticipant(reference:$randomUser);
+        $peerParticipant = $conversation->peerParticipant(reference: $randomUser);
 
         expect($peerParticipant)->toBe(null);
 
     });
-
 
 });
 
@@ -1731,26 +1629,25 @@ describe('peerParticipants()', function () {
 
         $auth = User::factory()->create();
         $otherUser = User::factory()->create();
-    
+
         // Create a group conversation
         $conversation = $auth->createGroup('test');
-    
+
         // Add $otherUser to the conversation
         $conversation->addParticipant($otherUser);
-    
+
         // Add 10 other participants
         $participants = collect();
-        for ($i = 0; $i < 10; $i++) { 
+        for ($i = 0; $i < 10; $i++) {
             $participants->push($conversation->addParticipant(User::factory()->create()));
         }
-    
+
         // Get peer participants, excluding the authenticated user ($auth)
         $peerParticipants = $conversation->peerParticipants(reference: $auth);
-    
+
         // Ensure that all retrieved peer participants are in the expected set
         expect($peerParticipants)->toHaveCount(11); // 10 random + 1 ($otherUser)
-    
-       
+
         foreach ($peerParticipants as $peerParticipant) {
             foreach ($participants as $key => $participant) {
 
@@ -1758,46 +1655,43 @@ describe('peerParticipants()', function () {
                 expect($participant->pluck('participantable_id'))->contains($peerParticipant->participantable->id)->toBeTrue(); // Ensure they are part of the added participants
                 expect($participant->pluck('participantable_type'))->contains($peerParticipant->participantable->getMorphClass())->toBeTrue(); // Ensure they are part of the added participants
             }
-         
+
         }
     });
-    
 
     it('it gets correct peer particiapnt in the conversaiton in a group conversation  of Mixed Models', function () {
 
         $auth = User::factory()->create();
         $otherUser = Admin::factory()->create();
-    
+
         // Create a group conversation
         $conversation = $auth->createGroup('test');
-    
+
         // Add $otherUser to the conversation
         $conversation->addParticipant($otherUser);
         // Add 10 other participants
         $participants = collect();
-        for ($i = 0; $i < 10; $i++) { 
+        for ($i = 0; $i < 10; $i++) {
             $participants->push($conversation->addParticipant(User::factory()->create()));
         }
-    
+
         // Get peer participants, excluding the authenticated user ($auth)
         $peerParticipants = $conversation->peerParticipants(reference: $auth);
-    
+
         // Ensure that all retrieved peer participants are in the expected set
         expect($peerParticipants)->toHaveCount(11); // 10 random + 1 ($otherUser)
-    
+
         foreach ($peerParticipants as $peerParticipant) {
             foreach ($participants as $key => $participant) {
 
                 expect($peerParticipant->participantable)->not->toBe($auth); // Ensure $auth is excluded
                 expect($participant->pluck('participantable_id'))->contains($peerParticipant->participantable->id)->toBeTrue(); // Ensure they are part of the added participants
                 expect($participant->pluck('participantable_type'))->contains($peerParticipant->participantable->getMorphClass())->toBeTrue(); // Ensure they are part of the added participants
-            
+
             }
-         
+
         }
     });
-    
-
 
     it('can return one user for private conversation', function () {
 
@@ -1806,20 +1700,18 @@ describe('peerParticipants()', function () {
 
         $conversation = $auth->createConversationWith($otherUser);
 
-         //get receiver 
-         $peerParticipants= $conversation->peerParticipants(reference:$auth);
-
+        //get receiver
+        $peerParticipants = $conversation->peerParticipants(reference: $auth);
 
         expect($peerParticipants)->toHaveCount(1); // 1
 
-         foreach ($peerParticipants as $peerParticipant) {
+        foreach ($peerParticipants as $peerParticipant) {
             expect($peerParticipant->pluck('participantable_id'))->contains($otherUser->id)->toBeTrue(); // Ensure they are part of the added participants
             expect($peerParticipant->pluck('participantable_type'))->contains($otherUser->getMorphClass())->toBeTrue(); // Ensure they are part of the added participants
-        
+
         }
 
     });
-
 
     it('returns only one  peer particiapnt in the conversaiton in a self conversation ', function () {
 
@@ -1827,15 +1719,13 @@ describe('peerParticipants()', function () {
 
         $conversation = $auth->createConversationWith($auth);
 
-         //get receiver 
-         $peerParticipants= $conversation->peerParticipants(reference:$auth);
+        //get receiver
+        $peerParticipants = $conversation->peerParticipants(reference: $auth);
 
         expect($peerParticipants)->toBeEmpty(); // 1
     });
 
-
 });
-
 
 describe('getReciever()', function () {
 
@@ -1844,70 +1734,59 @@ describe('getReciever()', function () {
         $auth = User::factory()->create();
         $otherUser = User::factory()->create();
 
-
         $conversation = $auth->createConversationWith($otherUser);
 
         //log in as $auth
         $this->actingAs($auth);
 
-         //get receiver 
-         $receiver= $conversation->getReceiver();
+        //get receiver
+        $receiver = $conversation->getReceiver();
 
-
-      //   dd($receiver->participantable,$otherUser);
+        //   dd($receiver->participantable,$otherUser);
 
         expect($receiver->id)->toBe($otherUser->id);
         expect($receiver->getMorphClass())->toBe($otherUser->getMorphClass());
         expect($receiver->name)->toBe($otherUser->name);
 
-
     });
-
 
     it('it gets correct receiverParticipant in a private conversation of Mixed Participant Models ', function () {
 
         $auth = User::factory()->create();
         $otherUser = Admin::factory()->create();
 
-
         $conversation = $auth->createConversationWith($otherUser);
 
         //log in as $auth
         $this->actingAs($auth);
 
-         //get receiver 
-         $receiver= $conversation->getReceiver();
+        //get receiver
+        $receiver = $conversation->getReceiver();
 
-
-      //   dd($receiver->participantable,$otherUser);
+        //   dd($receiver->participantable,$otherUser);
 
         expect($receiver->id)->toBe($otherUser->id);
         expect($receiver->getMorphClass())->toBe($otherUser->getMorphClass());
         expect($receiver->name)->toBe($otherUser->name);
-
 
     });
 
     it('it gets correct receiverParticipant in a Self conversation', function () {
         $auth = User::factory()->create();
 
-
         $conversation = $auth->createConversationWith($auth);
 
         //log in as $auth
         $this->actingAs($auth);
 
-         //get receiver 
-         $receiver= $conversation->getReceiver();
+        //get receiver
+        $receiver = $conversation->getReceiver();
 
-
-      //   dd($receiver,$otherUser);
+        //   dd($receiver,$otherUser);
 
         expect($receiver->id)->toBe($auth->id);
         expect($receiver->getMorphClass())->toBe($auth->getMorphClass());
         expect($receiver->name)->toBe($auth->name);
-
-
 
     });
 

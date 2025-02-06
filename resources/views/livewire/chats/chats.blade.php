@@ -74,94 +74,92 @@ x-init=" setTimeout(() => {
                             selectedConversationId = null;
                         }
                     }"
-                
                        id="conversation-{{$conversation->id }}"
                        wire:key="conversation-em-{{$conversation->id}}"
-                       x-on:close-chat.window="handleCloseChat($event)"
-                       
-                        @style([ 'border-color:var(--wirechat-primary-color)' => $selectedConversationId == $conversation?->id, ]) 
-                        class="py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-sm transition-colors duration-150 flex gap-4 relative w-full cursor-pointer px-2"
-                        :class="$wire.selectedConversationId == conversationID && 'bg-gray-50 dark:bg-gray-800 border-r-4  border-opacity-20 border-[var(--wirechat-primary-color)]'">
+                       x-on:close-chat.window="handleCloseChat($event)">
+                      
                         <a
-                        @if ($widget)
-                             @click="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
+                        @if ($widget) 
+                        tabindex="0" 
+                        role="button" 
+                        dusk="openChatWidgetButton"
+                        @click="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
+                        @keydown.enter="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
                         @else
-                         href="{{ route(WireChat::viewRouteName(), $conversation->id) }}" class="shrink-0" 
-                         @endif>
+                        wire:navigate href="{{ route(WireChat::viewRouteName(), $conversation->id) }}"
+                        @endif
+
+                        @style([ 'border-color:var(--wirechat-primary-color)' => $selectedConversationId == $conversation?->id ]) 
+                        class="py-3 flex gap-4 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-sm transition-colors duration-150  relative w-full cursor-pointer px-2"
+                        :class="$wire.selectedConversationId == conversationID && 'bg-gray-50 dark:bg-gray-800 border-r-4  border-opacity-20 border-[var(--wirechat-primary-color)]'"
+                        >
+
+
+                        <div class="shrink-0"  >
                             <x-wirechat::avatar disappearing="{{ $conversation->hasDisappearingTurnedOn() }}"
                                 group="{{ $conversation->isGroup() }}"
                                 src="{{ $group ? $group?->cover_url : $receiver?->cover_url ?? null }}"
                                 class="w-12 h-12" />
-                        </a>
+                        </div>
 
                         <aside class="grid  grid-cols-12 w-full">
+                            <div class="col-span-10 border-b pb-2 border-gray-100 dark:border-gray-700 relative overflow-hidden truncate leading-5 w-full flex-nowrap p-1">
 
+                                    {{-- name --}}
+                                    <div class="flex gap-1 mb-1 w-full items-center">
+                                        <h6 class="truncate font-medium text-gray-900 dark:text-white">
+                                            {{ $group ? $group?->name : $receiver?->display_name }}
+                                        </h6>
 
-                        <a @if ($widget) tabindex="0" 
-                            role="button" 
-                            dusk="openChatWidgetButton"
-                            @click="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
-                            @keydown.enter="$dispatch('open-chat',{conversation:'@json($conversation->id)'})"
-                            @else
-                            wire:navigate href="{{ route(WireChat::viewRouteName(), $conversation->id) }}" @endif
-                                class="col-span-10 border-b pb-2 border-gray-100 dark:border-gray-700 relative overflow-hidden truncate leading-5 w-full flex-nowrap p-1">
-
-                                {{-- name --}}
-                                <div class="flex gap-1 mb-1 w-full items-center">
-                                    <h6 class="truncate font-medium text-gray-900 dark:text-white">
-                                        {{ $group ? $group?->name : $receiver?->display_name }}
-                                    </h6>
-
-                                    @if ($conversation->isSelfConversation())
-                                        <span class="font-medium dark:text-white">(You)</span>
-                                    @endif
-
-                                </div>
-
-                                {{-- Message body --}}
-                                @if ($lastMessage != null)
-                                    <div class="flex gap-x-2 items-center">
-
-                                        {{-- Only show if AUTH is onwer of message --}}
-                                        @if ($belongsToAuth)
-                                            <span class="font-bold text-xs dark:text-white/90 dark:font-normal">
-                                                You:
-                                            </span>
-                                        @elseif(!$belongsToAuth && $group !== null)
-                                            <span class="font-bold text-xs dark:text-white/80 dark:font-normal">
-                                                {{ $lastMessage->sendable?->display_name }}:
-                                            </span>
+                                        @if ($conversation->isSelfConversation())
+                                            <span class="font-medium dark:text-white">(You)</span>
                                         @endif
 
-                                        <p @class([
-                                            'truncate text-sm dark:text-white  gap-2 items-center',
-                                            'font-semibold text-black' =>
-                                                !$isReadByAuth && !$lastMessage?->ownedBy($authUser),
-                                            'font-normal text-gray-600' =>
-                                                $isReadByAuth && !$lastMessage?->ownedBy($authUser),
-                                            'font-normal text-gray-600' =>
-                                                $isReadByAuth && $lastMessage?->ownedBy($authUser),
-                                        ])>
-                                            {{ $lastMessage->body != '' ? $lastMessage->body : ($lastMessage->hasAttachment() ? '📎 Attachment' : '') }}
-                                        </p>
+                                    </div>
 
-                                        <span class="font-medium px-1 text-xs shrink-0 text-gray-800 dark:text-gray-50">
-                                            @if ($lastMessage->created_at->diffInMinutes(now()) < 1)
-                                                now
-                                            @else
-                                                {{ $lastMessage->created_at->shortAbsoluteDiffForHumans() }}
+                                    {{-- Message body --}}
+                                    @if ($lastMessage != null)
+                                        <div class="flex gap-x-2 items-center">
+
+                                            {{-- Only show if AUTH is onwer of message --}}
+                                            @if ($belongsToAuth)
+                                                <span class="font-bold text-xs dark:text-white/90 dark:font-normal">
+                                                    You:
+                                                </span>
+                                            @elseif(!$belongsToAuth && $group !== null)
+                                                <span class="font-bold text-xs dark:text-white/80 dark:font-normal">
+                                                    {{ $lastMessage->sendable?->display_name }}:
+                                                </span>
                                             @endif
-                                        </span>
 
+                                            <p @class([
+                                                'truncate text-sm dark:text-white  gap-2 items-center',
+                                                'font-semibold text-black' =>
+                                                    !$isReadByAuth && !$lastMessage?->ownedBy($authUser),
+                                                'font-normal text-gray-600' =>
+                                                    $isReadByAuth && !$lastMessage?->ownedBy($authUser),
+                                                'font-normal text-gray-600' =>
+                                                    $isReadByAuth && $lastMessage?->ownedBy($authUser),
+                                            ])>
+                                                {{ $lastMessage->body != '' ? $lastMessage->body : ($lastMessage->hasAttachment() ? '📎 Attachment' : '') }}
+                                            </p>
+
+                                            <span class="font-medium px-1 text-xs shrink-0 text-gray-800 dark:text-gray-50">
+                                                @if ($lastMessage->created_at->diffInMinutes(now()) < 1)
+                                                    now
+                                                @else
+                                                    {{ $lastMessage->created_at->shortAbsoluteDiffForHumans() }}
+                                                @endif
+                                            </span>
+
+
+                                        </div>
+                                    @endif
 
                                     </div>
-                                @endif
-
-                            </a>
 
                             {{-- Read status --}}
                             {{-- Only show if AUTH is NOT onwer of message --}}
-
                             @if ($lastMessage != null && !$lastMessage?->ownedBy($authUser) && !$isReadByAuth)
                                 <div x-show="showUnreadStatus" dusk="unreadMessagesDot" class=" col-span-2 flex flex-col text-center my-auto">
                                     {{-- Dots icon --}}
@@ -177,6 +175,7 @@ x-init=" setTimeout(() => {
 
 
                         </aside>
+                      </a>
 
                     </li>
                 @endforeach

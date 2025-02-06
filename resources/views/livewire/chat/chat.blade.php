@@ -110,7 +110,6 @@
         }
     </style>
 
-    {{-- <script type='module' defer  src='https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js'></script> --}}
 @endassets
 
 <div x-data="{
@@ -129,7 +128,9 @@
 
         return $wire.widget == true;
     }
-}" x-init="setTimeout(() => {
+}" 
+
+ x-init="setTimeout(() => {
 
     requestAnimationFrame(() => {
         initializing = false;
@@ -140,10 +141,9 @@
         }
     });
 }, 120);"
-    class=" w-full transition  bg-white/95 dark:bg-gray-900 overflow-hidden  h-full relative" style="contain:content">
+    class="w-full transition bg-white/95 dark:bg-gray-900 overflow-hidden h-full relative" style="contain:content">
 
-    <div class=" flex flex-col  grow  h-full relative ">
-
+    <div class=" flex flex-col  grow h-full   relative ">
         {{-- ---------- --}}
         {{-- --Header-- --}}
         {{-- ---------- --}}

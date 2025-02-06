@@ -67,8 +67,6 @@
     "
     
 
-
-
     x-cloak
      class='flex flex-col h-full  relative gap-2 gap-y-4 p-4 md:p-5 lg:p-8  flex-grow  overscroll-contain overflow-x-hidden w-full my-auto'
     style="contain: content" >

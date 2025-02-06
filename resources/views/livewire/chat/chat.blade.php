@@ -3,9 +3,7 @@
 @use('Namu\WireChat\Facades\WireChat')
 
 @php
-
     $primaryColor = WireChat::getColor();
-
 @endphp
 
 
@@ -132,23 +130,15 @@
         return $wire.widget == true;
     }
 }" x-init="setTimeout(() => {
-    $wire.dispatchTo('chats', 'refresh');
 
     requestAnimationFrame(() => {
         initializing = false;
         $wire.dispatch('focus-input-field');
-
-
         loadEmojiPicker();
-
         if (isWidget) {
-
+            $wire.dispatchTo('chats', 'refresh');
         }
-
-        ///dispatch refreh event if is Widget
-
     });
-
 }, 120);"
     class=" w-full transition  bg-white/95 dark:bg-gray-900 overflow-hidden  h-full relative" style="contain:content">
 

@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Namu\WireChat\Livewire\Chat\Index;
-use Namu\WireChat\Livewire\Chat\View;
+use Namu\WireChat\Livewire\Index;
+use Namu\WireChat\Livewire\View;
 
 Route::middleware(config('wirechat.routes.middleware'))
     ->prefix(config('wirechat.routes.prefix'))

@@ -1,4 +1,4 @@
-<div>
+<div class="h-full ">
 
     @assets
         <script>
@@ -179,7 +179,7 @@
 
         }
     }"
-     class ='w-full h-[calc(100vh_-_10.0rem)] bg-white dark:bg-gray-900 border dark:border-gray-700 flex overflow-hidden rounded-lg'>
+     class ='w-full h-full bg-white dark:bg-gray-900 border dark:border-gray-700 flex overflow-hidden rounded-lg'>
       <div :class="chatIsOpen && 'hidden md:grid'" class="relative  w-full h-full   md:w-[360px] lg:w-[400px] xl:w-[450px] shrink-0 overflow-y-auto  ">
           <livewire:chats :widget="true" />
       </div>
@@ -190,7 +190,7 @@
            x-on:keydown.escape.stop.window="closeChatWidgetOnEscape({ modalType: 'ChatWidget', event: $event });"
            aria-modal="true"
            tabindex="0"
-           class="w-full  grow  focus:outline-none focus:border-none"
+           class="w-full h-full min-h-full grid relative grow  focus:outline-none focus:border-none"
            :class="!chatIsOpen && 'hidden md:grid'"
            style="contain:content;">
             <div 

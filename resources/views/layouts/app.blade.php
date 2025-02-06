@@ -46,6 +46,7 @@
     </style>
 
     @livewireStyles
+    @wirechatStyles
 </head>
 
 <body class="font-sans antialiased">

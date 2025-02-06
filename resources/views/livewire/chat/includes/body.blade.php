@@ -252,7 +252,7 @@
                                     {{-- -------------------- --}}
                                     @if ($attachment)
                                         @if (!$belongsToAuth && $isGroup)
-                                            <div style="color:  var(--primary-color);" @class([
+                                            <div style="color:  var(--wirechat-primary-color);" @class([
                                                 'shrink-0 font-medium text-sm sm:text-base',
                                                 // Hide avatar if the next message is from the same user
                                                 'hidden' => $message?->sendable?->is($previousMessage?->sendable),
@@ -289,7 +289,7 @@
                                     {{-- -------------------- --}}
 
                                     @if ($message->body && !$isEmoji)
-                                    @include('wirechat::livewire.chat.includes.message', [ 'previousMessage' => $previousMessage, 'message' => $message, 'nextMessage' => $nextMessage, 'belongsToAuth' => $belongsToAuth, 'isGroup' => $isGroup, 'attachment' => $attachment, ])
+                                    @include('wirechat::livewire.chat.includes.message', [ 'previousMessage' => $previousMessage, 'message' => $message, 'nextMessage' => $nextMessage, 'belongsToAuth' => $belongsToAuth, 'isGroup' => $isGroup, 'attachment' => $attachment])
                                     @endif
 
                                 </div>

@@ -1,9 +1,6 @@
 
 @use('Namu\WireChat\Facades\WireChat')
 
-@props(['widget'=>false])
-
-
 <header class="px-3 z-10  sticky top-0 w-full py-2  ">
 
 

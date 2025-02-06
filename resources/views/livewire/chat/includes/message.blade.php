@@ -1,22 +1,11 @@
 @use('Namu\WireChat\Facades\WireChat')
 
-@props([
-    'previousMessage' => $previousMessage,
-    'message' => $message,
-    'nextMessage' => $nextMessage,
-    'belongsToAuth' => $belongsToAuth,
-    'primaryColor'=> WireChat::getColor(),
-    'isGroup'=>false
-
-])
-
-
 <div
 
 
 {{-- We use style here to make it easy for dynamic and safe injection --}}
 @style([
-'background-color:'. $primaryColor .'' => $belongsToAuth==true
+'background-color:var(--wirechat-primary-color)' => $belongsToAuth==true
 ])
 
 @php
@@ -62,7 +51,6 @@
 >
 @if (!$belongsToAuth && $isGroup)
 <div    
-    {{-- style="color:  var(--primary-color);" --}}
     @class([
         'shrink-0 font-medium text-purple-500',
         // Hide avatar if the next message is from the same user

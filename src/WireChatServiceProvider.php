@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Namu\WireChat\Console\Commands\InstallWireChat;
+use Namu\WireChat\Facades\WireChat as FacadesWireChat;
 use Namu\WireChat\Livewire\Chat\Chat;
 use Namu\WireChat\Livewire\Chats\Chats;
 use Namu\WireChat\Livewire\Index;
@@ -74,6 +75,9 @@ class WireChatServiceProvider extends ServiceProvider
         //load assets
         $this->loadAssets();
 
+        //load styles
+        $this->loadStyles();
+
 
         //load middleware
         $this->registerMiddlewares();
@@ -137,6 +141,22 @@ class WireChatServiceProvider extends ServiceProvider
                 echo Blade::render('@livewire(\'chat-dialog\')');
                 echo Blade::render('<x-wirechat::toast/>');
                 ?>";
+        });
+    }
+
+
+     //load assets 
+     protected function loadStyles(){
+
+        $primaryColor = FacadesWireChat::getColor();
+        Blade::directive('wirechatStyles', function () use ($primaryColor) {
+            return "<?php echo <<<EOT
+                <style>
+                    :root {
+                        --wirechat-primary-color: {$primaryColor};
+                    }
+                </style>
+            EOT; ?>";
         });
     }
 

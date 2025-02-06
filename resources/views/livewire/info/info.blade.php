@@ -135,7 +135,7 @@
                             <span class="col-span-11">
                                 <div x-show="!editing">
                                     @if (empty($description))
-                                        <p class="text-sm" style="color: var(--primary-color)">Add a group description
+                                        <p class="text-sm" style="color: var(--wirechat-primary-color)">Add a group description
                                         </p>
                                     @else
                                         <p class="font-medium break-all   whitespace-pre-line ">{{ $description }}

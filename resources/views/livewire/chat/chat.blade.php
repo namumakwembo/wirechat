@@ -10,12 +10,7 @@
 
 @assets
     <style>
-        :root {
-            --primary-color: {{ $primaryColor }};
-            --wirechat-primary-color: {{ $primaryColor }}
-        }
-
-
+     
         emoji-picker {
             width: 100% !important;
             height: 100%;
@@ -68,45 +63,6 @@
             --input-font-color: white;
             --indicator-color: #9ca3af;
             --button-hover-background: #9ca3af
-        }
-
-
-        .custom-scrollbar {
-            overflow-y: auto;
-            /* Make sure the div is scrollable */
-
-            scrollbar-width: 7px;
-
-            &::-webkit-scrollbar {
-                width: 8px;
-                background-color: transparent;
-            }
-
-            &::-webkit-scrollbar-thumb {
-                border-radius: 15px;
-                /* visibility: hidden; */
-                background-color: #d1d5db;
-            }
-
-            /* Show scrollbar on hover */
-            &:hover {
-                &::-webkit-scrollbar-thumb {
-                    /* visibility: visible; */
-                }
-            }
-
-            @media (prefers-color-scheme: dark) {
-                &::-webkit-scrollbar-thumb {
-                    background-color: #374151;
-                }
-            }
-
-            &::-webkit-scrollbar-track {
-                background-color: transparent;
-            }
-
-
-
         }
     </style>
 

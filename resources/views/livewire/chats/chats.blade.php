@@ -1,57 +1,5 @@
 @use('Namu\WireChat\Facades\WireChat')
 
-@php
-    $primaryColor = WireChat::getColor();
-@endphp
-
-@assets
-    <style>
-        :root {
-            --primary-color: {{ $primaryColor }};
-            --wirechat-primary-color: {{ $primaryColor }}
-        }
-
-        .custom-scrollbar {
-            overflow-y: auto;
-            /* Make sure the div is scrollable */
-
-            scrollbar-width: 7px;
-
-            &::-webkit-scrollbar {
-                width: 8px;
-                background-color: transparent;
-            }
-
-            &::-webkit-scrollbar-thumb {
-                border-radius: 15px;
-                visibility: hidden;
-                background-color: #d1d5db;
-            }
-
-            /* Show scrollbar on hover */
-            &:hover {
-                &::-webkit-scrollbar-thumb {
-                    visibility: visible;
-                }
-            }
-
-            @media (prefers-color-scheme: dark) {
-                &::-webkit-scrollbar-thumb {
-                    background-color: #374151;
-                }
-            }
-
-            &::-webkit-scrollbar-track {
-                background-color: transparent;
-            }
-
-
-
-        }
-    </style>
-@endassets
-
-
 <div 
 x-data="{selectedConversationId:'{{request()->conversation_id??$selectedConversationId}}' }"
 x-on:open-chat.window="selectedConversationId= $event.detail.conversation; $wire.selectedConversationId= $event.detail.conversation;"
@@ -131,7 +79,7 @@ x-init=" setTimeout(() => {
                        wire:key="conversation-em-{{$conversation->id}}"
                        x-on:close-chat.window="handleCloseChat($event)"
                        
-                        @style([ 'border-color:' . $primaryColor . '20' => $selectedConversationId == $conversation?->id, ]) 
+                        @style([ 'border-color:var(--wirechat-primary-color)' => $selectedConversationId == $conversation?->id, ]) 
                         class="py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-sm transition-colors duration-150 flex gap-4 relative w-full cursor-pointer px-2"
                         :class="$wire.selectedConversationId == conversationID && 'bg-gray-50 dark:bg-gray-800 border-r-4  border-opacity-20 border-[var(--wirechat-primary-color)]'">
                         <a
@@ -218,7 +166,7 @@ x-init=" setTimeout(() => {
                                 <div x-show="showUnreadStatus" dusk="unreadMessagesDot" class=" col-span-2 flex flex-col text-center my-auto">
                                     {{-- Dots icon --}}
                                     <span dusk="unreadDotItem" class="sr-only">unread dot</span>
-                                    <svg @style(['color:' . $primaryColor]) xmlns="http://www.w3.org/2000/svg" width="16"
+                                    <svg @style(['color:var(--wirechat-primary-color)']) xmlns="http://www.w3.org/2000/svg" width="16"
                                         height="16" fill="currentColor" class="bi bi-dot w-10 h-10 text-blue-500"
                                         viewBox="0 0 16 16">
                                         <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />

@@ -136,10 +136,7 @@ class WireChatServiceProvider extends ServiceProvider
         return "<?php 
                 echo Blade::render('@livewire(\'chat-dialog\')');
                 echo Blade::render('<x-wirechat::toast/>');
-                ?>
-                
-       
-                ";
+                ?>";
         });
     }
 

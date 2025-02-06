@@ -132,6 +132,7 @@
         return $wire.widget == true;
     }
 }" x-init="setTimeout(() => {
+    $wire.dispatchTo('chats', 'refresh');
 
     requestAnimationFrame(() => {
         initializing = false;
@@ -142,7 +143,6 @@
 
         if (isWidget) {
 
-            $wire.dispatchTo('chats', 'refresh');
         }
 
         ///dispatch refreh event if is Widget

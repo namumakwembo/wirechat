@@ -356,18 +356,23 @@ describe('mount()', function () {
             ->assertNotDispatched('refresh');
     });
 
-    test('When Widget it dispatches "refresh" event after succesfully loading chat', function () {
+   // test('When Widget it dispatches "refresh" event after succesfully loading chat', function () {
+    test('because event is fired in blade x-init so it\'s not testable so we just check it\'s presence ', function () {
         $auth = User::factory()->create();
         $user = User::factory()->create();
 
         //create group
         $conversation = $auth->createConversationWith($auth,'hi');
         //login as user not auth (Owner)
+        Carbon::setTestNow(now()->subSeconds(60));
+
         $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id, 'widget' => true]);
 
+        Carbon::setTestNow();
+
         $request
-            ->assertOK()
-            ->assertDispatched('refresh');
+            ->assertOK() 
+            ->assertSeeHtml('$wire.dispatchTo(\'chats\', \'refresh\')');
     });
 
 

@@ -11,7 +11,7 @@ x-init=" setTimeout(() => {
          conversationElement.scrollIntoView({ behavior: 'smooth' });
      }
  }, 200);"
-    class="flex flex-col bg-white/95 dark:bg-gray-900 transition-all h-full overflow-hidden w-full sm:p-3 border-r dark:border-gray-700  ">
+    class="flex flex-col bg-white/95 dark:bg-gray-900 transition-all h-full overflow-hidden w-full sm:p-3">
 
     @php
         $authUser = auth()->user();

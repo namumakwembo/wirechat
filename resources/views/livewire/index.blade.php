@@ -1,5 +1,5 @@
 <div class="w-full h-full min-h-full flex rounded-lg" >
-    <div class="relative  w-full h-full   md:w-[360px] lg:w-[400px] xl:w-[500px] shrink-0 overflow-y-auto  ">
+    <div class="relative  w-full h-full  border-r dark:border-gray-700  md:w-[360px] lg:w-[400px] xl:w-[500px] shrink-0 overflow-y-auto  ">
       <livewire:chats/> 
     </div>
     <main class="hidden md:grid h-full min-h-full w-full dark:border-gray-700 h-full relative overflow-y-auto"  style="contain:content">

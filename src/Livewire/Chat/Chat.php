@@ -689,6 +689,11 @@ class Chat extends Component
         $this->loadMessages();
     }
 
+    public function hydrate()
+    {
+        $this->loadMessages();
+    }
+
     private function initializeConversation()
     {
         abort_unless(auth()->check(), 401);
@@ -706,7 +711,7 @@ class Chat extends Component
     {
         if (in_array($this->conversation->type, [ConversationType::PRIVATE, ConversationType::SELF])) {
             $this->conversation->load('participants');
-            $participants = $this->conversation->participants;
+            $participants = $this->conversation->participants()->with('participantable', 'conversation')->get();
 
             $this->authParticipant = $participants
                 ->where('participantable_id', auth()->id())

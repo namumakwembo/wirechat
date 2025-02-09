@@ -83,6 +83,7 @@ class Chats extends Component
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
                 'messages',
                 'lastMessage.attachment',
+                'lastMessage.sendable',
                 'receiver.participantable',
                 'group.cover', //=> fn($query) => $query->select('id', 'name'),
 

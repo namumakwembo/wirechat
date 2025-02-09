@@ -39,8 +39,6 @@ class WireChatServiceProvider extends ServiceProvider
 
         $this->loadLivewireComponents();
 
-        Blade::component('wirechat::chatbox.image', Image::class);
-
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'wirechat');
 
@@ -148,6 +146,9 @@ class WireChatServiceProvider extends ServiceProvider
                 <style>
                     :root {
                         --wirechat-primary-color: {$primaryColor};
+                    }
+                    [x-cloak] {
+                        display: none !important;
                     }
                 </style>
             EOT; ?>";

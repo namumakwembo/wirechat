@@ -8,5 +8,5 @@ Route::middleware(config('wirechat.routes.middleware'))
     ->prefix(config('wirechat.routes.prefix'))
     ->group(function () {
         Route::get('/', Index::class)->name('chats');
-        Route::get('/{conversation_id}', View::class)->middleware('belongsToConversation')->name('chat');
+        Route::get('/{conversation}', View::class)->middleware('belongsToConversation')->name('chat');
     });

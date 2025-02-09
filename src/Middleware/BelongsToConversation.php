@@ -18,7 +18,7 @@ class BelongsToConversation
     {
 
         $user = $request->user();
-        $conversationId = $request->route('conversation_id');
+        $conversationId = $request->route('conversation');
 
         $conversation = Conversation::findOrFail($conversationId);
 

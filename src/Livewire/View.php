@@ -8,7 +8,6 @@ use Namu\WireChat\Models\Conversation;
 
 class View extends Component
 {
-    public $conversation_id;
 
     public $conversation;
 
@@ -18,7 +17,7 @@ class View extends Component
         abort_unless(auth()->check(), 401);
 
         //We remove deleted conversation incase the user decides to visit the delted conversation
-        $this->conversation = Conversation::where('id', $this->conversation_id)->firstOrFail();
+        $this->conversation = Conversation::where('id', $this->conversation)->firstOrFail();
 
         // Check if the user belongs to the conversation
         abort_unless(auth()->user()->belongsToConversation($this->conversation), 403);

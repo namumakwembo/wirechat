@@ -445,7 +445,10 @@ class Conversation extends Model
     public function readBy(Model $user): bool
     {
         // Reuse the unread count method and return true if unread count is 0
-        return $this->getUnreadCountFor($user) <= 0;
+        // return $this->getUnreadCountFor($user) <= 0;
+
+        $participant=  $this->participant($user);
+        return $participant->conversation_read_at > $this->updated_at;
     }
 
     /**

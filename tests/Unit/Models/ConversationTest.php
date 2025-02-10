@@ -218,6 +218,51 @@ describe('getUnreadCountFor()', function () {
     });
 });
 
+
+describe('readBy()', function () {
+
+
+
+    it('returns true for read conversations', function () {
+
+        $auth = User::factory()->create();
+        $receiver = User::factory()->create();
+
+        //Authenticate $auth
+        $this->actingAs($auth);
+
+        //Create conversation
+
+        //auth -> receiver
+        Carbon::setTestNowAndTimezone(now()->subMinutes(10));
+        $auth->sendMessageTo($receiver, message: '1');
+        $conversation = $auth->sendMessageTo($receiver, message: '2')->conversation;
+
+        //send message to auth
+        //receiver -> auth
+        $receiver->sendMessageTo($auth, message: '3');
+        $receiver->sendMessageTo($auth, message: '4');
+
+        //Assert number of unread messages for $auth
+        expect($conversation->readBy($auth))->toBe(false);
+
+        Carbon::setTestNow(now()->addMinutes(4));
+
+        //assert returns zero(0) when messages are marked as read
+        $conversation->markAsRead();
+
+        Carbon::setTestNowAndTimezone(now());
+
+        expect($conversation->readBy($auth))->toBe(true);
+
+    });
+
+
+
+});
+
+
+
 describe('deleteFor()', function () {
 
     it('load all conversations if not deleted', function () {

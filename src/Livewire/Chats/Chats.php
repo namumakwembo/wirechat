@@ -11,25 +11,60 @@ use Namu\WireChat\Helpers\MorphClassResolver;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Traits\Widget;
 
+/**
+ * Chats Component
+ *
+ * Handles chat conversations, search, and real-time updates.
+ */
 class Chats extends Component
 {
     use Widget;
 
+    /**
+     * The search query.
+     *
+     * @var mixed
+     */
     public $search;
 
+    /**
+     * The list of conversations.
+     *
+     * @var \Illuminate\Support\Collection|array
+     */
     public $conversations = [];
 
+    /**
+     * Indicates if more conversations can be loaded.
+     *
+     * @var bool
+     */
     public bool $canLoadMore = false;
 
+    /**
+     * The current page for pagination.
+     *
+     * @var int
+     */
     public $page = 1;
 
+    /**
+     * The ID of the selected conversation.
+     *
+     * @var mixed
+     */
     public $selectedConversationId;
 
+    /**
+     * Returns an array of event listeners.
+     *
+     * @return array
+     */
     public function getListeners()
     {
         $user = $this->auth;
-        $encodedType = MorphClassResolver::encode($user->getMorphClass());
-        $userId = $user->id;
+        $encodedType = MorphClassResolver::encode($user?->getMorphClass());
+        $userId = $user?->id;
 
         // dd($encodedType,$userId);
         return [
@@ -41,15 +76,21 @@ class Chats extends Component
     }
 
     /**
-     *  Used to force hat list to reset all data as if it was newly opened
+     * Forces the conversation list to reset as if it was newly opened.
+     *
+     * @return void
      */
     public function hardRefresh()
     {
         $this->conversations = collect();
         $this->reset(['page', 'canLoadMore']);
-
     }
 
+    /**
+     * Refreshes the chats by resetting the conversation list and pagination.
+     *
+     * @return void
+     */
     #[On('refresh-chats')]
     public function refreshChats()
     {
@@ -58,7 +99,10 @@ class Chats extends Component
     }
 
     /**
-     * Handle the 'chat-deleted' event
+     * Handle the 'chat-deleted' event.
+     *
+     * @param mixed $conversationId The ID of the deleted conversation.
+     * @return void
      */
     #[On('chat-deleted')]
     public function chatDeleted($conversationId)
@@ -66,11 +110,13 @@ class Chats extends Component
         $this->conversations = $this->conversations->reject(function ($conversation) use ($conversationId) {
             return $conversation->id === $conversationId;
         });
-
     }
 
     /**
-     * Handle the 'chat-exited' event
+     * Handle the 'chat-exited' event.
+     *
+     * @param mixed $conversationId The ID of the exited conversation.
+     * @return void
      */
     #[On('chat-exited')]
     public function chatExited($conversationId)
@@ -78,57 +124,59 @@ class Chats extends Component
         $this->conversations = $this->conversations->reject(function ($conversation) use ($conversationId) {
             return $conversation->id === $conversationId;
         });
-
-    }
-
-    public function refreshComponent($event)
-    {
-
-        if ($event['message']['conversation_id'] != $this->selectedConversationId) {
-            $this->dispatch('refresh')->self();
-
-        }
-
     }
 
     /**
-     * loadmore conversation
+     * Refreshes the component if the event's conversation ID does not match the selected conversation.
+     *
+     * @param array $event Event data containing message and conversation details.
+     * @return void
+     */
+    public function refreshComponent($event)
+    {
+        if ($event['message']['conversation_id'] != $this->selectedConversationId) {
+            $this->dispatch('refresh')->self();
+        }
+    }
+
+    /**
+     * Loads more conversations if available.
+     *
+     * @return void|null
      */
     public function loadMore()
     {
-        //dd('cannot load more');
-
-        //Check if no more conversations
+        // Check if no more conversations are available.
         if (! $this->canLoadMore) {
-            // dd('cannot load more');
             return null;
         }
 
-        // Load the next page
+        // Load the next page.
         $this->page++;
-
-    }
-
-    public function updatedSearch($value)
-    {
-
-        // if ($value!=$this->search) {
-        // code...
-        $this->conversations = []; // Clear previous results when a new search is made
-        $this->reset(['page', 'canLoadMore']);
-        // }
-
     }
 
     /**
-     * ----------------
-     * Load conversations
-     * Apply search filters & update $this->conversations
+     * Resets conversations and pagination when the search query is updated.
+     *
+     * @param mixed $value The new search query.
+     * @return void
+     */
+    public function updatedSearch($value)
+    {
+        $this->conversations = []; // Clear previous results when a new search is made.
+        $this->reset(['page', 'canLoadMore']);
+    }
+
+    /**
+     * Loads conversations based on the current page and search filters.
+     * Applies search filters and updates the conversations collection.
+     *
+     * @return void
      */
     protected function loadConversations()
     {
-        // Calculate the offset based on the current page and the number of items per page
-        $perPage = 10; // Number of items per "page"
+        // Calculate the offset based on the current page and the number of items per page.
+        $perPage = 10; // Number of items per "page".
         $offset = ($this->page - 1) * $perPage;
 
         $additionalConversations = Conversation::query()
@@ -139,90 +187,106 @@ class Chats extends Component
                 'authParticipant',
                 'receiverParticipant.participantable',
                 'group.cover', //=> fn($query) => $query->select('id', 'name'),
-
             ])
-            ->whereHas('participants', fn ($query) => $query->whereParticipantable($this->auth))
-            ->when(trim($this->search ?? '') != '', fn ($query) => $this->applySearchConditions($query)) // Apply search
-            ->when(trim($this->search ?? '') == '', fn ($query) => $query->withoutDeleted()->withoutBlanks()) // Without blanks & deleted
+            ->whereHas('participants', fn($query) => $query->whereParticipantable($this->auth))
+            ->when(trim($this->search ?? '') != '', fn($query) => $this->applySearchConditions($query)) // Apply search.
+            ->when(trim($this->search ?? '') == '', fn($query) => $query->withoutDeleted()->withoutBlanks()) // Exclude blanks & deleted.
             ->latest('updated_at')
             ->skip($offset)
             ->take($perPage)
-            ->get(); // Fetch only required fields
+            ->get(); // Fetch only required fields.
 
-        //    dd($additionalConversations->first);
-        // Check if there are more conversations for the next page
+        // Check if there are more conversations for the next page.
         $this->canLoadMore = $additionalConversations->count() === $perPage;
 
-        // Merge and sort conversations
+        // Merge and sort conversations.
         $this->conversations = collect($this->conversations)
-            ->concat($additionalConversations) // Append new conversations
-            ->unique('id') // Ensure unique conversation IDs
-            ->sortByDesc('updated_at') // Sort by updated_at in descending order
-            ->values(); // Reset the array keys
+            ->concat($additionalConversations) // Append new conversations.
+            ->unique('id') // Ensure unique conversation IDs.
+            ->sortByDesc('updated_at') // Sort by updated_at in descending order.
+            ->values(); // Reset the array keys.
     }
 
-
+    /**
+     * Eager loads additional conversation relationships.
+     *
+     * @return void
+     */
     public function hydrateConversations()
-{
-    $this->conversations->map(function ($conversation) {
-        if (! $conversation->isGroup()) {
-           // $conversation->loadMissing('participants.participantable');
-        }
-        return $conversation  ->loadMissing([
-            // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
-            //'messages',
-            'lastMessage.attachment',
-            'authParticipant',
-            'receiverParticipant.participantable',
-            'group.cover', //=> fn($query) => $query->select('id', 'name'),
+    {
+        $this->conversations->map(function ($conversation) {
+            if (! $conversation->isGroup()) {
+                // $conversation->loadMissing('participants.participantable');
+            }
+            return $conversation->loadMissing([
+                // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
+                //'messages',
+                'lastMessage.attachment',
+                'authParticipant',
+                'receiverParticipant.participantable',
+                'group.cover', //=> fn($query) => $query->select('id', 'name'),
+            ]);
+        });
+    }
 
-        ]);
-    });
-}
-#[Computed()]
-public function auth()
-{
-    return auth()->user();
+    /**
+     * Returns the authenticated user.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    #[Computed()]
+    public function auth()
+    {
+        return auth()->user();
+    }
 
-}
-
-    //Helper method for applying search logic
+    /**
+     * Applies search conditions to the conversations query.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query The query builder instance.
+     * @return void
+     */
     protected function applySearchConditions($query)
     {
         $searchableFields = WireChat::searchableFields();
         $groupSearchableFields = ['name', 'description'];
         $columnCache = [];
 
-        //use withDeleted to reverse withoutDeleted in order to make deleted chats appear in search
+        // Use withDeleted to reverse withoutDeleted in order to make deleted chats appear in search.
         $query->withDeleted()->where(function ($query) use ($searchableFields, $groupSearchableFields, &$columnCache) {
-            // Search in participants' participantable fields
+            // Search in participants' participantable fields.
             $query->whereHas('participants', function ($subquery) use ($searchableFields, &$columnCache) {
                 $subquery->whereHas('participantable', function ($query2) use ($searchableFields, &$columnCache) {
                     $query2->where(function ($query3) use ($searchableFields, &$columnCache) {
                         $table = $query3->getModel()->getTable();
                         foreach ($searchableFields as $field) {
                             if ($this->columnExists($table, $field, $columnCache)) {
-                                $query3->orWhere($field, 'LIKE', '%'.$this->search.'%');
+                                $query3->orWhere($field, 'LIKE', '%' . $this->search . '%');
                             }
                         }
                     });
                 });
             });
 
-            // Search in group fields directly
+            // Search in group fields directly.
             $query->orWhereHas('group', function ($groupQuery) use ($groupSearchableFields) {
                 $groupQuery->where(function ($query4) use ($groupSearchableFields) {
                     foreach ($groupSearchableFields as $field) {
-                        $query4->orWhere($field, 'LIKE', '%'.$this->search.'%');
+                        $query4->orWhere($field, 'LIKE', '%' . $this->search . '%');
                     }
                 });
             });
         });
     }
 
-    //Eager loading relationships for better readability
-
-    //Helper function to check and cache column existence
+    /**
+     * Checks if a column exists in the table and caches the result.
+     *
+     * @param string $table The name of the table.
+     * @param string $field The column name.
+     * @param array $columnCache Reference to the cache array.
+     * @return bool
+     */
     protected function columnExists($table, $field, &$columnCache)
     {
         if (! isset($columnCache[$table])) {
@@ -232,22 +296,28 @@ public function auth()
         return in_array($field, $columnCache[$table]);
     }
 
+    /**
+     * Mounts the component and initializes conversations.
+     *
+     * @return void
+     */
     public function mount()
     {
         abort_unless(auth()->check(), 401);
         $this->selectedConversationId = request()->conversation;
-        //$this->loadConversations();
         $this->conversations = collect();
-
-
-
     }
 
+    /**
+     * Loads conversations and renders the view.
+     *
+     * @return \Illuminate\View\View
+     */
     public function render()
     {
         $this->loadConversations();
 
-
         return view('wirechat::livewire.chats.chats');
     }
 }
+

@@ -14,7 +14,7 @@ x-init=" setTimeout(() => {
     class="flex flex-col bg-white/95 dark:bg-gray-900 transition-all h-full overflow-hidden w-full sm:p-3">
 
     @php
-        $authUser = auth()->user();
+        $authUser = $this->auth;
 
 
         $authId = $authUser->id;

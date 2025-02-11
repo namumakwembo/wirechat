@@ -106,25 +106,29 @@ class Conversation extends Model
         return $this->hasMany(Participant::class, 'conversation_id', 'id');
     }
 
-    /**
-     * Get a participant model  from the user
+   /**
+     * Retrieve the participant model for a given user in the conversation.
      *
-     * @return Participant|null
+     * If participants are already loaded, it fetches from the collection.
+     * Otherwise, it queries dynamically via the `participants()` relationship.
+     *
+     * @param  Model|Authenticatable  $user  The user instance.
+     * @param  bool  $withoutGlobalScopes  Whether to ignore global scopes in the query.
+     * @return Participant|null  The corresponding participant or null if not found.
      */
-    public function participant(Model|Authenticatable $user, bool $withoutGlobalScopes = false)
+    public function participant(Model|Authenticatable $user, bool $withoutGlobalScopes = false): ?Participant
     {
-        $query = Participant::where('participantable_id', $user->id)
-            ->where('participantable_type', $user->getMorphClass())
-            ->where('conversation_id', $this->id); //* Ensures you're querying for the correct conversation
+        $query = $this->relationLoaded('participants') 
+            ? $this->participants 
+            : $this->participants();
 
         if ($withoutGlobalScopes) {
-            $query->withoutGlobalScopes(); // Apply this condition if necessary
+            $query = $query->withoutGlobalScopes();
         }
 
-        // Retrieve the participant directly
-        $participant = $query->first();
-
-        return $participant;
+        return $query->where('participantable_id', $user->id)
+            ->where('participantable_type', $user->getMorphClass())
+            ->first();
     }
 
     /**
@@ -311,8 +315,7 @@ class Conversation extends Model
      */
     public function peerParticipant(Model $reference): ?Participant
     {
-
-        //return null if user does not belong to conversation
+        // Return null if user does not belong to conversation
         if (! $reference->belongsToConversation($this)) {
             return null;
         }
@@ -321,17 +324,22 @@ class Conversation extends Model
             return null;
         }
 
-        // Check if 'participants' relationship is already loaded to avoid extra queries
+
+        // Ensure participants is always a collection
         $participants = $this->relationLoaded('participants')
-        ? $this->participants
-        : $this->participants();
+            ? collect($this->participants) // Convert to collection if already loaded
+            : $this->participants()->get(); // Fetch as a collection
 
         if ($this->isSelf()) {
-            return $participants->whereParticipantable($reference)->first();
+            return $participants->where('participantable_id', $reference->id)->where('participantable_type', $reference->getMorphClass())->first();
         }
 
-        return $participants->withoutParticipantable($reference)->first();
+        return $participants->reject(fn ($participant) => 
+            $participant->participantable_id == $reference->id &&
+            $participant->participantable_type == $reference->getMorphClass()
+        )->first();
     }
+
 
     /**
      * Get all peer participants in a conversation, excluding the reference user.
@@ -340,21 +348,27 @@ class Conversation extends Model
      * except for the given reference user.
      *
      * @param  Model  $reference  The reference user/model to exclude.
-     * @return Collection<int, ?Participant> A collection of peer participants.
+     * @return Collection<int, Participant> A collection of peer participants.
      */
-    public function peerParticipants(Model $reference): ?Collection
+    public function peerParticipants(Model $reference): Collection
     {
-
-        //return null if user does not belong to conversation
+        // Return an empty collection if the user does not belong to the conversation
         if (! $reference->belongsToConversation($this)) {
-            return null;
+            return collect();
         }
 
-        // Check if 'participants' relationship is already loaded to avoid extra queries
-        $participants = $this->relationLoaded('participants') ? $this->participants : $this->participants();
+        // Check if 'participants' relationship is already loaded
+        if ($this->relationLoaded('participants')) {
+            return collect($this->participants)->reject(fn ($participant) =>
+                $participant->participantable_id == $reference->id &&
+                $participant->participantable_type == $reference->getMorphClass()
+            );
+        }
 
-        return $participants->with('participantable')->withoutParticipantable($reference)->get();
+        // If not loaded, use the query scope
+        return $this->participants()->withoutParticipantable($reference)->get();
     }
+
 
     /**
      * Get receiver Participant for Private Conversation
@@ -367,13 +381,13 @@ class Conversation extends Model
         return $this->hasOne(Participant::class)
             ->withoutParticipantable($user)
             ->where('role', ParticipantRole::OWNER)
-            ->whereHas('conversation', function ($query) {
+            ->withWhereHas('conversation', function ($query) {
                 $query->whereIn('type', [ConversationType::PRIVATE]);
             });
     }
 
     /**
-     * Get Auth Participant for Private Conversation
+     * Get Auth Participant all types Private Conversation
      * will return Auth for Self Conversation
      */
     public function authParticipant(): HasOne
@@ -382,10 +396,7 @@ class Conversation extends Model
 
         return $this->hasOne(Participant::class)
             ->whereParticipantable($user)
-            ->where('role', ParticipantRole::OWNER)
-            ->whereHas('conversation', function ($query) {
-                $query->whereIn('type', [ConversationType::PRIVATE, ConversationType::SELF]);
-            });
+            ->where('role', ParticipantRole::OWNER);
     }
 
     /**
@@ -438,17 +449,21 @@ class Conversation extends Model
     }
 
     /**
-     * Check if the conversation has been fully read by a specific user.
-     * This returns true if there are no unread messages after the conversation
-     * was marked as read by the user.
+     * Determine if the conversation has been fully read by a specific user.
+     *
+     * This method checks if the last read timestamp of the participant is later
+     * than the last update timestamp of the conversation. If a `Participant`
+     * instance is provided, it is used directly; otherwise, the participant
+     * is retrieved from the conversation.
+     *
+     * @param  Model|Participant  $user  The user model or Participant instance.
+     * @return bool  True if the conversation has been fully read, false otherwise.
      */
-    public function readBy(Model $user): bool
+    public function readBy(Model|Participant $user): bool
     {
-        // Reuse the unread count method and return true if unread count is 0
-        // return $this->getUnreadCountFor($user) <= 0;
+        $participant = $user instanceof Participant ? $user : $this->participant($user);
 
-        $participant=  $this->participant($user);
-        return $participant->conversation_read_at > $this->updated_at;
+        return $participant?->conversation_read_at > $this->updated_at;
     }
 
     /**

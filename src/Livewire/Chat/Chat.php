@@ -64,7 +64,7 @@ class Chat extends Component
     public function getListeners()
     {
         // dd($this->conversation);
-        $conversationId = $this->conversation->id;
+        $conversationId = $this->conversation?->id;
 
         return [
             'refresh' => '$refresh',
@@ -542,6 +542,16 @@ class Chat extends Component
         $this->loadedMessages->put($groupKey, $this->loadedMessages->get($groupKey, collect())->push($message));
     }
 
+
+
+     /**
+     * Hydrate conversations in Livewire.
+     *
+     * This method is triggered during Livewire hydration to ensure that 
+     * loadedMessages relationships are eagerloaded during state change
+     *
+     * @return void
+     */
         public function hydrateLoadedMessages()
     {
         $this->loadedMessages = $this->loadedMessages->map(function ($group) {

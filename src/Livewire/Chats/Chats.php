@@ -3,6 +3,7 @@
 namespace Namu\WireChat\Livewire\Chats;
 
 use Illuminate\Support\Facades\Schema;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Namu\WireChat\Facades\WireChat;
@@ -26,7 +27,7 @@ class Chats extends Component
 
     public function getListeners()
     {
-        $user = auth()->user();
+        $user = $this->auth;
         $encodedType = MorphClassResolver::encode($user->getMorphClass());
         $userId = $user->id;
 
@@ -135,11 +136,12 @@ class Chats extends Component
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
                 //'messages',
                 'lastMessage.attachment',
+                'authParticipant',
                 'receiverParticipant.participantable',
                 'group.cover', //=> fn($query) => $query->select('id', 'name'),
 
             ])
-            ->whereHas('participants', fn ($query) => $query->whereParticipantable(auth()->user()))
+            ->whereHas('participants', fn ($query) => $query->whereParticipantable($this->auth))
             ->when(trim($this->search ?? '') != '', fn ($query) => $this->applySearchConditions($query)) // Apply search
             ->when(trim($this->search ?? '') == '', fn ($query) => $query->withoutDeleted()->withoutBlanks()) // Without blanks & deleted
             ->latest('updated_at')
@@ -158,6 +160,31 @@ class Chats extends Component
             ->sortByDesc('updated_at') // Sort by updated_at in descending order
             ->values(); // Reset the array keys
     }
+
+
+    public function hydrateConversations()
+{
+    $this->conversations->map(function ($conversation) {
+        if (! $conversation->isGroup()) {
+           // $conversation->loadMissing('participants.participantable');
+        }
+        return $conversation  ->loadMissing([
+            // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
+            //'messages',
+            'lastMessage.attachment',
+            'authParticipant',
+            'receiverParticipant.participantable',
+            'group.cover', //=> fn($query) => $query->select('id', 'name'),
+
+        ]);
+    });
+}
+#[Computed()]
+public function auth()
+{
+    return auth()->user();
+
+}
 
     //Helper method for applying search logic
     protected function applySearchConditions($query)
@@ -212,12 +239,14 @@ class Chats extends Component
         //$this->loadConversations();
         $this->conversations = collect();
 
+
+
     }
 
     public function render()
     {
-
         $this->loadConversations();
+
 
         return view('wirechat::livewire.chats.chats');
     }

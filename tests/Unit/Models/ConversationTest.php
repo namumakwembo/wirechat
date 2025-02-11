@@ -1612,6 +1612,7 @@ describe('peerParticipant()', function () {
 
         $conversation = $auth->createConversationWith($otherUser);
 
+        $conversation->load('participants.participantable');
         //get receiver
         $peerParticipant = $conversation->peerParticipant(reference: $auth);
 
@@ -1628,6 +1629,7 @@ describe('peerParticipant()', function () {
 
         $conversation = $auth->createConversationWith($otherUser);
 
+        $conversation->load('participants.participantable');
         //get receiver
         $peerParticipant = $conversation->peerParticipant(reference: $auth);
 
@@ -1687,6 +1689,8 @@ describe('peerParticipants()', function () {
             $participants->push($conversation->addParticipant(User::factory()->create()));
         }
 
+        $conversation->load('participants.participantable');
+
         // Get peer participants, excluding the authenticated user ($auth)
         $peerParticipants = $conversation->peerParticipants(reference: $auth);
 
@@ -1720,6 +1724,8 @@ describe('peerParticipants()', function () {
             $participants->push($conversation->addParticipant(User::factory()->create()));
         }
 
+
+        $conversation->load('participants.participantable');
         // Get peer participants, excluding the authenticated user ($auth)
         $peerParticipants = $conversation->peerParticipants(reference: $auth);
 

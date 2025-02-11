@@ -208,7 +208,7 @@ class Chats extends Component
     public function mount()
     {
         abort_unless(auth()->check(), 401);
-        $this->selectedConversationId = request()->conversation_id;
+        $this->selectedConversationId = request()->conversation;
         //$this->loadConversations();
         $this->conversations = collect();
 

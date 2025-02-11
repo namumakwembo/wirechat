@@ -1,7 +1,7 @@
 @use('Namu\WireChat\Facades\WireChat')
 
 <div 
-x-data="{selectedConversationId:'{{request()->conversation_id??$selectedConversationId}}'}"
+x-data="{selectedConversationId:'{{request()->conversation??$selectedConversationId}}'}"
 x-on:open-chat.window="selectedConversationId= $event.detail.conversation; $wire.selectedConversationId= $event.detail.conversation;"
 x-init=" setTimeout(() => {
      conversationElement = document.getElementById('conversation-'+selectedConversationId);
@@ -15,6 +15,8 @@ x-init=" setTimeout(() => {
 
     @php
         $authUser = auth()->user();
+
+
         $authId = $authUser->id;
     @endphp
 
@@ -45,7 +47,7 @@ x-init=" setTimeout(() => {
         @if (count($conversations) > 0)
         
             <ul wire:loading.delay.long.remove wire:target="search" class="p-2 grid w-full spacey-y-2">
-                @foreach ($conversations as $conversation)
+                @foreach ($conversations as $key=> $conversation)
                  {{-- include list item --}}
                   @include('wirechat::livewire.chats.includes.list-item')  
                 @endforeach

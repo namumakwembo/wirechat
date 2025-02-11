@@ -227,6 +227,9 @@ class Participant extends Model
             return false;
         }
 
+        //loadMissing Conversation 
+        $this->loadMissing('conversation');
+
         // Get the latest updated_at timestamp for the conversation
         $conversation = $this->conversation;
 

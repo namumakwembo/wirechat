@@ -62,7 +62,7 @@ trait Chatable
         $authenticatedUserType = $this->getMorphClass();
 
         // Determine if this is a self-conversation (for the same user as both participants)
-        $selfConversationCheck = $participantId == $authenticatedUserId && $participantType === $authenticatedUserType;
+        $selfConversationCheck = $participantId == $authenticatedUserId && $participantType == $authenticatedUserType;
 
         //  dd($selfConversationCheck);
         $existingConversationQuery = Conversation::withoutGlobalScopes()

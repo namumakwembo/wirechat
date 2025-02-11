@@ -4,6 +4,7 @@ namespace Namu\WireChat\Tests;
 
 use Christophrumpel\MissingLivewireAssertions\MissingLivewireAssertionsServiceProvider;
 use Illuminate\Config\Repository;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithViews;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
@@ -63,6 +64,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $config->set('queue.batching.database', 'testbench');
             $config->set('queue.failed.database', 'testbench');
         });
+
+        Model::shouldBeStrict();
     }
 
     protected function setUp(): void

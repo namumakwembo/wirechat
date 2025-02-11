@@ -202,6 +202,9 @@ class Message extends Model
 
         // If it's a private conversation (only 2 users), then check if both users have deleted the message
         if ($conversation->isPrivate()) {
+
+            //Eager load particiapnts 
+            $conversation->loadMissing('participants.participantable');
             $deletedByBothParticipants = true;
 
             foreach ($conversation->participants as $participant) {

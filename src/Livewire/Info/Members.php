@@ -78,6 +78,9 @@ class Members extends ModalComponent
 
         abort_unless(auth()->check(), 401);
 
+        //Load missing relationship in case of strict models types 
+        $participant->loadMissing('participantable');
+
         $conversation = auth()->user()->createConversationWith($participant->participantable);
 
         $this->handleComponentTermination(
@@ -103,11 +106,17 @@ class Members extends ModalComponent
      * Admin actions */
     public function dismissAdmin(Participant $participant)
     {
+        //Load missing relationship in case of strict models types 
+        $participant->loadMissing('participantable');
+
         $this->toggleAdmin($participant);
     }
 
     public function makeAdmin(Participant $participant)
     {
+        //Load missing relationship in case of strict models types 
+        $participant->loadMissing('participantable');
+
         $this->toggleAdmin($participant);
     }
 
@@ -116,6 +125,8 @@ class Members extends ModalComponent
 
         abort_unless(auth()->check(), 401);
 
+                //Load missing relationship in case of strict models types 
+                $participant->loadMissing('participantable');
         //abort if user does not belong to conversation
         abort_unless($participant->participantable->belongsToConversation($this->conversation), 403, 'This user does not belong to conversation');
 
@@ -140,7 +151,7 @@ class Members extends ModalComponent
         $this->participants = $this->participants ?? collect();
 
         $additionalParticipants = $this->conversation->participants()
-        // ->with('participantable')
+         ->with('participantable')
             ->when($this->search, function ($query) use ($searchableFields, &$columnCache) {
                 $query->whereHas('participantable', function ($query2) use ($searchableFields, &$columnCache) {
                     $query2->where(function ($query3) use ($searchableFields, &$columnCache) {
@@ -183,6 +194,8 @@ class Members extends ModalComponent
     public function removeFromGroup(Participant $participant)
     {
 
+        //Load missing relationship in case of strict models types 
+        $participant->loadMissing('participantable');
         //abort if user does not belong to conversation
         abort_unless($participant->participantable->belongsToConversation($this->conversation), 403, 'This user does not belong to conversation');
 

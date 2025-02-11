@@ -84,7 +84,7 @@ test('it_shows_load_more_button_if_user_can_load_more', function () {
 
     for ($i = 0; $i < 12; $i++) {
 
-        $user = Conversation::factory()->create();
+        $user = User::factory()->create();
 
         $auth->createConversationWith($user, 'hello');
     }
@@ -101,12 +101,12 @@ test('it_does_not_show_load_more_button_if_user_cannot_load_more', function () {
 
     for ($i = 0; $i < 4; $i++) {
 
-        $user = Conversation::factory()->create();
+        $user = User::factory()->create();
 
         $auth->createConversationWith($user, 'hello');
     }
 
-    // dd($conversation);
+
     Livewire::actingAs($auth)->test(Chatlist::class)
         ->assertDontSee('Load more')
         ->assertDontSeeHtml('dusk="loadMoreButton"');

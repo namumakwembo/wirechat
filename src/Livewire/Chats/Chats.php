@@ -133,7 +133,7 @@ class Chats extends Component
         $additionalConversations = Conversation::query()
             ->with([
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
-                'messages',
+                //'messages',
                 'lastMessage.attachment',
                 'receiverParticipant.participantable',
                 'group.cover', //=> fn($query) => $query->select('id', 'name'),

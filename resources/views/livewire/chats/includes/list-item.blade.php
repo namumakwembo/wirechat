@@ -9,6 +9,7 @@ $lastMessage = $conversation->lastMessage;
 $isReadByAuth = $conversation?->readBy(auth()?->user()) || $selectedConversationId == $conversation->id;
 $belongsToAuth = $lastMessage?->belongsToAuth();
 
+
 @endphp
 
 <li x-data="{

@@ -353,7 +353,7 @@ class Conversation extends Model
         // Check if 'participants' relationship is already loaded to avoid extra queries
         $participants = $this->relationLoaded('participants') ? $this->participants : $this->participants();
 
-        return $participants->withoutParticipantable($reference)->get();
+        return $participants->with('participantable')->withoutParticipantable($reference)->get();
     }
 
     /**

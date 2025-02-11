@@ -67,45 +67,37 @@ describe('Presense', function () {
         $conversation = $auth->createConversationWith($receiver);
 
         // Set specific times for testing purposes
-        Carbon::setTestNowAndTimezone(now()->today());
-
-        //
-        $todayTime = now()->today(); // Today at 1:00 PM
-        $yesterdayTime = now()->subDay(); // Yesterday at 3:00 PM
-        $thisWeekTime = now()->subDays(2); // Two days ago at 9:00 AM
-        $olderTime = now()->subWeeks(2); // Two weeks ago at 10:30 AM
-
+        Carbon::setTestNow(now()->today());
         // Create messages with different timestamps
         $todayMessage = Message::create([
             'conversation_id' => $conversation->id,
             'sendable_type' => get_class($auth),
             'sendable_id' => $auth->id,
             'body' => 'Message from today',
-            'created_at' => $todayTime,
         ]);
 
+        Carbon::setTestNow(now()->subDay());
         $yesterdayMessage = Message::create([
             'conversation_id' => $conversation->id,
             'sendable_type' => get_class($auth),
             'sendable_id' => $auth->id,
             'body' => 'Message from yesterday',
-            'created_at' => $yesterdayTime,
         ]);
 
+        Carbon::setTestNow(now()->subDay(2));
         $thisWeekMessage = Message::create([
             'conversation_id' => $conversation->id,
             'sendable_type' => get_class($auth),
             'sendable_id' => $auth->id,
-            'body' => 'Message from this week',
-            'created_at' => $thisWeekTime,
+            'body' => 'Message from this week'
         ]);
 
+        Carbon::setTestNow(now()->subWeeks(2));
         $olderMessage = Message::create([
             'conversation_id' => $conversation->id,
             'sendable_type' => get_class($auth),
             'sendable_id' => $auth->id,
-            'body' => 'Older message',
-            'created_at' => $olderTime,
+            'body' => 'Older message'
         ]);
 
         // Expected outputs based on the message created_at timestamps

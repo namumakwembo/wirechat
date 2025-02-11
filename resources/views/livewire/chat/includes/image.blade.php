@@ -1,33 +1,43 @@
+
+
+
+@php
+
+   $isSameAsNext = ($message?->sendable_id === $nextMessage?->sendable_id) && ($message?->sendable_type === $nextMessage?->sendable_type);
+   $isNotSameAsNext = !$isSameAsNext;
+   $isSameAsPrevious = ($message?->sendable_id === $previousMessage?->sendable_id) && ($message?->sendable_type === $previousMessage?->sendable_type);
+   $isNotSameAsPrevious = !$isSameAsPrevious;
+@endphp
+
+
+
 <img @class([ 
 
         'max-w-max  h-[200px] min-h-[210px] bg-gray-50/60 dark:bg-gray-700/20   object-scale-down  grow-0 shrink  overflow-hidden  rounded-3xl',
 
-        'rounded-br-md rounded-tr-2xl'=>($message?->sender_id==$nextMessage?->sender_id && $message?->sender_id!=$previousMessage?->sender_id) && $belongsToAuth,
+        'rounded-br-md rounded-tr-2xl' => ($isSameAsNext && $isNotSameAsPrevious && $belongsToAuth),
 
-        //middle message on RIGHT
-        'rounded-r-md'=>$previousMessage?->sender_id==$message->sender_id && $belongsToAuth,
+        // Middle message on RIGHT
+        'rounded-r-md' => ($isSameAsPrevious && $belongsToAuth),
 
-        //Standalone message RIGHT
-        'rounded-br-xl rounded-r-xl'=>($previousMessage?->sender_id!=$message?->sender_id &&
-        $nextMessage?->sender_id!=$message?->sender_id) && $belongsToAuth,
+        // Standalone message RIGHT
+        'rounded-br-xl rounded-r-xl' => ($isNotSameAsPrevious && $isNotSameAsNext && $belongsToAuth),
 
+        // Last Message on RIGHT
+        'rounded-br-2xl' => ($isNotSameAsNext && $belongsToAuth),
 
-        //last Message on RIGHT
-        'rounded-br-2xl '=>$previousMessage?->sender_id!==$nextMessage?->sender_id &&$belongsToAuth,
+        // LEFT
+        // First message on LEFT
+        'rounded-bl-md rounded-tl-2xl' => ($isSameAsNext && $isNotSameAsPrevious && !$belongsToAuth),
 
-        //**LEFT
+        // Middle message on LEFT
+        'rounded-l-md' => ($isSameAsPrevious && !$belongsToAuth),
 
-        //first message on LEFT
-        'rounded-bl-md rounded-tl-2xl'=>($message?->sender_id==$nextMessage?->sender_id
-        &&$message?->sender_id!=$previousMessage?->sender_id) && !$belongsToAuth,
+        // Standalone message LEFT
+        'rounded-bl-xl rounded-l-xl' => ($isNotSameAsPrevious && $isNotSameAsNext && !$belongsToAuth),
 
-        //middle message on LEFT
-        'rounded-l-md'=>$previousMessage?->sender_id==$message->sender_id && !$belongsToAuth,
-
-        //Standalone message LEFT
-        'rounded-bl-xl rounded-l-xl '=>($previousMessage?->sender_id!=$message?->sender_id
-        &&$nextMessage?->sender_id!=$message?->sender_id) && !$belongsToAuth,
-
-        //last message on LEFT
-        'rounded-bl-2xl'=>($message?->sender_id!=$nextMessage?->sender_id ) && !$belongsToAuth,
-        ]) loading="lazy" src="{{$attachment?->url}}" alt="attachment">
+        // Last message on LEFT
+        'rounded-bl-2xl' => ($isNotSameAsNext && !$belongsToAuth),
+        ]) 
+        
+        loading="lazy" src="{{$attachment?->url}}" alt="attachment">

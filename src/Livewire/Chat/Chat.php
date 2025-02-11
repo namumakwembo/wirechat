@@ -542,6 +542,17 @@ class Chat extends Component
         $this->loadedMessages->put($groupKey, $this->loadedMessages->get($groupKey, collect())->push($message));
     }
 
+        public function hydrateLoadedMessages()
+    {
+        $this->loadedMessages = $this->loadedMessages->map(function ($group) {
+            return $group->map(function ($message) {
+                return $message->loadMissing('sendable', 'parent', 'attachment');
+            });
+        });
+    }
+
+
+ 
     //Method to remove method from collection
     private function removeMessage(Message $message)
     {

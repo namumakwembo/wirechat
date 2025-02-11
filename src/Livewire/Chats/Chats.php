@@ -182,13 +182,13 @@ class Chats extends Component
         $additionalConversations = Conversation::query()
             ->with([
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
-                //'messages',
+               // 'participants',
                 'lastMessage.attachment',
                 'authParticipant',
                 'receiverParticipant.participantable',
                 'group.cover', //=> fn($query) => $query->select('id', 'name'),
             ])
-            ->whereHas('participants', fn($query) => $query->whereParticipantable($this->auth))
+            ->withWhereHas('participants', fn($query) => $query->whereParticipantable($this->auth))
             ->when(trim($this->search ?? '') != '', fn($query) => $this->applySearchConditions($query)) // Apply search.
             ->when(trim($this->search ?? '') == '', fn($query) => $query->withoutDeleted()->withoutBlanks()) // Exclude blanks & deleted.
             ->latest('updated_at')

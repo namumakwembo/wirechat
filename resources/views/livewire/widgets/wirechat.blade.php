@@ -141,13 +141,13 @@
                                 this.$wire.resetState();
 
                                 //Notify listeners that chat is
-                                const conversation =  this.$wire.selectedConversationId;
+                              
+                            }, 300);
+
+                            const conversation =  this.$wire.selectedConversationId;
                                 Livewire.dispatch('chat-closed', {
                                     conversation:conversation
                                 });
-                            }, 300);
-
-
                         
 
                         }

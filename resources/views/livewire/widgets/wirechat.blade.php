@@ -32,11 +32,12 @@
                             return;
                         }
 
+                       
+
                         //check if should also close all children modal when this current on is closed
                         const force = this.closeOnEscapeIsForceful === true;
                         this.closeWidget(force);
 
-                        $dispatch('close-chat');
                     },
                     closingModal(eventName) {
                         const componentName = this.$wire.get('widgetComponents')[this.activeWidgetComponent].name;
@@ -55,14 +56,6 @@
 
                         if (this.show === false) {
                             return;
-                        }
-
-                        //Check if should dispatch events
-                        if (this.dispatchCloseEvent === true) {
-                            const componentName = this.$wire.get('widgetComponents')[this.activeWidgetComponent].name;
-                            Livewire.dispatch('chatWidgetClosed', {
-                                name: componentName
-                            });
                         }
 
                         //Check if should completley destroy component on close 
@@ -146,8 +139,20 @@
                             setTimeout(() => {
                                 this.activeWidgetComponent = false;
                                 this.$wire.resetState();
+
+                                //Notify listeners that chat is
+                                const conversation =  this.$wire.selectedConversationId;
+                                Livewire.dispatch('chat-closed', {
+                                    conversation:conversation
+                                });
                             }, 300);
+
+
+                        
+
                         }
+
+                      
                     },
                     init() {
 

@@ -16,28 +16,23 @@ $belongsToAuth = $lastMessage?->belongsToAuth();
 <li x-data="{
     conversationID: @js($conversation->id),
     showUnreadStatus: @js(!$isReadByAuth),
-    handleCloseChat(event) {
-        // Clear the globally selected conversation.
-        $wire.selectedConversationId = null;
-        selectedConversationId = null;
-    },
     handleChatOpened(event) {
-         
-
+        // Hide unread dot
         if (event.detail.conversation== this.conversationID) {
-           // alert('event.detail.conversation this.conversationID'  + $event.detail.conversation== this.conversationID)
             this.showUnreadStatus= false;
-
-
         }
+    },
+    handleChatClosed(event) {
+            // Clear the globally selected conversation.
+            $wire.selectedConversationId = null;
+            selectedConversationId = null;
     }
 }"  
 
 id="conversation-{{ $conversation->id }}" 
     wire:key="conversation-em-{{ $conversation->id }}-{{ $conversation->updated_at->timestamp }}"
     x-on:chat-opened.window="handleChatOpened($event)"
-    x-on:close-chat.window="handleCloseChat($event)">
-
+    x-on:chat-closed.window="handleChatClosed($event)"
     <a @if ($widget) tabindex="0" 
     role="button" 
     dusk="openChatWidgetButton"

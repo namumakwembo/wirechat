@@ -352,7 +352,7 @@ describe('mount()', function () {
         $request
             ->assertOK()
             ->assertSeeHtml('$wire.dispatch(\'chat-opened\',{conversation:conversationId})');
-    })->only();
+    });
 
 });
 

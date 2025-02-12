@@ -5,6 +5,7 @@ namespace Namu\WireChat\Livewire\Chat;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -85,7 +86,7 @@ class Chat extends Component
 
             //Make sure message does not belong to auth
             // Make sure message does not belong to auth
-            if ($event['message']['sendable_id'] == auth()->id() && $event['message']['sendable_type'] === auth()->user()->getMorphClass()) {
+            if ($event['message']['sendable_id'] == auth()->id() && $event['message']['sendable_type'] === $this->auth->getMorphClass()) {
                 return null;
             }
 
@@ -123,7 +124,7 @@ class Chat extends Component
             // dd($newMessage);
 
             // Make sure message does not belong to auth
-            if ($newMessage->sendable_id == auth()->id() && $newMessage->sendable_type == auth()->user()->getMorphClass()) {
+            if ($newMessage->sendable_id == auth()->id() && $newMessage->sendable_type == $this->auth->getMorphClass()) {
                 return null;
             }
 
@@ -148,7 +149,7 @@ class Chat extends Component
     public function setReply(Message $message)
     {
         //check if user belongs to message
-        abort_unless(auth()->user()->belongsToConversation($this->conversation), 403);
+        abort_unless($this->auth->belongsToConversation($this->conversation), 403);
 
         //abort if message does not belong to this conversation or is not owned by any participant
         abort_unless($message->conversation_id == $this->conversation->id, 403);
@@ -221,7 +222,7 @@ class Chat extends Component
         abort_unless(auth()->check(), 401);
 
         //delete conversation
-        $this->conversation->deleteFor(auth()->user());
+        $this->conversation->deleteFor($this->auth);
 
         $this->handleComponentTermination(
             redirectRoute: route(WireChat::indexRouteName()),
@@ -239,7 +240,7 @@ class Chat extends Component
         abort_unless(auth()->check(), 401);
 
         //delete conversation
-        $this->conversation->clearFor(auth()->user());
+        $this->conversation->clearFor($this->auth);
 
         $this->reset('loadedMessages', 'media', 'files', 'body');
 
@@ -258,7 +259,7 @@ class Chat extends Component
     {
         abort_unless(auth()->check(), 401);
 
-        $auth = auth()->user();
+        $auth = $this->auth;
 
         //make sure conversation is neigher self nor private
 
@@ -360,7 +361,7 @@ class Chat extends Component
                 $message = Message::create([
                     'reply_id' => $replyId,
                     'conversation_id' => $this->conversation->id,
-                    'sendable_type' => auth()->user()->getMorphClass(), // Polymorphic sender type
+                    'sendable_type' => $this->auth->getMorphClass(), // Polymorphic sender type
                     'sendable_id' => auth()->id(), // Polymorphic sender ID
                     'type' => MessageType::ATTACHMENT,
                     // 'body' => $this->body, // Add body if required
@@ -405,7 +406,7 @@ class Chat extends Component
             $createdMessage = Message::create([
                 'reply_id' => $this->replyMessage?->id,
                 'conversation_id' => $this->conversation->id,
-                'sendable_type' => auth()->user()->getMorphClass(), // Polymorphic sender type
+                'sendable_type' => $this->auth->getMorphClass(), // Polymorphic sender type
                 'sendable_id' => auth()->id(), // Polymorphic sender ID
                 'body' => $this->body,
                 'type' => MessageType::TEXT,
@@ -453,7 +454,7 @@ class Chat extends Component
 
         //make sure user belongs to conversation from the message
         //We are checking the $message->conversation for extra security because the param might be tempered with
-        abort_unless(auth()->user()->belongsToConversation($message->conversation), 403);
+        abort_unless($this->auth->belongsToConversation($message->conversation), 403);
 
         //remove message from collection
         $this->removeMessage($message);
@@ -462,7 +463,7 @@ class Chat extends Component
         $this->dispatch('refresh')->to(Chats::class);
 
         //delete For $user
-        $message->deleteFor(auth()->user());
+        $message->deleteFor($this->auth);
     }
 
     /**
@@ -473,18 +474,18 @@ class Chat extends Component
     public function deleteForEveryone(Message $message)
     {
 
-        $authParticipant = $this->conversation->participant(auth()->user());
+        $authParticipant = $this->conversation->participant($this->auth);
 
         //make sure user is authenticated
 
         abort_unless(auth()->check(), 401);
 
         //make sure user owns message OR allow if is admin in group
-        abort_unless($message->ownedBy(auth()->user()) || ($authParticipant->isAdmin() && $this->conversation->isGroup()), 403);
+        abort_unless($message->ownedBy($this->auth) || ($authParticipant->isAdmin() && $this->conversation->isGroup()), 403);
 
         //make sure user belongs to conversation from the message
         //We are checking the $message->conversation for extra security because the param might be tempered with
-        abort_unless(auth()->user()->belongsToConversation($message->conversation), 403);
+        abort_unless($this->auth->belongsToConversation($message->conversation), 403);
 
         //remove message from collection
         $this->removeMessage($message);
@@ -590,7 +591,7 @@ class Chat extends Component
 
         //Dont dispatch if it is a selfConversation
 
-        if ($this->conversation->isSelfConversation(auth()->user())) {
+        if ($this->conversation->isSelfConversation($this->auth)) {
 
             return null;
         }
@@ -640,7 +641,7 @@ class Chat extends Component
 
         $message = Message::create([
             'conversation_id' => $this->conversation->id,
-            'sendable_type' => auth()->user()->getMorphClass(), // Polymorphic sender type
+            'sendable_type' => $this->auth->getMorphClass(), // Polymorphic sender type
             'sendable_id' => auth()->id(), // Polymorphic sender ID
             'body' => '❤️',
             'type' => MessageType::TEXT,
@@ -735,8 +736,31 @@ class Chat extends Component
 
         //$this->conversation = Conversation::where('id', $conversation)->firstOr(fn () => abort(404));
         $this->totalMessageCount = Message::where('conversation_id', $this->conversation->id)->count();
-        abort_unless(auth()->user()->belongsToConversation($this->conversation), 403);
+        abort_unless($this->auth->belongsToConversation($this->conversation), 403);
     }
+
+
+    /**
+     * Computed property for auth 
+     * */
+
+         /**
+     * Returns the authenticated user.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    #[Computed(persist: true)]
+    public function auth()
+    {
+        return auth()->user();
+    }
+
+
+
+
+
+
+
 
     private function initializeParticipants()
     {
@@ -744,7 +768,7 @@ class Chat extends Component
             $this->conversation->load('participants');
             $participants = $this->conversation->participants();
 
-            $this->authParticipant = $participants->whereParticipantable(auth()->user())->first();
+            $this->authParticipant = $participants->whereParticipantable($this->auth)->first();
 
             $this->receiverParticipant = $this->conversation->receiverParticipant;
 
@@ -757,7 +781,7 @@ class Chat extends Component
                 ? $this->receiverParticipant->participantable
                 : null;
         } else {
-            $this->authParticipant = Participant::where('conversation_id', $this->conversation->id)->whereParticipantable(auth()->user())->first();
+            $this->authParticipant = Participant::where('conversation_id', $this->conversation->id)->whereParticipantable($this->auth)->first();
             $this->receiver = null;
         }
     }

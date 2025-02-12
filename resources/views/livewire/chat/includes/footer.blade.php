@@ -193,7 +193,7 @@
                         <div class="flex justify-between items-center dark:text-white">
                             <h6 class="text-sm">Replying to
                                 <span class="font-bold">
-                                    {{ $replyMessage?->ownedBy(auth()->user()) ? ' Yourself' : $replyMessage->sendable?->name }}
+                                    {{ $replyMessage?->ownedBy($this->auth) ? ' Yourself' : $replyMessage->sendable?->name }}
                                 </span>
                             </h6>
                             <button wire:loading.attr="disabled" wire:click="removeReply()"

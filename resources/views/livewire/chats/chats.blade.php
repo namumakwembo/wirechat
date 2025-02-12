@@ -44,7 +44,7 @@ x-init=" setTimeout(() => {
         {{-- include search if true --}}
         @includeWhen(config('wirechat.allow_chats_search', false) == true,'wirechat::livewire.chats.includes.search')
 
-        @if ($conversations)
+        @if (count($conversations)>0)
         
             <ul wire:loading.delay.long.remove wire:target="search" class="p-2 grid w-full spacey-y-2">
                 @foreach ($conversations as $key=> $conversation)

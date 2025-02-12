@@ -147,10 +147,10 @@
 
 
                                     <h6 class="text-xs text-gray-500 dark:text-gray-300 px-2 ">
-                                        {{ $message?->ownedBy(auth()->user()) ? 'You ' : $message->sendable?->display_name ?? 'User' }}
+                                        {{ $message?->ownedBy($this->auth) ? 'You ' : $message->sendable?->display_name ?? 'User' }}
                                         replied to
 
-                                        {{ $parent?->ownedBy(auth()->user()) ? ($message?->ownedBy(auth()->user()) ? 'Yourself' : ' You'):($message?->ownedBy($parent->sendable) ? 'Themself' : $parent->sendable?->display_name) }}
+                                        {{ $parent?->ownedBy($this->auth) ? ($message?->ownedBy($this->auth) ? 'Yourself' : ' You'):($message?->ownedBy($parent->sendable) ? 'Themself' : $parent->sendable?->display_name) }}
                                     </h6>
 
                                     <div @class([
@@ -207,7 +207,7 @@
                                         </x-slot>
                                         <x-slot name="content">
 
-                                            @if ($message->ownedBy(auth()->user())|| ($authParticipant->isAdmin() && $isGroup))
+                                            @if ($message->ownedBy($this->auth)|| ($authParticipant->isAdmin() && $isGroup))
                                                 <button dusk="delete_message_for_everyone" wire:click="deleteForEveryone('{{ $message->id }}')"
                                                     wire:confirm="Are you sure?" class="w-full text-start">
                                                     <x-wirechat::dropdown-link>

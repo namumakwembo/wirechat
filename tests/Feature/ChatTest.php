@@ -351,8 +351,8 @@ describe('mount()', function () {
 
         $request
             ->assertOK()
-            ->assertSeeHtml('$wire.dispatchTo(\'chats\', \'refresh\')');
-    });
+            ->assertSeeHtml('$wire.dispatch(\'chat-opened\',{conversation:conversationId})');
+    })->only();
 
 });
 

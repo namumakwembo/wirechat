@@ -16,12 +16,26 @@ $belongsToAuth = $lastMessage?->belongsToAuth();
 <li x-data="{
     conversationID: @js($conversation->id),
     showUnreadStatus: @js(!$isReadByAuth),
-    handleCloseChat($event) {
+    handleCloseChat(event) {
         // Clear the globally selected conversation.
         $wire.selectedConversationId = null;
         selectedConversationId = null;
+    },
+    handleChatOpened(event) {
+         
+
+        if (event.detail.conversation== this.conversationID) {
+           // alert('event.detail.conversation this.conversationID'  + $event.detail.conversation== this.conversationID)
+            this.showUnreadStatus= false;
+
+
+        }
     }
-}" id="conversation-{{ $conversation->id }}" wire:key="conversation-em-{{ $conversation->id }}"
+}"  
+
+id="conversation-{{ $conversation->id }}" 
+    wire:key="conversation-em-{{ $conversation->id }}-{{ $conversation->updated_at->timestamp }}"
+    x-on:chat-opened.window="handleChatOpened($event)"
     x-on:close-chat.window="handleCloseChat($event)">
 
     <a @if ($widget) tabindex="0" 
@@ -68,8 +82,7 @@ $belongsToAuth = $lastMessage?->belongsToAuth();
             {{-- Read status --}}
             {{-- Only show if AUTH is NOT onwer of message --}}
             @if ($lastMessage != null && !$lastMessage?->ownedBy($this->auth) && !$isReadByAuth)
-                <div x-show="showUnreadStatus" dusk="unreadMessagesDot"
-                    class=" col-span-2 flex flex-col text-center my-auto">
+                <div x-show="showUnreadStatus" dusk="unreadMessagesDot" class=" col-span-2 flex flex-col text-center my-auto">
                     {{-- Dots icon --}}
                     <span dusk="unreadDotItem" class="sr-only">unread dot</span>
                     <svg @style(['color:var(--wirechat-primary-color)']) xmlns="http://www.w3.org/2000/svg" width="16" height="16"

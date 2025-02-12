@@ -70,6 +70,7 @@
 
 <div x-data="{
     initializing: true,
+    conversationId:@js($conversation->id),
     conversationElement: document.getElementById('conversation'),
     loadEmojiPicker() {
         if (!document.head.querySelector('script[src=\'https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js\']')) {
@@ -93,7 +94,7 @@
         $wire.dispatch('focus-input-field');
         loadEmojiPicker();
         if (isWidget) {
-            $wire.dispatchTo('chats', 'refresh');
+            $wire.dispatch('chat-opened',{conversation:conversationId});
         }
     });
 }, 120);"

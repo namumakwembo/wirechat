@@ -20,7 +20,7 @@ test('authenticaed user can access chats page ', function () {
     $auth = User::factory()->create();
     $user = User::factory()->create();
 
-    $conversation= $auth->createConversationWith($user);
+    $conversation = $auth->createConversationWith($user);
     // dd($conversation);
     $this->actingAs($auth)->get(route(WireChat::viewRouteName(), $conversation->id))
         ->assertStatus(200);
@@ -41,9 +41,9 @@ test('it renders livewire Chat component', function () {
     $auth = User::factory()->create();
     $user = User::factory()->create();
 
-    $conversation= $auth->createConversationWith($user);
+    $conversation = $auth->createConversationWith($user);
 
-    $this->actingAs($auth)->get(route(WireChat::viewRouteName(),$conversation->id))->assertSeeLivewire(Chat::class);
+    $this->actingAs($auth)->get(route(WireChat::viewRouteName(), $conversation->id))->assertSeeLivewire(Chat::class);
 
 });
 
@@ -56,7 +56,7 @@ test('returns 404 if conversation is not found', function () {
         ->assertStatus(404);
 
 });
- 
+
 test('returns 403(Forbidden) if user doesnt not bleong to conversation', function () {
     $auth = User::factory()->create();
 

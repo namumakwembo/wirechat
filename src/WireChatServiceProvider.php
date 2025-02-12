@@ -23,7 +23,6 @@ use Namu\WireChat\Livewire\View;
 use Namu\WireChat\Livewire\Widgets\WireChat;
 use Namu\WireChat\Middleware\BelongsToConversation;
 use Namu\WireChat\Services\WireChatService;
-use Namu\WireChat\View\Components\ChatBox\Image;
 
 class WireChatServiceProvider extends ServiceProvider
 {

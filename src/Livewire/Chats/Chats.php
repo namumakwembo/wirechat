@@ -36,8 +36,6 @@ class Chats extends Component
 
     /**
      * Indicates if more conversations can be loaded.
-     *
-     * @var bool
      */
     public bool $canLoadMore = false;
 
@@ -101,7 +99,7 @@ class Chats extends Component
     /**
      * Handle the 'chat-deleted' event.
      *
-     * @param mixed $conversationId The ID of the deleted conversation.
+     * @param  mixed  $conversationId  The ID of the deleted conversation.
      * @return void
      */
     #[On('chat-deleted')]
@@ -115,7 +113,7 @@ class Chats extends Component
     /**
      * Handle the 'chat-exited' event.
      *
-     * @param mixed $conversationId The ID of the exited conversation.
+     * @param  mixed  $conversationId  The ID of the exited conversation.
      * @return void
      */
     #[On('chat-exited')]
@@ -129,7 +127,7 @@ class Chats extends Component
     /**
      * Refreshes the component if the event's conversation ID does not match the selected conversation.
      *
-     * @param array $event Event data containing message and conversation details.
+     * @param  array  $event  Event data containing message and conversation details.
      * @return void
      */
     public function refreshComponent($event)
@@ -158,7 +156,7 @@ class Chats extends Component
     /**
      * Resets conversations and pagination when the search query is updated.
      *
-     * @param mixed $value The new search query.
+     * @param  mixed  $value  The new search query.
      * @return void
      */
     public function updatedSearch($value)
@@ -182,15 +180,15 @@ class Chats extends Component
         $additionalConversations = Conversation::query()
             ->with([
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
-               // 'participants',
+                // 'participants',
                 'lastMessage.attachment',
                 'authParticipant',
                 'receiverParticipant.participantable',
                 'group.cover', //=> fn($query) => $query->select('id', 'name'),
             ])
-            ->withWhereHas('participants', fn($query) => $query->whereParticipantable($this->auth))
-            ->when(trim($this->search ?? '') != '', fn($query) => $this->applySearchConditions($query)) // Apply search.
-            ->when(trim($this->search ?? '') == '', fn($query) => $query->withoutDeleted()->withoutBlanks()) // Exclude blanks & deleted.
+            ->withWhereHas('participants', fn ($query) => $query->whereParticipantable($this->auth))
+            ->when(trim($this->search ?? '') != '', fn ($query) => $this->applySearchConditions($query)) // Apply search.
+            ->when(trim($this->search ?? '') == '', fn ($query) => $query->withoutDeleted()->withoutBlanks()) // Exclude blanks & deleted.
             ->latest('updated_at')
             ->skip($offset)
             ->take($perPage)
@@ -218,6 +216,7 @@ class Chats extends Component
             if (! $conversation->isGroup()) {
                 // $conversation->loadMissing('participants.participantable');
             }
+
             return $conversation->loadMissing([
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
                 //'messages',
@@ -243,7 +242,7 @@ class Chats extends Component
     /**
      * Applies search conditions to the conversations query.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query The query builder instance.
+     * @param  \Illuminate\Database\Eloquent\Builder  $query  The query builder instance.
      * @return void
      */
     protected function applySearchConditions($query)
@@ -261,7 +260,7 @@ class Chats extends Component
                         $table = $query3->getModel()->getTable();
                         foreach ($searchableFields as $field) {
                             if ($this->columnExists($table, $field, $columnCache)) {
-                                $query3->orWhere($field, 'LIKE', '%' . $this->search . '%');
+                                $query3->orWhere($field, 'LIKE', '%'.$this->search.'%');
                             }
                         }
                     });
@@ -272,7 +271,7 @@ class Chats extends Component
             $query->orWhereHas('group', function ($groupQuery) use ($groupSearchableFields) {
                 $groupQuery->where(function ($query4) use ($groupSearchableFields) {
                     foreach ($groupSearchableFields as $field) {
-                        $query4->orWhere($field, 'LIKE', '%' . $this->search . '%');
+                        $query4->orWhere($field, 'LIKE', '%'.$this->search.'%');
                     }
                 });
             });
@@ -282,9 +281,9 @@ class Chats extends Component
     /**
      * Checks if a column exists in the table and caches the result.
      *
-     * @param string $table The name of the table.
-     * @param string $field The column name.
-     * @param array $columnCache Reference to the cache array.
+     * @param  string  $table  The name of the table.
+     * @param  string  $field  The column name.
+     * @param  array  $columnCache  Reference to the cache array.
      * @return bool
      */
     protected function columnExists($table, $field, &$columnCache)
@@ -320,4 +319,3 @@ class Chats extends Component
         return view('wirechat::livewire.chats.chats');
     }
 }
-

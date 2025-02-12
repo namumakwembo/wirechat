@@ -106,7 +106,6 @@ test('it_does_not_show_load_more_button_if_user_cannot_load_more', function () {
         $auth->createConversationWith($user, 'hello');
     }
 
-
     Livewire::actingAs($auth)->test(Chatlist::class)
         ->assertDontSee('Load more')
         ->assertDontSeeHtml('dusk="loadMoreButton"');

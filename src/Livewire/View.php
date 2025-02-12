@@ -8,7 +8,6 @@ use Namu\WireChat\Models\Conversation;
 
 class View extends Component
 {
-
     public $conversation;
 
     public function mount()

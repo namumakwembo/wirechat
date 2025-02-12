@@ -218,10 +218,7 @@ describe('getUnreadCountFor()', function () {
     });
 });
 
-
 describe('readBy()', function () {
-
-
 
     it('returns true for read conversations', function () {
 
@@ -257,11 +254,7 @@ describe('readBy()', function () {
 
     });
 
-
-
 });
-
-
 
 describe('deleteFor()', function () {
 
@@ -1723,7 +1716,6 @@ describe('peerParticipants()', function () {
         for ($i = 0; $i < 10; $i++) {
             $participants->push($conversation->addParticipant(User::factory()->create()));
         }
-
 
         $conversation->load('participants.participantable');
         // Get peer participants, excluding the authenticated user ($auth)

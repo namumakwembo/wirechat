@@ -543,17 +543,15 @@ class Chat extends Component
         $this->loadedMessages->put($groupKey, $this->loadedMessages->get($groupKey, collect())->push($message));
     }
 
-
-
-     /**
+    /**
      * Hydrate conversations in Livewire.
      *
-     * This method is triggered during Livewire hydration to ensure that 
+     * This method is triggered during Livewire hydration to ensure that
      * loadedMessages relationships are eagerloaded during state change
      *
      * @return void
      */
-        public function hydrateLoadedMessages()
+    public function hydrateLoadedMessages()
     {
         $this->loadedMessages = $this->loadedMessages->map(function ($group) {
             return $group->map(function ($message) {
@@ -562,8 +560,6 @@ class Chat extends Component
         });
     }
 
-
- 
     //Method to remove method from collection
     private function removeMessage(Message $message)
     {
@@ -739,12 +735,11 @@ class Chat extends Component
         abort_unless($this->auth->belongsToConversation($this->conversation), 403);
     }
 
-
     /**
-     * Computed property for auth 
+     * Computed property for auth
      * */
 
-         /**
+    /**
      * Returns the authenticated user.
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
@@ -754,13 +749,6 @@ class Chat extends Component
     {
         return auth()->user();
     }
-
-
-
-
-
-
-
 
     private function initializeParticipants()
     {

@@ -79,7 +79,6 @@ describe(' Data verifiction ', function () {
 
         $message = $auth->sendMessageTo($receiver, 'hello');
 
-
         NotifyParticipant::dispatch($receiver, $message);
         Event::assertDispatched(NotifyParticipant::class, function ($event) use ($receiver) {
 
@@ -93,14 +92,12 @@ describe(' Data verifiction ', function () {
         });
     });
 
-
     it('broadcasts on correct  private channnel when Admin model is param ', function () {
         Event::fake();
         $auth = User::factory()->create();
         $receiver = Admin::factory()->create(['name' => 'John']);
 
         $message = $auth->sendMessageTo($receiver, 'hello');
-
 
         NotifyParticipant::dispatch($receiver, $message);
         Event::assertDispatched(NotifyParticipant::class, function ($event) use ($receiver) {
@@ -167,7 +164,7 @@ describe(' Data verifiction ', function () {
         });
     });
 
-})->only();
+});
 
 describe('Actions', function () {
 

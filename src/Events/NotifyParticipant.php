@@ -20,19 +20,19 @@ class NotifyParticipant implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $participantType;
+
     public $participantId;
+
     public function __construct(public Participant|Model $participant, public Message $message)
     {
 
+        if ($participant instanceof Participant) {
+            $this->participantType = $participant->participantable_type;
+            $this->participantId = $participant->participantable_id;
+        } else {
 
-        if ($participant instanceof Participant ) {
-            $this->participantType=$participant->participantable_type;
-            $this->participantId=$participant->participantable_id;
-        }
-        else{
-
-            $this->participantType=$participant->getMorphClass();
-            $this->participantId=$participant->getKey();
+            $this->participantType = $participant->getMorphClass();
+            $this->participantId = $participant->getKey();
         }
 
         //  $this->dontBroadcastToCurrentUser();

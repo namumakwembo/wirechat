@@ -89,7 +89,7 @@ describe('Presense', function () {
             'conversation_id' => $conversation->id,
             'sendable_type' => get_class($auth),
             'sendable_id' => $auth->id,
-            'body' => 'Message from this week'
+            'body' => 'Message from this week',
         ]);
 
         Carbon::setTestNow(now()->subWeeks(2));
@@ -97,7 +97,7 @@ describe('Presense', function () {
             'conversation_id' => $conversation->id,
             'sendable_type' => get_class($auth),
             'sendable_id' => $auth->id,
-            'body' => 'Older message'
+            'body' => 'Older message',
         ]);
 
         // Expected outputs based on the message created_at timestamps

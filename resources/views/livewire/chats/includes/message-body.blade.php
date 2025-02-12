@@ -14,11 +14,11 @@
     <p @class([
         'truncate text-sm dark:text-white  gap-2 items-center',
         'font-semibold text-black' =>
-            !$isReadByAuth && !$lastMessage?->ownedBy($authUser),
+            !$isReadByAuth && !$lastMessage?->ownedBy($this->auth),
         'font-normal text-gray-600' =>
-            $isReadByAuth && !$lastMessage?->ownedBy($authUser),
+            $isReadByAuth && !$lastMessage?->ownedBy($this->auth),
         'font-normal text-gray-600' =>
-            $isReadByAuth && $lastMessage?->ownedBy($authUser),
+            $isReadByAuth && $lastMessage?->ownedBy($this->auth),
     ])>
         {{ $lastMessage->body != '' ? $lastMessage->body : ($lastMessage->hasAttachment() ? '📎 Attachment' : '') }}
     </p>

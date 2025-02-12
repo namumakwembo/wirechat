@@ -67,7 +67,7 @@ $belongsToAuth = $lastMessage?->belongsToAuth();
 
             {{-- Read status --}}
             {{-- Only show if AUTH is NOT onwer of message --}}
-            @if ($lastMessage != null && !$lastMessage?->ownedBy($authUser) && !$isReadByAuth)
+            @if ($lastMessage != null && !$lastMessage?->ownedBy($this->auth) && !$isReadByAuth)
                 <div x-show="showUnreadStatus" dusk="unreadMessagesDot"
                     class=" col-span-2 flex flex-col text-center my-auto">
                     {{-- Dots icon --}}

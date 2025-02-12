@@ -4,6 +4,7 @@ namespace Namu\WireChat\Livewire\Chats;
 
 use Illuminate\Support\Facades\Schema;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Namu\WireChat\Facades\WireChat;
@@ -33,6 +34,22 @@ class Chats extends Component
      * @var \Illuminate\Support\Collection|array
      */
     public $conversations = [];
+
+
+
+    /**
+     * Features
+     */
+
+    #[Locked]
+    public bool $showNewChatModalButton;
+    #[Locked]
+    public bool $allowChatsSearch;
+    #[Locked]
+    public bool $showHomeRouteButton;
+    #[Locked]
+    public ?string $title;
+
 
     /**
      * Indicates if more conversations can be loaded.
@@ -300,8 +317,19 @@ class Chats extends Component
      *
      * @return void
      */
-    public function mount()
-    {
+    public function mount(
+        $showNewChatModalButton = null,
+        $allowChatsSearch = null,
+        $showHomeRouteButton = null,
+        $title = "Chats",
+    ) {
+        // If a value is passed, use it; otherwise fallback to WireChat defaults.
+        $this->showNewChatModalButton = isset($showNewChatModalButton) ? $showNewChatModalButton : WireChat::showNewChatModalButton();
+        $this->allowChatsSearch         =  isset($allowChatsSearch) ? $allowChatsSearch  : WireChat::allowChatsSearch();
+        $this->showHomeRouteButton     =  isset($showHomeRouteButton) ? $showHomeRouteButton     : !$this->widget ;
+        $this->title     =  isset($title)? $title  : null ;
+
+
         abort_unless(auth()->check(), 401);
         $this->selectedConversationId = request()->conversation;
         $this->conversations = collect();

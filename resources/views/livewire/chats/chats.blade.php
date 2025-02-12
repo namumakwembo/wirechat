@@ -14,14 +14,12 @@ x-init=" setTimeout(() => {
     class="flex flex-col bg-white/95 dark:bg-gray-900 transition-all h-full overflow-hidden w-full sm:p-3">
 
     @php
-        $authUser = $this->auth;
-
-
-        $authId = $authUser->id;
+      /* Show header if any of these conditions are true  */
+        $showHeader= ($showNewChatModalButton || $allowChatsSearch || $showHomeRouteButton ) || ($title != null)
     @endphp
 
     {{-- include header --}}
-    @include('wirechat::livewire.chats.includes.header')
+    @includeWhen($showHeader, 'wirechat::livewire.chats.includes.header')
 
     <main x-data 
 
@@ -41,8 +39,7 @@ x-init=" setTimeout(() => {
             "
         class=" overflow-y-auto py-2   grow  h-full relative " style="contain:content">
 
-        {{-- include search if true --}}
-        @includeWhen(config('wirechat.allow_chats_search', false) == true,'wirechat::livewire.chats.includes.search')
+        {{-- loading indicator --}}
 
         @if (count($conversations)>0)
         

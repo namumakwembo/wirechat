@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
+use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Livewire\Chats\Chats as Chatlist;
 use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Conversation;
@@ -654,12 +655,13 @@ describe('List', function () {
             'conversation_id' => $conversation->id,
             'sendable_type' => get_class($auth),
             'sendable_id' => $auth->id,
+            'type'=>MessageType::ATTACHMENT
         ]);
 
         $createdAttachment = Attachment::factory()->for($message, 'attachable')->create();
 
         Livewire::actingAs($auth)->test(Chatlist::class)
-            ->assertSee('📎 Attachment');
+                 ->assertSee('📎 Attachment');
     });
 
     test('deleted conversation should not appear in user chats list', function () {

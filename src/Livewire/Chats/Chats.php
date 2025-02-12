@@ -194,16 +194,15 @@ class Chats extends Component
         $perPage = 10; // Number of items per "page".
         $offset = ($this->page - 1) * $perPage;
 
-        $additionalConversations = Conversation::query()
+        $additionalConversations = $this->auth->conversations()
             ->with([
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
                 // 'participants',
-                'lastMessage.attachment',
-                'authParticipant',
-                'receiverParticipant.participantable',
-                'group.cover', //=> fn($query) => $query->select('id', 'name'),
+                'lastMessage',
+                'authParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at'),
+                'receiverParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at')->with('participantable'),
+                'group.cover'=> fn($query) =>  $query->select('id','url','attachable_type','attachable_id')
             ])
-            ->withWhereHas('participants', fn ($query) => $query->whereParticipantable($this->auth))
             ->when(trim($this->search ?? '') != '', fn ($query) => $this->applySearchConditions($query)) // Apply search.
             ->when(trim($this->search ?? '') == '', fn ($query) => $query->withoutDeleted()->withoutBlanks()) // Exclude blanks & deleted.
             ->latest('updated_at')
@@ -237,10 +236,10 @@ class Chats extends Component
             return $conversation->loadMissing([
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
                 //'messages',
-                'lastMessage.attachment',
-                'authParticipant',
-                'receiverParticipant.participantable',
-                'group.cover', //=> fn($query) => $query->select('id', 'name'),
+                'lastMessage',
+                'authParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at'),
+                'receiverParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at')->with('participantable'),
+                'group.cover'=> fn($query) => $query->select('id','url','attachable_type','attachable_id'),
             ]);
         });
     }

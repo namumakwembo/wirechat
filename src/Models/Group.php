@@ -70,7 +70,7 @@ class Group extends Model
     public function getCoverUrlAttribute(): ?string
     {
 
-        return $this->cover?->url;
+        return  $this->cover?->url;
 
     }
 

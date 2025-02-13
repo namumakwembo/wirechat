@@ -12,32 +12,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added  
 - Initial changelog setup.  
 - Placeholder for upcoming features.
-### Updated:
-
-### Removed:
-
-### Fixed:
 
 ---
 
-## [Unreleased]  
+## [v0.1.0](https://github.com/namumakwembo/wirechat/releases/tag/0.1.0) - 2025-02-13  
+
 ### Added  
 - Initial changelog setup.  
-- new config vairables 
-  - `'guards'=>['web','admin']`
-  - `'layout'=>'wirechat::layouts.app'`
-- `peerParticipants(referece:$user)` && `peerParticipant(referece:$user)` to Conversation model to make it easy to retrieve corespndants in the conversaiotn
-- command for publishing config files 
-- Docs on Authorization , Extending UI & components 
-- belongsToConversation middleware
+- New config variables:  
+  - `'guards' => ['web']`  
+  - `'layout' => 'wirechat::layouts.app'`  
+- Command for publishing views.  
+- Standalone WireChat widget.  
+- Added / Improved documentation on:  
+  - Authorization  
+  - Core Components  
+  - Layout  
+  - Views  
+  - Contribution Guide  
+  - Extending WireChat Components  
+- `belongsToConversation` middleware to `/chats` view route .  
+
+### Changed  
+- `NotifyParticipant` channel now uses an encoded type and ID to support mixed models in conversations.  
+
+  **Breaking Change:**  
+  If you previously listened to the `participant` channel, update to the new format:  
+
+  ```diff
+  + userId = @js(auth()->id());
+  + encodedType = @js(Namu\WireChat\Helpers\MorphClassResolver::encode(auth()->user()->getMorphClass()));
+
+  - Echo.private(`participant.${userId}`)
+  + Echo.private(`participant.${encodedType}.${userId}`)
+        .listen('.Namu\\WireChat\\Events\\NotifyParticipant', (e) => {
+           console.log(e);
+      });
+  ```  
 
 ### Fixed  
-- And updaed code with tests to fully sopport converations with mixed models 
+- Updated tests to fully support conversations with mixed models.  
+- Improved participant handling for different models.  
 
-### Updated:
-- Code and query improvements for faster loading  of conversations
-- notify participant channel to use type and id in order to distinguice different models
-
+### Updated  
+- Optimized code and queries for faster conversation loading.  
+- Updated brodcasting to use the guards provided in wirechat config the 
 
 ---
 

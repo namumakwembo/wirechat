@@ -229,7 +229,7 @@
 
             {{-- Members count --}}
             <button
-                wire:click="$dispatch('openChatDialog', {component: 'members',arguments: { conversation: {{ $conversation?->id }} ,widget:@json($this->isWidget()) }})"
+                wire:click="$dispatch('openChatDialog', {component: 'wirechat.members',arguments: { conversation: {{ $conversation?->id }} ,widget:@json($this->isWidget()) }})"
                 class="flex w-full justify-between items-center px-8 focus:outline-none ">
                 <span class="text-gray-600 dark:text-gray-300"> Members {{ $totalParticipants }}</span>
 
@@ -247,7 +247,7 @@
 
             {{-- Add Members --}}
             @if ($authIsAdminInGroup || $group?->allowsMembersToAddOthers())
-            <button @dusk="open_add_members_modal_button" wire:click="$dispatch('openChatDialog', {component: 'add-members',arguments: { conversation: {{ $conversation?->id }},widget:@json($this->isWidget()) }})"
+            <button @dusk="open_add_members_modal_button" wire:click="$dispatch('openChatDialog', {component: 'wirechat.add-members',arguments: { conversation: {{ $conversation?->id }},widget:@json($this->isWidget()) }})"
                 class=" w-full py-5 px-8 hover:bg-gray-200 focus:outline-none transition dark:hover:bg-gray-800 flex gap-3 items-center">
 
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
@@ -307,7 +307,7 @@
             <div>
 
                 <button
-                    wire:click="$dispatch('openChatDrawer', {component: 'permissions',arguments: { conversation: {{ $conversation->id }} }})"
+                    wire:click="$dispatch('openChatDrawer', {component: 'wirechat.permissions',arguments: { conversation: {{ $conversation->id }} }})"
                     class=" w-full py-5 px-8 hover:bg-gray-200 transition dark:hover:bg-gray-700 text-start space-y-2   gap-3   dark:text-white/90">
                     <div class="flex gap-3 items-center ">
 

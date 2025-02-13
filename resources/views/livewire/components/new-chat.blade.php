@@ -36,7 +36,7 @@
         @if (WireChat::showNewGroupModalButton() && auth()->user()->canCreateGroups())
         <button
   
-         wire:click="$dispatch('openChatDialog', {component: 'new-group',arguments: { widget:  @json($this->isWidget())  }})"
+         wire:click="$dispatch('openChatDialog', {component: 'wirechat.new-group',arguments: { widget:  @json($this->isWidget())  }})"
          @dusk="open_new_group_modal_button"
          class="flex items-center gap-3 my-4  rounded-lg p-2 w-full border hover:border-gray-300 transition-colors  dark:border-gray-800 dark:hover:border-gray-700   "
 

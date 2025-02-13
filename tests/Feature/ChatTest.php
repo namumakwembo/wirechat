@@ -2653,7 +2653,7 @@ describe('deleteMessage ForEveryone', function () {
         $receiver = User::factory()->create(['name' => 'John']);
         $conversation = $auth->createConversationWith($receiver, 'This is message');
 
-        $CHATLIST = Livewire::actingAs($auth)->test(ChatList::class)->assertSeeText('This is message');
+        $CHATLIST = Livewire::actingAs($auth)->test(ChatList::class)->assertSee('This is message');
 
         //run
         $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
@@ -2799,7 +2799,7 @@ describe('deletForMe', function () {
 
         $conversation = $auth->createConversationWith($receiver, 'This is message');
 
-        $CHATLIST = Livewire::actingAs($auth)->test(ChatList::class)->assertSeeText('This is message');
+        $CHATLIST = Livewire::actingAs($auth)->test(ChatList::class)->assertSee('This is message');
 
         $request = Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id]);
 

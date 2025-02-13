@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Modals;
+namespace Namu\WireChat\Livewire\Chat;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -9,7 +9,7 @@ use Illuminate\Support\Reflector;
 use Livewire\Component;
 use Livewire\Mechanisms\ComponentRegistry;
 
-class ChatDrawer extends Component
+class Drawer extends Component
 {
     public ?string $activeDrawerComponent;
 
@@ -122,6 +122,6 @@ class ChatDrawer extends Component
 
     public function render()
     {
-        return view('wirechat::livewire.modals.chat-drawer');
+        return view('wirechat::livewire.chat.drawer');
     }
 }

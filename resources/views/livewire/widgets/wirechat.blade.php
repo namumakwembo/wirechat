@@ -185,7 +185,7 @@
         }
     }"
      class ='w-full h-full bg-white dark:bg-gray-900 border dark:border-gray-700 flex overflow-hidden rounded-lg'>
-      <div :class="chatIsOpen && 'hidden md:grid'" class="relative  w-full h-full border-r dark:border-gray-700    md:w-[360px] lg:w-[400px] xl:w-[450px] shrink-0 overflow-y-auto  ">
+      <div :class="chatIsOpen && 'hidden md:grid'" class="relative  w-full h-full sm:border-r dark:border-gray-700    md:w-[360px] lg:w-[400px] xl:w-[450px] shrink-0 overflow-y-auto  ">
           <livewire:chats :widget="true" />
       </div>
       <main

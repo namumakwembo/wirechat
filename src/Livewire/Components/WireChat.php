@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Widgets;
+namespace Namu\WireChat\Livewire\Components;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -96,7 +96,7 @@ class WireChat extends Component
                 return $enum;
             }
         }
-
+        
         $instance = app()->make($parameterClassName);
 
         if (! $model = $instance->resolveRouteBinding($parameterValue)) {
@@ -136,6 +136,6 @@ class WireChat extends Component
 
     public function render()
     {
-        return view('wirechat::livewire.widgets.wirechat');
+        return view('wirechat::livewire.components.wirechat');
     }
 }

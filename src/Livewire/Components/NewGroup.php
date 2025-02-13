@@ -6,7 +6,7 @@ use Livewire\Attributes\Validate;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
-use Namu\WireChat\Livewire\Widgets\WireChat as WidgetsWireChat;
+use Namu\WireChat\Livewire\Components\WireChat as WidgetsWireChat;
 use Namu\WireChat\Traits\Widget;
 
 class NewGroup extends ModalComponent

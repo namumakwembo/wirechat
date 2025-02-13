@@ -20,7 +20,7 @@ use Namu\WireChat\Livewire\Info\Members;
 use Namu\WireChat\Livewire\Modals\ChatDialog;
 use Namu\WireChat\Livewire\Modals\ChatDrawer;
 use Namu\WireChat\Livewire\View;
-use Namu\WireChat\Livewire\Widgets\WireChat;
+use Namu\WireChat\Livewire\Components\WireChat;
 use Namu\WireChat\Middleware\BelongsToConversation;
 use Namu\WireChat\Services\WireChatService;
 

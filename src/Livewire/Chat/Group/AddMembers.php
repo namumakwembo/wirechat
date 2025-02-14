@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Group;
+namespace Namu\WireChat\Livewire\Chat\Group;
 
 use App\Models\User;
 use Livewire\Attributes\Locked;
@@ -166,6 +166,6 @@ class AddMembers extends ModalComponent
     {
 
         // Pass data to the view
-        return view('wirechat::livewire.group.add-members', ['maxGroupMembers' => WireChat::maxGroupMembers()]);
+        return view('wirechat::livewire.chat.group.add-members', ['maxGroupMembers' => WireChat::maxGroupMembers()]);
     }
 }

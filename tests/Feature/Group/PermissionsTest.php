@@ -1,7 +1,7 @@
 <?php
 
 use Livewire\Livewire;
-use Namu\WireChat\Livewire\Group\Permissions;
+use Namu\WireChat\Livewire\Chat\Group\Permissions;
 use Namu\WireChat\Models\Conversation;
 use Workbench\App\Models\User;
 

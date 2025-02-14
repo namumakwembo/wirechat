@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Group;
+namespace Namu\WireChat\Livewire\Chat\Group;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Schema;
@@ -265,7 +265,7 @@ class Members extends ModalComponent
         //
 
         // Pass data to the view
-        return view('wirechat::livewire.group.members', [
+        return view('wirechat::livewire.chat.group.members', [
             'participant' => $this->conversation->participant(auth()->user()),
 
         ]);

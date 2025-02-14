@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Group;
+namespace Namu\WireChat\Livewire\Chat\Group;
 
 use Livewire\Attributes\Locked;
 //use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -86,6 +86,6 @@ class Permissions extends ModalComponent
     {
 
         // Pass data to the view
-        return view('wirechat::livewire.group.permissions', ['maxGroupMembers' => WireChat::maxGroupMembers()]);
+        return view('wirechat::livewire.chat.group.permissions', ['maxGroupMembers' => WireChat::maxGroupMembers()]);
     }
 }

@@ -228,7 +228,7 @@
         <section class="my-4 text-left space-y-3">
 
             {{-- Actiion button to trigger opening members  modal --}}
-            <x-wirechat::open-modal  component="wirechat.chat.group.members"  conversation="{{ $conversation?->id }}" widget="{{$this->isWidget()}}">
+            <x-wirechat::actions.open-modal  component="wirechat.chat.group.members"  conversation="{{ $conversation?->id }}" widget="{{$this->isWidget()}}">
             {{-- Members count --}}
             <button class="flex w-full justify-between items-center px-8 focus:outline-none ">
                 <span class="text-gray-600 dark:text-gray-300"> Members {{ $totalParticipants }}</span>
@@ -241,11 +241,11 @@
                     </svg>
                 </span>
             </button>
-            </x-wirechat::open-modal>
+            </x-wirechat::actions.open-modal>
 
             {{-- Add Members --}}
             @if ($authIsAdminInGroup || $group?->allowsMembersToAddOthers())
-            <x-wirechat::open-modal  component="wirechat.chat.group.add-members"  conversation="{{ $conversation?->id }}" widget="{{$this->isWidget()}}">
+            <x-wirechat::actions.open-modal  component="wirechat.chat.group.add-members"  conversation="{{ $conversation?->id }}" widget="{{$this->isWidget()}}">
             <button @dusk="open_add_members_modal_button" 
                 class=" w-full py-5 px-8 hover:bg-gray-200 focus:outline-none transition dark:hover:bg-gray-800 flex gap-3 items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
@@ -256,7 +256,7 @@
 
                 <span>Add Members</span>
             </button>
-            </x-wirechat::open-modal>
+            </x-wirechat::actions.open-modal>
             @endif
 
 
@@ -305,7 +305,7 @@
             {{-- Permissions --}}
             <div>
 
-                <x-wirechat::open-chat-drawer component='wirechat.chat.group.permissions' conversation="{{ $conversation?->id }}">
+                <x-wirechat::actions.open-chat-drawer component='wirechat.chat.group.permissions' conversation="{{ $conversation?->id }}">
                 <button  class=" w-full py-5 px-8 hover:bg-gray-200 transition dark:hover:bg-gray-700 text-start space-y-2   gap-3   dark:text-white/90">
                     <div class="flex gap-3 items-center ">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -317,7 +317,7 @@
                         <span>Group Permissions</span>
                     </div>
                 </button>
-                </x-wirechat::open-chat-drawer>
+                </x-wirechat::actions.open-chat-drawer>
             </div>
         @endif
 

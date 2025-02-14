@@ -29,7 +29,7 @@
         <section class="grid grid-cols-12 w-full">
             <div class="shrink-0 col-span-11 w-full truncate overflow-h-hidden relative">
                 
-                <x-wirechat::open-chat-info conversation="{{ $conversation->id }}" widget="{{$this->isWidget()}}">
+                <x-wirechat::actions.show-chat-info conversation="{{ $conversation->id }}" widget="{{$this->isWidget()}}">
                     <div class="flex items-center gap-2 cursor-pointer ">
                         <x-wirechat::avatar disappearing="{{ $conversation->hasDisappearingTurnedOn() }}"
                             group="{{ $conversation->isGroup() }}"
@@ -41,7 +41,7 @@
                             @endif
                         </h6>
                     </div>
-              </x-wirechat::open-chat-info>
+              </x-wirechat::actions.show-chat-info>
 
 
 
@@ -63,13 +63,13 @@
                     <x-slot name="content">
 
                         {{-- Open chat info button --}}
-                        <x-wirechat::open-chat-info conversation="{{ $conversation->id }}" widget="{{$this->isWidget()}}">
+                        <x-wirechat::actions.show-chat-info conversation="{{ $conversation->id }}" widget="{{$this->isWidget()}}">
                         <button class="w-full text-start">
                             <x-wirechat::dropdown-link>
                                 {{ $conversation->isGroup() ? 'Group' : 'Chat' }} Info
                             </x-wirechat::dropdown-link>
                         </button>
-                        </x-wirechat::open-chat-info>
+                        </x-wirechat::actions.show-chat-info>
 
 
                         @if ($this->isWidget())

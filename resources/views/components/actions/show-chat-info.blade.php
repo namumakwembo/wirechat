@@ -4,10 +4,10 @@
 ])
 
 
-<x-wirechat::open-chat-drawer 
+<x-wirechat::actions.open-chat-drawer 
         component="wirechat.chat.info"
         conversation="{{$conversation}}"
         :widget="$widget"
         >
 {{$slot}}
-</x-wirechat::open-chat-drawer>
+</x-wirechat::actions.open-chat-drawer>

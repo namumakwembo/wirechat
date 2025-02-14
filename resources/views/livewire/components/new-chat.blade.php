@@ -36,7 +36,7 @@
         @if (WireChat::showNewGroupModalButton() && auth()->user()->canCreateGroups())
 
         {{-- Buton to trigger opening of new grop modal --}}
-        <x-wirechat::open-new-group-modal widget="{{$this->isWidget()}}">
+        <x-wirechat::actions.new-group widget="{{$this->isWidget()}}">
         <button  @dusk="open_new_group_modal_button"  class="flex items-center gap-3 my-4  rounded-lg p-2 w-full border hover:border-gray-300 transition-colors  dark:border-gray-800 dark:hover:border-gray-700 " >
             <span style=" color: var(--wirechat-primary-color); " class="p-1 bg-gray-100  rounded-full ">
 
@@ -48,7 +48,7 @@
 
             <p class="dark:text-white">New group</p>
         </button>
-       </x-wirechat::open-new-group-modal>
+       </x-wirechat::actions.new-group>
      @endif
     {{-- <h5 class="text font-semibold text-gray-800 dark:text-gray-100">Recent Chats</h5> --}}
         <section class="my-4">

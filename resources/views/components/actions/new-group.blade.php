@@ -3,9 +3,9 @@
 ])
 
 
-<x-wirechat::open-modal
+<x-wirechat::actions.open-modal
         component="wirechat.new-group"
         :widget="$widget"
         >
 {{$slot}}
-</x-wirechat::open-modal>
+</x-wirechat::actions.open-modal>

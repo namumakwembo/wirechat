@@ -6,7 +6,7 @@ use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
-use Namu\WireChat\Livewire\Info\Members;
+use Namu\WireChat\Livewire\Group\Members;
 use Namu\WireChat\Models\Action;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Participant;

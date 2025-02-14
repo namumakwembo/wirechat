@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Info;
+namespace Namu\WireChat\Livewire\Group;
 
 use App\Models\User;
 use Livewire\Attributes\Locked;
@@ -8,6 +8,7 @@ use Livewire\Attributes\Validate;
 //use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Facades\WireChat;
+use Namu\WireChat\Livewire\Info\Info;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Participant;
@@ -165,6 +166,6 @@ class AddMembers extends ModalComponent
     {
 
         // Pass data to the view
-        return view('wirechat::livewire.info.add-members', ['maxGroupMembers' => WireChat::maxGroupMembers()]);
+        return view('wirechat::livewire.group.add-members', ['maxGroupMembers' => WireChat::maxGroupMembers()]);
     }
 }

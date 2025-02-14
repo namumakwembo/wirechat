@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
-use Namu\WireChat\Livewire\Info\AddMembers;
+use Namu\WireChat\Livewire\Group\AddMembers;
 use Namu\WireChat\Models\Conversation;
 use Workbench\App\Models\User;
 

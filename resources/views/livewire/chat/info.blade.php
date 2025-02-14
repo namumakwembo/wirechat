@@ -227,13 +227,11 @@
     @if ($isGroup)
         <section class="my-4 text-left space-y-3">
 
+            {{-- Actiion button to trigger opening members  modal --}}
+            <x-wirechat::open-modal  component="wirechat.chat.group.members"  conversation="{{ $conversation?->id }}" widget="{{$this->isWidget()}}">
             {{-- Members count --}}
-            <button
-                wire:click="$dispatch('openChatDialog', {component: 'wirechat.members',arguments: { conversation: {{ $conversation?->id }} ,widget:@json($this->isWidget()) }})"
-                class="flex w-full justify-between items-center px-8 focus:outline-none ">
+            <button class="flex w-full justify-between items-center px-8 focus:outline-none ">
                 <span class="text-gray-600 dark:text-gray-300"> Members {{ $totalParticipants }}</span>
-
-
                 {{-- Search icon --}}
                 <span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -241,15 +239,15 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                     </svg>
-
                 </span>
             </button>
+            </x-wirechat::open-modal>
 
             {{-- Add Members --}}
             @if ($authIsAdminInGroup || $group?->allowsMembersToAddOthers())
-            <button @dusk="open_add_members_modal_button" wire:click="$dispatch('openChatDialog', {component: 'wirechat.add-members',arguments: { conversation: {{ $conversation?->id }},widget:@json($this->isWidget()) }})"
+            <x-wirechat::open-modal  component="wirechat.chat.group.add-members"  conversation="{{ $conversation?->id }}" widget="{{$this->isWidget()}}">
+            <button @dusk="open_add_members_modal_button" 
                 class=" w-full py-5 px-8 hover:bg-gray-200 focus:outline-none transition dark:hover:bg-gray-800 flex gap-3 items-center">
-
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                     class="size-6 w-5 h-5">
                     <path
@@ -258,6 +256,7 @@
 
                 <span>Add Members</span>
             </button>
+            </x-wirechat::open-modal>
             @endif
 
 
@@ -306,11 +305,9 @@
             {{-- Permissions --}}
             <div>
 
-                <button
-                    wire:click="$dispatch('openChatDrawer', {component: 'wirechat.permissions',arguments: { conversation: {{ $conversation->id }} }})"
-                    class=" w-full py-5 px-8 hover:bg-gray-200 transition dark:hover:bg-gray-700 text-start space-y-2   gap-3   dark:text-white/90">
+                <x-wirechat::open-chat-drawer component='wirechat.chat.group.permissions' conversation="{{ $conversation?->id }}">
+                <button  class=" w-full py-5 px-8 hover:bg-gray-200 transition dark:hover:bg-gray-700 text-start space-y-2   gap-3   dark:text-white/90">
                     <div class="flex gap-3 items-center ">
-
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke-width="1.5" stroke="currentColor" class="size-6 w-5 h-5 dark:text-gray-400">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -320,6 +317,7 @@
                         <span>Group Permissions</span>
                     </div>
                 </button>
+                </x-wirechat::open-chat-drawer>
             </div>
         @endif
 

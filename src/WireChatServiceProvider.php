@@ -105,10 +105,10 @@ class WireChatServiceProvider extends ServiceProvider
 
         //Group related components
         Livewire::component('wirechat.new-group', NewGroup::class);
-        Livewire::component('wirechat.info', Info::class);
-        Livewire::component('wirechat.add-members', AddMembers::class);
-        Livewire::component('wirechat.members', Members::class);
-        Livewire::component('wirechat.permissions', Permissions::class);
+        Livewire::component('wirechat.chat.info', Info::class);
+        Livewire::component('wirechat.chat.group.add-members', AddMembers::class);
+        Livewire::component('wirechat.chat.group.members', Members::class);
+        Livewire::component('wirechat.chat.group.permissions', Permissions::class);
 
         //Widgets
         Livewire::component('wirechat', WireChat::class);

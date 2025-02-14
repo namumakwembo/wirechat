@@ -28,18 +28,21 @@
         {{-- Receiver wirechat::Avatar --}}
         <section class="grid grid-cols-12 w-full">
             <div class="shrink-0 col-span-11 w-full truncate overflow-h-hidden relative">
-                <div wire:click="$dispatch('openChatDrawer', {component: 'wirechat.info',arguments: { conversation: {{ $conversation->id }} ,widget:  @json($this->isWidget())  }})"
-                    class="flex items-center gap-2 cursor-pointer ">
-                    <x-wirechat::avatar disappearing="{{ $conversation->hasDisappearingTurnedOn() }}"
-                        group="{{ $conversation->isGroup() }}"
-                        src="{{ $group ? $group?->cover_url : $receiver?->cover_url ?? null }}"
-                        class="h-8 w-8 lg:w-10 lg:h-10 " />
-                    <h6 class="font-bold text-base text-gray-800 dark:text-white w-full truncate">
-                        {{ $group ? $group?->name : $receiver?->display_name }} @if ($conversation->isSelfConversation())
-                            (You)
-                        @endif
-                    </h6>
-                </div>
+                
+                <x-wirechat::open-chat-info conversation="{{ $conversation->id }}" widget="{{$this->isWidget()}}">
+                    <div class="flex items-center gap-2 cursor-pointer ">
+                        <x-wirechat::avatar disappearing="{{ $conversation->hasDisappearingTurnedOn() }}"
+                            group="{{ $conversation->isGroup() }}"
+                            src="{{ $group ? $group?->cover_url : $receiver?->cover_url ?? null }}"
+                            class="h-8 w-8 lg:w-10 lg:h-10 " />
+                        <h6 class="font-bold text-base text-gray-800 dark:text-white w-full truncate">
+                            {{ $group ? $group?->name : $receiver?->display_name }} @if ($conversation->isSelfConversation())
+                                (You)
+                            @endif
+                        </h6>
+                    </div>
+              </x-wirechat::open-chat-info>
+
 
 
             </div>
@@ -59,15 +62,14 @@
                     </x-slot>
                     <x-slot name="content">
 
-                        <button
-                            wire:click="$dispatch('openChatDrawer', {component: 'wirechat.info',arguments: { conversation: {{ $conversation->id }},widget: @json($this->isWidget())  }})"
-                            class="w-full text-start">
-
+                        {{-- Open chat info button --}}
+                        <x-wirechat::open-chat-info conversation="{{ $conversation->id }}" widget="{{$this->isWidget()}}">
+                        <button class="w-full text-start">
                             <x-wirechat::dropdown-link>
                                 {{ $conversation->isGroup() ? 'Group' : 'Chat' }} Info
                             </x-wirechat::dropdown-link>
-
                         </button>
+                        </x-wirechat::open-chat-info>
 
 
                         @if ($this->isWidget())

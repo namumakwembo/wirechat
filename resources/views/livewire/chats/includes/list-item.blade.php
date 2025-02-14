@@ -21,12 +21,20 @@ $belongsToAuth = $lastMessage?->belongsToAuth();
         if (event.detail.conversation== this.conversationID) {
             this.showUnreadStatus= false;
         }
+        //update this so that the the selected conversation highlighter can be updated
+        $wire.selectedConversationId= event.detail.conversation;
     },
     handleChatClosed(event) {
             // Clear the globally selected conversation.
             $wire.selectedConversationId = null;
             selectedConversationId = null;
-    }
+    },
+    handleOpenChat(event) {
+        // Clear the globally selected conversation.
+        if (this.showUnreadStatus==  event.detail.conversation== this.conversationID) {
+            this.showUnreadStatus= false;
+        }
+}
 }"  
 
 id="conversation-{{ $conversation->id }}" 

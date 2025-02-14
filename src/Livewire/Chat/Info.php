@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Info;
+namespace Namu\WireChat\Livewire\Chat;
 
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Locked;
@@ -281,7 +281,7 @@ class Info extends ModalComponent
         //  dd($this->isWidget(),$participant);
 
         // Pass data to the view
-        return view('wirechat::livewire.info.info', [
+        return view('wirechat::livewire.chat.info', [
             'receiver' => $this->conversation?->getReceiver(),
             'participant' => $participant,
         ]);

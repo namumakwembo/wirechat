@@ -15,7 +15,7 @@ use Namu\WireChat\Livewire\Components\NewGroup;
 use Namu\WireChat\Livewire\Chat\Group\Permissions;
 use Namu\WireChat\Livewire\Index;
 use Namu\WireChat\Livewire\Chat\Group\AddMembers;
-use Namu\WireChat\Livewire\Info\Info;
+use Namu\WireChat\Livewire\Chat\Info;
 use Namu\WireChat\Livewire\Chat\Group\Members;
 use Namu\WireChat\Livewire\Modals\ChatDialog;
 use Namu\WireChat\Livewire\Chat\Drawer;

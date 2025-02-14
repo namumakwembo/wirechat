@@ -9,7 +9,7 @@ use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Jobs\DeleteConversationJob;
 use Namu\WireChat\Livewire\Chats\Chats;
-use Namu\WireChat\Livewire\Info\Info;
+use Namu\WireChat\Livewire\Chat\Info;
 use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Conversation;
 use Workbench\App\Models\Admin;

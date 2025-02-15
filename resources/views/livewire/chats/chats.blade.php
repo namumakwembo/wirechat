@@ -43,13 +43,10 @@ x-init=" setTimeout(() => {
 
         @if (count($conversations)>0)
         
-            <ul wire:loading.delay.long.remove wire:target="search" class="p-2 grid w-full spacey-y-2">
-                @foreach ($conversations as $key=> $conversation)
+           
                  {{-- include list item --}}
-                  @include('wirechat::livewire.chats.includes.list-item')  
-                @endforeach
+                  @include('wirechat::livewire.chats.includes.list')  
 
-            </ul>
 
             {{-- include load more if true --}}
              @includeWhen($canLoadMore,'wirechat::livewire.chats.includes.load-more-button')

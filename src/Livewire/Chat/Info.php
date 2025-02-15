@@ -10,7 +10,7 @@ use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Jobs\DeleteConversationJob;
 use Namu\WireChat\Livewire\Chat\Chat;
 use Namu\WireChat\Livewire\Chats\Chats;
-use Namu\WireChat\Livewire\Modals\ModalComponent;
+use Namu\WireChat\Livewire\Concerns\ModalComponent;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Traits\Widget;
 

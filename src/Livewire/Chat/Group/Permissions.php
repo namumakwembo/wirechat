@@ -6,7 +6,7 @@ use Livewire\Attributes\Locked;
 //use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Facades\WireChat;
-use Namu\WireChat\Livewire\Modals\ModalComponent;
+use Namu\WireChat\Livewire\Concerns\ModalComponent;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Participant;
 

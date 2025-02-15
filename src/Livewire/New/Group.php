@@ -5,7 +5,7 @@ namespace Namu\WireChat\Livewire\New;
 use Livewire\Attributes\Validate;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Facades\WireChat;
-use Namu\WireChat\Livewire\Modals\ModalComponent;
+use Namu\WireChat\Livewire\Concerns\ModalComponent;
 use Namu\WireChat\Livewire\WireChat as WidgetsWireChat;
 use Namu\WireChat\Traits\Widget;
 

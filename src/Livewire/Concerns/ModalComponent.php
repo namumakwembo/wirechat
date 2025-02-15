@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Modals;
+namespace Namu\WireChat\Livewire\Concerns;
 
 use Livewire\Component;
 

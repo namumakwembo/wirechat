@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Facades\WireChat;
-use Namu\WireChat\Livewire\NewGroup;
+use Namu\WireChat\Livewire\New\Group as NewGroup;
 use Namu\WireChat\Models\Attachment;
 use Namu\WireChat\Models\Conversation;
 use Workbench\App\Models\User as ModelsUser;

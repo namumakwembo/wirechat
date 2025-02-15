@@ -5,7 +5,7 @@
 use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
 use Namu\WireChat\Facades\WireChat;
-use Namu\WireChat\Livewire\NewChat;
+use Namu\WireChat\Livewire\New\Chat as NewChat ;
 use Workbench\App\Models\User as ModelsUser;
 
 it('user must be authenticated', function () {

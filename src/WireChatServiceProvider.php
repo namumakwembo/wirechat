@@ -10,8 +10,8 @@ use Namu\WireChat\Console\Commands\InstallWireChat;
 use Namu\WireChat\Facades\WireChat as FacadesWireChat;
 use Namu\WireChat\Livewire\Chat\Chat;
 use Namu\WireChat\Livewire\Chats\Chats;
-use Namu\WireChat\Livewire\NewChat;
-use Namu\WireChat\Livewire\NewGroup;
+use Namu\WireChat\Livewire\New\Chat as NewChat;
+use Namu\WireChat\Livewire\New\Group as NewGroup;
 use Namu\WireChat\Livewire\Chat\Group\Permissions;
 use Namu\WireChat\Livewire\Index;
 use Namu\WireChat\Livewire\Chat\Group\AddMembers;
@@ -101,16 +101,16 @@ class WireChatServiceProvider extends ServiceProvider
         Livewire::component('wirechat.chat-dialog', ChatDialog::class);
         Livewire::component('wirechat.chat.drawer', Drawer::class);
 
-        Livewire::component('wirechat.new-chat', NewChat::class);
+        Livewire::component('wirechat.new.chat', NewChat::class);
+        Livewire::component('wirechat.new.group', NewGroup::class);
 
         //Group related components
-        Livewire::component('wirechat.new-group', NewGroup::class);
         Livewire::component('wirechat.chat.info', Info::class);
         Livewire::component('wirechat.chat.group.add-members', AddMembers::class);
         Livewire::component('wirechat.chat.group.members', Members::class);
         Livewire::component('wirechat.chat.group.permissions', Permissions::class);
 
-        //Widgets
+        //Main Stand alone component
         Livewire::component('wirechat', WireChat::class);
 
     }

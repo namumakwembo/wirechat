@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Namu\WireChat\Livewire\Index;
 use Namu\WireChat\Livewire\View;
-
+use Namu\WireChat\Livewire\Pages\Chats;
+use Namu\WireChat\Livewire\Pages\Chat;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -28,6 +29,6 @@ Route::middleware('guest')->get('/login', function () {
 Route::middleware(config('wirechat.routes.middleware'))
     ->prefix(config('wirechat.routes.prefix'))
     ->group(function () {
-        Route::get('/', Index::class)->name('chats');
-        Route::get('/{conversation_id}', View::class)->name('chat');
+        Route::get('/', Chats::class)->name('chats');
+        Route::get('/{conversation}', Chat::class)->middleware('belongsToConversation')->name('chat');
     });

@@ -1,16 +1,16 @@
 <?php
 
-namespace Namu\WireChat\Livewire;
+namespace Namu\WireChat\Livewire\Pages;
 
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-class Index extends Component
+class Chats extends Component
 {
     #[Title('Chats')]
     public function render()
     {
-        return view('wirechat::livewire.index')
+        return view('wirechat::livewire.pages.chats')
             ->layout(config('wirechat.layout', 'wirechat::layouts.app'));
 
     }

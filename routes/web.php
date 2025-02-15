@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Namu\WireChat\Livewire\Index;
-use Namu\WireChat\Livewire\View;
+use Namu\WireChat\Livewire\Pages\Chats;
+use Namu\WireChat\Livewire\Pages\Chat;
 
 Route::middleware(config('wirechat.routes.middleware'))
     ->prefix(config('wirechat.routes.prefix'))
     ->group(function () {
-        Route::get('/', Index::class)->name('chats');
-        Route::get('/{conversation}', View::class)->middleware('belongsToConversation')->name('chat');
+        Route::get('/', Chats::class)->name('chats');
+        Route::get('/{conversation}', Chat::class)->middleware('belongsToConversation')->name('chat');
     });

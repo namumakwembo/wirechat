@@ -13,13 +13,13 @@ use Namu\WireChat\Livewire\Chats\Chats;
 use Namu\WireChat\Livewire\New\Chat as NewChat;
 use Namu\WireChat\Livewire\New\Group as NewGroup;
 use Namu\WireChat\Livewire\Chat\Group\Permissions;
-use Namu\WireChat\Livewire\Index;
+use Namu\WireChat\Livewire\Pages\Chats as Index;
 use Namu\WireChat\Livewire\Chat\Group\AddMembers;
 use Namu\WireChat\Livewire\Chat\Info;
 use Namu\WireChat\Livewire\Chat\Group\Members;
 use Namu\WireChat\Livewire\Modal;
 use Namu\WireChat\Livewire\Chat\Drawer;
-use Namu\WireChat\Livewire\View;
+use Namu\WireChat\Livewire\Pages\Chat as View;
 use Namu\WireChat\Livewire\WireChat;
 use Namu\WireChat\Middleware\BelongsToConversation;
 use Namu\WireChat\Services\WireChatService;
@@ -91,9 +91,9 @@ class WireChatServiceProvider extends ServiceProvider
     //custom methods for livewire components
     protected function loadLivewireComponents()
     {
-        //views
-        Livewire::component('wirechat.index', Index::class);
-        Livewire::component('wirechat.view', View::class);
+        //Pages
+        Livewire::component('wirechat.pages.index', Index::class);
+        Livewire::component('wirechat.pages.view', View::class);
 
         //Chats 
         Livewire::component('wirechat.chats', Chats::class);

@@ -1,12 +1,12 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Components;
+namespace Namu\WireChat\Livewire;
 
 use Livewire\Attributes\Validate;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
-use Namu\WireChat\Livewire\Components\WireChat as WidgetsWireChat;
+use Namu\WireChat\Livewire\WireChat as WidgetsWireChat;
 use Namu\WireChat\Traits\Widget;
 
 class NewGroup extends ModalComponent
@@ -180,6 +180,6 @@ class NewGroup extends ModalComponent
     public function render()
     {
 
-        return view('wirechat::livewire.components.new-group', ['maxGroupMembers' => WireChat::maxGroupMembers()]);
+        return view('wirechat::livewire.new-group', ['maxGroupMembers' => WireChat::maxGroupMembers()]);
     }
 }

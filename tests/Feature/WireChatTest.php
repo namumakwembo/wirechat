@@ -3,7 +3,7 @@
 use Livewire\Livewire;
 use Namu\WireChat\Livewire\Chat\Chat;
 use Namu\WireChat\Livewire\Chats\Chats;
-use Namu\WireChat\Livewire\Components\WireChat;
+use Namu\WireChat\Livewire\WireChat;
 use Namu\WireChat\Models\Conversation;
 use Workbench\App\Models\User;
 

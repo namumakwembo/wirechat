@@ -12,7 +12,7 @@ use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
-use Namu\WireChat\Livewire\Components\WireChat as WidgetsWireChat;
+use Namu\WireChat\Livewire\WireChat as WidgetsWireChat;
 use Namu\WireChat\Livewire\Chat\Info;
 use Namu\WireChat\Models\Action;
 use Namu\WireChat\Models\Conversation;

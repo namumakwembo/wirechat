@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Components;
+namespace Namu\WireChat\Livewire;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -136,6 +136,6 @@ class WireChat extends Component
 
     public function render()
     {
-        return view('wirechat::livewire.components.wirechat');
+        return view('wirechat::livewire.wire-chat');
     }
 }

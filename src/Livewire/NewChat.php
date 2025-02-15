@@ -1,10 +1,10 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Components;
+namespace Namu\WireChat\Livewire;
 
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Modals\ModalComponent;
-use Namu\WireChat\Livewire\Components\WireChat as WidgetsWireChat;
+use Namu\WireChat\Livewire\WireChat as WidgetsWireChat;
 use Namu\WireChat\Traits\Widget;
 
 class NewChat extends ModalComponent
@@ -78,6 +78,6 @@ class NewChat extends ModalComponent
 
     public function render()
     {
-        return view('wirechat::livewire.components.new-chat');
+        return view('wirechat::livewire.new-chat');
     }
 }

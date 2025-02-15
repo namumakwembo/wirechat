@@ -7,7 +7,7 @@ use Livewire\WithFileUploads;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Concerns\ModalComponent;
 use Namu\WireChat\Livewire\WireChat as WidgetsWireChat;
-use Namu\WireChat\Traits\Widget;
+use  Namu\WireChat\Livewire\Concerns\Widget;
 
 class Group extends ModalComponent
 {

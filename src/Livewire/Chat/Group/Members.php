@@ -17,7 +17,7 @@ use Namu\WireChat\Livewire\Chat\Info;
 use Namu\WireChat\Models\Action;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Participant;
-use Namu\WireChat\Traits\Widget;
+use  Namu\WireChat\Livewire\Concerns\Widget;
 
 class Members extends ModalComponent
 {

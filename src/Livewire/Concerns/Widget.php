@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Traits;
+namespace  Namu\WireChat\Livewire\Concerns;
 
 use Livewire\Attributes\Locked;
 use Namu\WireChat\Facades\WireChat;

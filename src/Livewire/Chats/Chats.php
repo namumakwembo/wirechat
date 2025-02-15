@@ -10,7 +10,7 @@ use Livewire\Component;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Helpers\MorphClassResolver;
 use Namu\WireChat\Models\Conversation;
-use Namu\WireChat\Traits\Widget;
+use Namu\WireChat\Livewire\Concerns\Widget;
 
 /**
  * Chats Component

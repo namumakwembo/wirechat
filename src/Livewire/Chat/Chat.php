@@ -21,7 +21,7 @@ use Namu\WireChat\Livewire\Chats\Chats;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message;
 use Namu\WireChat\Models\Participant;
-use Namu\WireChat\Traits\Widget;
+use Namu\WireChat\Livewire\Concerns\Widget;
 
 class Chat extends Component
 {

@@ -37,6 +37,6 @@ describe('Ensure Compenents use Widget Trait', function () {
         ->expect('Namu\WireChat\Livewire\Info\AddMembers')
         ->expect('Namu\WireChat\Livewire\Info\Info')
         ->expect('Namu\WireChat\Livewire\Info\Members')
-        ->toUseTrait('Namu\WireChat\Traits\Widget');
+        ->toUseTrait('Namu\WireChat\Livewire\Concerns\Widget');
 
 });

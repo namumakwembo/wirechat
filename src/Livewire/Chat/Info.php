@@ -12,7 +12,7 @@ use Namu\WireChat\Livewire\Chat\Chat;
 use Namu\WireChat\Livewire\Chats\Chats;
 use Namu\WireChat\Livewire\Concerns\ModalComponent;
 use Namu\WireChat\Models\Conversation;
-use Namu\WireChat\Traits\Widget;
+use  Namu\WireChat\Livewire\Concerns\Widget;
 
 class Info extends ModalComponent
 {

@@ -9,9 +9,9 @@
 
             <h3 class="text-lg font-semibold">New Chat</h3>
 
+            <x-wirechat::actions.close-modal>
             <button
              dusk="close_modal_button"
-             wire:click="$dispatch('closeChatDialog')"
                 class="p-2  text-gray-600 hover:dark:bg-gray-700 hover:dark:text-white rounded-full hover:text-gray-800 hover:bg-gray-50">
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor">
@@ -19,6 +19,7 @@
                         d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
+            </x-wirechat::actions.close-modal>
 
         </div>
         

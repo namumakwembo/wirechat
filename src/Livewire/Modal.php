@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire\Modals;
+namespace Namu\WireChat\Livewire;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -9,19 +9,28 @@ use Illuminate\Support\Reflector;
 use Livewire\Component;
 use Livewire\Mechanisms\ComponentRegistry;
 
-class ChatDialog extends Component
+class Modal extends Component
 {
     public ?string $activeComponent;
 
-    public array $dialogComponents = [];
+    public array $components = [];
+
+    public function getListeners(): array
+    {
+        return [
+            'openWireChatModal',
+            'destroyWireChatModal',
+        ];
+    }
+
 
     public function resetState(): void
     {
-        $this->dialogComponents = [];
+        $this->components = [];
         $this->activeComponent = null;
     }
 
-    public function openChatDialog($component, $arguments = [], $modalAttributes = []): void
+    public function openWireChatModal($component, $arguments = [], $modalAttributes = []): void
     {
         $componentClass = app(ComponentRegistry::class)->getClass($component);
         $id = md5($component.serialize($arguments));
@@ -30,7 +39,7 @@ class ChatDialog extends Component
             ->merge($this->resolveComponentProps($arguments, new $componentClass))
             ->all();
 
-        $this->dialogComponents[$id] = [
+        $this->components[$id] = [
             'name' => $component,
             'arguments' => $arguments,
             'modalAttributes' => array_merge(
@@ -41,7 +50,7 @@ class ChatDialog extends Component
 
         $this->activeComponent = $id;
 
-        $this->dispatch('activeDialogComponentChanged', id: $id);
+        $this->dispatch('activeWireChatModalComponentChanged', id: $id);
     }
 
     public function resolveComponentProps(array $attributes, Component $component): Collection
@@ -89,21 +98,14 @@ class ChatDialog extends Component
             ->filter();
     }
 
-    public function destroyChatDialog($id): void
+    public function destroyWireChatModal($id): void
     {
-        unset($this->dialogComponents[$id]);
+        unset($this->components[$id]);
     }
 
-    public function getListeners(): array
-    {
-        return [
-            'openChatDialog',
-            'destroyChatDialog',
-        ];
-    }
-
+   
     public function render()
     {
-        return view('wirechat::livewire.modals.chat-dialog');
+        return view('wirechat::livewire.modal');
     }
 }

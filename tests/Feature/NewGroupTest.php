@@ -68,7 +68,7 @@ describe('Initial page', function () {
         $request = Livewire::actingAs($auth)->test(NewGroup::class);
         $request->assertSee('Cancel');
         $request->assertSeeHtml('dusk="cancel_create_new_group_button"');
-        $request->assertMethodWired('$dispatch(\'closeChatDialog\')');
+        $request->assertContainsBladeComponent('wirechat::actions.close-modal');
 
     });
 
@@ -78,7 +78,7 @@ describe('Initial page', function () {
         $request = Livewire::actingAs($auth)->test(NewGroup::class);
         $request
             ->assertSeeHtml('dusk="cancel_create_new_group_button"');
-        $request->assertMethodWired('$dispatch(\'closeChatDialog\')');
+        $request->assertContainsBladeComponent('wirechat::actions.close-modal');
 
     });
 
@@ -370,7 +370,7 @@ describe('Creteing group', function () {
         expect($conversation->participants->count())->toBe(4);
     });
 
-    it('dispataches Livewire events "closeChatDialog" event after creating Group', function () {
+    it('dispataches Livewire events "closeWireChatModal" event after creating Group', function () {
 
         Config::set('wirechat.max_group_members', 3);
         $auth = ModelsUser::factory()->create();
@@ -395,7 +395,7 @@ describe('Creteing group', function () {
                 //create group
             ->call('create');
 
-        $request->assertDispatched('closeChatDialog');
+        $request->assertDispatched('closeWireChatModal');
 
     });
 

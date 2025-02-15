@@ -41,14 +41,10 @@ abstract class ModalComponent extends Component
         return $this;
     }
 
-    // public function closeModal(): void
-    // {
-    //     $this->dispatch('closeModal', force: $this->forceClose, skipPreviousModals: $this->skipModals, destroySkipped: $this->destroySkipped);
-    // }
 
-    public function closeChatDialog(): void
+    public function closeWireChatModal(): void
     {
-        $this->dispatch('closeChatDialog', force: $this->forceClose, skipPreviousModals: $this->skipModals, destroySkipped: $this->destroySkipped);
+        $this->dispatch('closeWireChatModal', force: $this->forceClose, skipPreviousModals: $this->skipModals, destroySkipped: $this->destroySkipped);
     }
 
     public function closeChatDrawer(): void
@@ -60,7 +56,7 @@ abstract class ModalComponent extends Component
     {
         $this->emitModalEvents($events);
         // $this->closeModal();
-        $this->closeChatDialog();
+        $this->closeWireChatModal();
         $this->closeChatDrawer();
     }
 

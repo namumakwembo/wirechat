@@ -156,7 +156,7 @@ class Group extends ModalComponent
         //close dialog
         //The froce close is importnat because it will close all dialogs including parents or children
         $this->forceClose();
-        $this->closeChatDialog();
+        $this->closeWireChatModal();
 
         //redirect to conversation
         $this->handleComponentTermination(

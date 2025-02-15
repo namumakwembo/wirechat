@@ -12,7 +12,8 @@
     <header class=" sticky top-0 bg-white  dark:bg-gray-800 z-10 p-2">
         <div class="flex items-center justify-center pb-2">
 
-            <button wire:click="$dispatch('closeChatDialog')" dusk="close_modal_button"
+            <x-wirechat::actions.close-modal>
+            <button  dusk="close_modal_button"
                 class="p-2 ml-0 text-gray-600 hover:dark:bg-gray-700 hover:dark:text-white rounded-full hover:text-gray-800 hover:bg-gray-50">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class=" w-5 w-5">
@@ -20,6 +21,7 @@
                 </svg>
 
             </button>
+            </x-wirechat::actions.close-modal>
 
             <h3 class=" mx-auto font-semibold ">Members</h3>
 

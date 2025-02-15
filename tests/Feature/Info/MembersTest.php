@@ -65,7 +65,7 @@ describe('presence test', function () {
 
         //* since converstaion already have one user which is the auth then default is 1
         $request->assertSeeHtml('dusk="close_modal_button"');
-        $request->assertMethodWired('$dispatch(\'closeChatDialog\')');
+        $request->assertContainsBladeComponent('wirechat::actions.close-modal');
 
     });
 
@@ -452,7 +452,7 @@ describe('actions test', function () {
     });
 
     describe('sendMessage: ', function () {
-        test('it redirects to chat route and does not dispatch "closeChatDialog" & "open-chat"  & "close-chat" event when componnet is not Wdiget route after creating conversation ', function () {
+        test('it redirects to chat route and does not dispatch "closeWireChatModal" & "open-chat"  & "close-chat" event when componnet is not Wdiget route after creating conversation ', function () {
             $auth = User::factory()->create();
             $conversation = $auth->createGroup('My Group');
 
@@ -465,11 +465,11 @@ describe('actions test', function () {
                 ->call('sendMessage', $participant->id)
                 ->assertRedirect(route(WireChat::viewRouteName(), 2))
                 ->assertNotDispatched('close-chat')
-                ->assertNotDispatched('closeChatDialog')
+                ->assertNotDispatched('closeWireChatModal')
                 ->assertNotDispatched('open-chat');
         });
 
-        test('it dispatches "closeChatDialog" & "open-chat"  & "close-chat" event and does not redirects to chat route and does not when componnet  is Wdiget route after creating conversation ', function () {
+        test('it dispatches "closeWireChatModal" & "open-chat"  & "close-chat" event and does not redirects to chat route and does not when componnet  is Wdiget route after creating conversation ', function () {
             $auth = User::factory()->create();
             $conversation = $auth->createGroup('My Group');
 
@@ -482,7 +482,7 @@ describe('actions test', function () {
                 ->call('sendMessage', $participant->id)
                 ->assertNoRedirect(route(WireChat::viewRouteName(), 2))
                 ->assertDispatched('open-chat')
-                ->assertDispatched('closeChatDialog')
+                ->assertDispatched('closeWireChatModal')
                 ->assertNotDispatched('close-chat');
 
         });

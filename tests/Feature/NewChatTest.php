@@ -61,7 +61,7 @@ test('close_modal_button_is_set_correctly', function () {
     $request = Livewire::actingAs($auth)->test(NewChat::class);
     $request
         ->assertSeeHtml('dusk="close_modal_button"');
-    $request->assertMethodWired('$dispatch(\'closeChatDialog\')');
+    $request->assertContainsBladeComponent('wirechat::actions.close-modal');
 
 });
 
@@ -131,7 +131,7 @@ describe('Creating conversation', function () {
 
     });
 
-    test('it dispataches Livewire events "closeChatDialog" after creating conversation', function () {
+    test('it dispataches Livewire events "closeWireChatModal" after creating conversation', function () {
 
         $auth = ModelsUser::factory()->create();
 
@@ -147,7 +147,7 @@ describe('Creating conversation', function () {
         $request->call('createConversation', $otherUser->id, ModelsUser::class);
 
         //assert redirect
-        $request->assertDispatched('closeChatDialog');
+        $request->assertDispatched('closeWireChatModal');
 
     });
 

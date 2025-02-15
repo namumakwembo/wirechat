@@ -3,15 +3,16 @@
 <header class=" sticky top-0 bg-white  dark:bg-gray-800 z-10 p-2">
     <div class="flex items-center pb-2">
 
-        <button wire:click="$dispatch('closeChatDialog')" 
+        <x-wirechat::actions.close-modal>
+        <button 
             class="p-2 ml-0 text-gray-600 hover:dark:bg-gray-700 hover:dark:text-white rounded-full hover:text-gray-800 hover:bg-gray-50">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class=" w-5 w-5">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
             </svg>
-
         </button>
+        </x-wirechat::actions.close-modal>
 
         <h3  class="text-sm mx-auto font-semibold "  ><span>Add Members</span> {{$newTotalCount}} / {{$maxGroupMembers}}</h3>
 

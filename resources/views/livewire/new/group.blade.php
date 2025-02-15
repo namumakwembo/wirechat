@@ -85,11 +85,11 @@
                 </main>
 
                 <footer class="flex gap-4 justify-end mt-auto">
-
-                    <button type="button" wire:click="$dispatch('closeChatDialog')" dusk="cancel_create_new_group_button"
-                        class="font-bold dark:hover:bg-gray-700 p-3 px-4 rounded-xl ">
-                        Cancel
-                    </button>
+                    <x-wirechat::actions.close-modal>
+                        <button type="button" dusk="cancel_create_new_group_button"class="font-bold dark:hover:bg-gray-700 p-3 px-4 rounded-xl ">
+                            Cancel
+                        </button>
+                    </x-wirechat::actions.close-modal>
 
                     <button type="submit" :disabled="!($wire.name?.trim()?.length)" dusk="next_button"
                         :class="{ 'cursor-not-allowed hover:bg-none dark:hover:bg-inherit opacity-70': !($wire.name?.trim()?.length) }"

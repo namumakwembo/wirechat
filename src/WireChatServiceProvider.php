@@ -17,7 +17,7 @@ use Namu\WireChat\Livewire\Index;
 use Namu\WireChat\Livewire\Chat\Group\AddMembers;
 use Namu\WireChat\Livewire\Chat\Info;
 use Namu\WireChat\Livewire\Chat\Group\Members;
-use Namu\WireChat\Livewire\Modals\ChatDialog;
+use Namu\WireChat\Livewire\Modal;
 use Namu\WireChat\Livewire\Chat\Drawer;
 use Namu\WireChat\Livewire\View;
 use Namu\WireChat\Livewire\WireChat;
@@ -91,26 +91,28 @@ class WireChatServiceProvider extends ServiceProvider
     //custom methods for livewire components
     protected function loadLivewireComponents()
     {
+        //views
         Livewire::component('wirechat.index', Index::class);
         Livewire::component('wirechat.view', View::class);
 
-        Livewire::component('wirechat.chat', Chat::class);
+        //Chats 
         Livewire::component('wirechat.chats', Chats::class);
-
+        
         //wirechat  modal
-        Livewire::component('wirechat.chat-dialog', ChatDialog::class);
-        Livewire::component('wirechat.chat.drawer', Drawer::class);
-
+        Livewire::component('wirechat.modal', Modal::class);
+        
         Livewire::component('wirechat.new.chat', NewChat::class);
         Livewire::component('wirechat.new.group', NewGroup::class);
-
+        
         //Group related components
+        Livewire::component('wirechat.chat', Chat::class);
         Livewire::component('wirechat.chat.info', Info::class);
+        Livewire::component('wirechat.chat.drawer', Drawer::class);
         Livewire::component('wirechat.chat.group.add-members', AddMembers::class);
         Livewire::component('wirechat.chat.group.members', Members::class);
         Livewire::component('wirechat.chat.group.permissions', Permissions::class);
 
-        //Main Stand alone component
+        //stand alone widget component
         Livewire::component('wirechat', WireChat::class);
 
     }
@@ -129,7 +131,7 @@ class WireChatServiceProvider extends ServiceProvider
 
         Blade::directive('wirechatAssets', function () {
             return "<?php 
-                echo Blade::render('@livewire(\'wirechat.chat-dialog\')');
+                echo Blade::render('@livewire(\'wirechat.modal\')');
                 echo Blade::render('<x-wirechat::toast/>');
                 ?>";
         });

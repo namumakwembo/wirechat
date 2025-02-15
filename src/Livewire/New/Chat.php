@@ -56,7 +56,7 @@ class Chat extends ModalComponent
             if ($createdConversation) {
 
                 //close dialog
-                $this->closeChatDialog();
+                $this->closeWireChatModal();
 
                 //redirect to conversation
                 $this->handleComponentTermination(

@@ -237,8 +237,8 @@ class Chats extends Component
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
                 //'messages',
                 'lastMessage',
-                'authParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at'),
-                'receiverParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at')->with('participantable'),
+                'authParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at')->with('actions'),
+                'receiverParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at')->with('participantable','actions'),
                 'group.cover'=> fn($query) => $query->select('id','url','attachable_type','attachable_id'),
             ]);
         });

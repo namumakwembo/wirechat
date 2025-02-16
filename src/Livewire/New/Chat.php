@@ -4,7 +4,7 @@ namespace Namu\WireChat\Livewire\New;
 
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Concerns\ModalComponent;
-use Namu\WireChat\Livewire\WireChat as WidgetsWireChat;
+use Namu\WireChat\Livewire\Widgets\WireChat as WidgetsWireChat;
 use  Namu\WireChat\Livewire\Concerns\Widget;
 
 class Chat extends ModalComponent

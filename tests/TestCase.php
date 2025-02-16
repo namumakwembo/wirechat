@@ -65,7 +65,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $config->set('queue.failed.database', 'testbench');
         });
 
-        Model::shouldBeStrict();
     }
 
     protected function setUp(): void

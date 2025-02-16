@@ -134,6 +134,12 @@ class WireChat extends Component
         ];
     }
 
+    function mount() : void {
+
+        abort_unless(auth()->check(), 401);
+        
+    }
+
     public function render()
     {
         return view('wirechat::livewire.widgets.wire-chat');

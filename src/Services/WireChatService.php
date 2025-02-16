@@ -9,7 +9,7 @@ class WireChatService
     /**
      * Get the color used to be used in as themse
      */
-    public function getColor()
+    public static function getColor()
     {
         return config('wirechat.color', '#3b82f6');
     }

@@ -89,7 +89,7 @@ class WireChatServiceProvider extends ServiceProvider
     }
 
     //custom methods for livewire components
-    protected function loadLivewireComponents()
+protected function loadLivewireComponents():void
     {
         //Pages
         Livewire::component('wirechat.pages.index', Index::class);
@@ -117,7 +117,7 @@ class WireChatServiceProvider extends ServiceProvider
 
     }
 
-    protected function registerMiddlewares()
+    protected function registerMiddlewares():void
     {
 
         $router = $this->app->make(Router::class);
@@ -126,7 +126,7 @@ class WireChatServiceProvider extends ServiceProvider
     }
 
     //load assets
-    protected function loadAssets()
+    protected function loadAssets():void
     {
 
         Blade::directive('wirechatAssets', function () {
@@ -138,7 +138,7 @@ class WireChatServiceProvider extends ServiceProvider
     }
 
     //load assets
-    protected function loadStyles()
+    protected function loadStyles():void
     {
 
         $primaryColor = FacadesWireChat::getColor();

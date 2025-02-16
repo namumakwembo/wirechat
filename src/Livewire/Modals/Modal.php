@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Livewire;
+namespace Namu\WireChat\Livewire\Modals;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;

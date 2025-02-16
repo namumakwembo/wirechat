@@ -17,7 +17,7 @@ use Namu\WireChat\Livewire\Pages\Chats as Index;
 use Namu\WireChat\Livewire\Chat\Group\AddMembers;
 use Namu\WireChat\Livewire\Chat\Info;
 use Namu\WireChat\Livewire\Chat\Group\Members;
-use Namu\WireChat\Livewire\Modal;
+use Namu\WireChat\Livewire\Modals\Modal;
 use Namu\WireChat\Livewire\Chat\Drawer;
 use Namu\WireChat\Livewire\Pages\Chat as View;
 use Namu\WireChat\Livewire\Widgets\WireChat;
@@ -98,13 +98,13 @@ class WireChatServiceProvider extends ServiceProvider
         //Chats 
         Livewire::component('wirechat.chats', Chats::class);
         
-        //wirechat  modal
+        //modal
         Livewire::component('wirechat.modal', Modal::class);
         
         Livewire::component('wirechat.new.chat', NewChat::class);
         Livewire::component('wirechat.new.group', NewGroup::class);
         
-        //Group related components
+        //Chat/Group related components
         Livewire::component('wirechat.chat', Chat::class);
         Livewire::component('wirechat.chat.info', Info::class);
         Livewire::component('wirechat.chat.drawer', Drawer::class);

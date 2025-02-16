@@ -134,10 +134,11 @@ class WireChat extends Component
         ];
     }
 
-    function mount() : void {
+    public function mount(): void
+    {
 
         abort_unless(auth()->check(), 401);
-        
+
     }
 
     public function render()

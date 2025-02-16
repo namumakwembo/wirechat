@@ -27,7 +27,7 @@ workbench:
       - drop-sqlite-db
       - create-sqlite-db
       #- vendor:publish --tag="wirechat-migrations"
-      # - migrate:refresh
+      - migrate:refresh
 
   ]
   assets: []

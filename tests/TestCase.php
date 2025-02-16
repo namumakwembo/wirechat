@@ -81,7 +81,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         //  $this->loadMigrationsFrom( );
         $this->withoutVite();
-          $this->loadMigrationsFrom(workbench_path('database/migrations'));
+        $this->loadMigrationsFrom([workbench_path('database/migrations'),__DIR__.'/../database/migrations']);
 
         // $this->artisan('migrate:fresh ')->run();
         //  $this->loadRoutesFrom(workbench_path('routes/web.php'));

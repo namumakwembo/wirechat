@@ -92,19 +92,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function defineDatabaseMigrations()
     {
-        $paths = [
-            __DIR__.'/../database/migrations',
-            workbench_path('database/migrations'),
-        ];
+        ///$this->loadLaravelMigrations();
+        $this->loadMigrationsFrom([__DIR__.'/../database/migrations', workbench_path('database/migrations')]);
 
-        // Filter only existing paths to avoid errors
-        $validPaths = array_filter($paths, fn ($path) => is_dir($path));
-
-        if (empty($validPaths)) {
-            throw new \Exception('No valid migration paths found.');
-        }
-
-        $this->loadMigrationsFrom($validPaths);
+        //   $this->loadMigrationsFrom(workbench_path('database/migrations'));
+        //     $this->artisan('orchid:install'); // installs migrations required for Orchid admin panel
     }
 
     // public static function applicationBasePath()

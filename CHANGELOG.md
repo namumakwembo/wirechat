@@ -15,29 +15,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [v0.1.0](https://github.com/namumakwembo/wirechat/releases/tag/0.1.0) - 2025-02-13  
 
-### Added  
-- Initial changelog setup.  
-- New config variables:  
-  - `'guards' => ['web']`  
-  - `'layout' => 'wirechat::layouts.app'`  
-- Command for publishing views.  
-- Standalone WireChat widget.  
-- Added / Improved documentation on:  
-  - Authorization  
-  - Core Components  
-  - Layout  
-  - Views  
-  - Contribution Guide  
-  - Extending WireChat Components  
-- `belongsToConversation` middleware to `/chats` view route .  
+## [v0.1.0](https://github.com/namumakwembo/wirechat/releases/tag/0.1.0) - 2025-02-16
 
-### Changed  
-- `NotifyParticipant` channel now uses an encoded type and ID to support mixed models in conversations.  
+### Added
+- New config variables:
+  - `'guards' => ['web']`
+  - `'layout' => 'wirechat::layouts.app'`
+- Command for publishing views.
+- Standalone WireChat widget.
+- Added/Improved documentation on:
+  - Authorization
+  - Core Components
+  - Layout
+  - Views
+  - Contribution Guide
+  - Extending WireChat Components
+- `belongsToConversation` middleware added to the `/chats` view route.
+
+### Changed
+- `NotifyParticipant` channel now uses an encoded type and ID to support mixed models in conversations.
 
   **Breaking Change:**  
-  If you previously listened to the `participant` channel, update to the new format:  
+  If you previously listened to the `participant` channel, update to the new format:
 
   ```diff
   + userId = @js(auth()->id());
@@ -48,7 +48,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         .listen('.Namu\\WireChat\\Events\\NotifyParticipant', (e) => {
            console.log(e);
       });
-  ```  
+  ```
+
+- `Folder Structure Reorganized `
+
+  We have restructured the package folders to group related components and assets more logically. This improves view publishing and feature additions. If you have previously published or customized views, please re-publish them using the new command and update any file path references accordingly.
+
 
 ### Fixed  
 - Updated tests to fully support conversations with mixed models.  

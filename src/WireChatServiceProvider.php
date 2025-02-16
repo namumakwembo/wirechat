@@ -9,17 +9,17 @@ use Livewire\Livewire;
 use Namu\WireChat\Console\Commands\InstallWireChat;
 use Namu\WireChat\Facades\WireChat as FacadesWireChat;
 use Namu\WireChat\Livewire\Chat\Chat;
+use Namu\WireChat\Livewire\Chat\Drawer;
+use Namu\WireChat\Livewire\Chat\Group\AddMembers;
+use Namu\WireChat\Livewire\Chat\Group\Members;
+use Namu\WireChat\Livewire\Chat\Group\Permissions;
+use Namu\WireChat\Livewire\Chat\Info;
 use Namu\WireChat\Livewire\Chats\Chats;
+use Namu\WireChat\Livewire\Modals\Modal;
 use Namu\WireChat\Livewire\New\Chat as NewChat;
 use Namu\WireChat\Livewire\New\Group as NewGroup;
-use Namu\WireChat\Livewire\Chat\Group\Permissions;
-use Namu\WireChat\Livewire\Pages\Chats as Index;
-use Namu\WireChat\Livewire\Chat\Group\AddMembers;
-use Namu\WireChat\Livewire\Chat\Info;
-use Namu\WireChat\Livewire\Chat\Group\Members;
-use Namu\WireChat\Livewire\Modals\Modal;
-use Namu\WireChat\Livewire\Chat\Drawer;
 use Namu\WireChat\Livewire\Pages\Chat as View;
+use Namu\WireChat\Livewire\Pages\Chats as Index;
 use Namu\WireChat\Livewire\Widgets\WireChat;
 use Namu\WireChat\Middleware\BelongsToConversation;
 use Namu\WireChat\Services\WireChatService;
@@ -95,15 +95,15 @@ class WireChatServiceProvider extends ServiceProvider
         Livewire::component('wirechat.pages.index', Index::class);
         Livewire::component('wirechat.pages.view', View::class);
 
-        //Chats 
+        //Chats
         Livewire::component('wirechat.chats', Chats::class);
-        
+
         //modal
         Livewire::component('wirechat.modal', Modal::class);
-        
+
         Livewire::component('wirechat.new.chat', NewChat::class);
         Livewire::component('wirechat.new.group', NewGroup::class);
-        
+
         //Chat/Group related components
         Livewire::component('wirechat.chat', Chat::class);
         Livewire::component('wirechat.chat.info', Info::class);

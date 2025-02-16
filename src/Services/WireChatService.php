@@ -49,7 +49,6 @@ class WireChatService
         return config('wirechat.table_prefix').$table;
     }
 
-
     /**
      * Checks if new group modal button can be shown
      */
@@ -58,15 +57,13 @@ class WireChatService
         return config('wirechat.show_new_group_modal_button', false);
     }
 
-
-       /**
+    /**
      * Checks if new group modal button can be shown
      */
     public static function allowChatsSearch(): bool
     {
         return config('wirechat.allow_chats_search', false);
     }
-
 
     /**
      * Checks if new chat modal button can be shown

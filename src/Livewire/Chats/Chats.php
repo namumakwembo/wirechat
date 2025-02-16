@@ -9,8 +9,8 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Helpers\MorphClassResolver;
-use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Livewire\Concerns\Widget;
+use Namu\WireChat\Models\Conversation;
 
 /**
  * Chats Component
@@ -35,21 +35,20 @@ class Chats extends Component
      */
     public $conversations = [];
 
-
-
     /**
      * Features
      */
-
     #[Locked]
     public bool $showNewChatModalButton;
+
     #[Locked]
     public bool $allowChatsSearch;
+
     #[Locked]
     public bool $showHomeRouteButton;
+
     #[Locked]
     public ?string $title;
-
 
     /**
      * Indicates if more conversations can be loaded.
@@ -199,9 +198,9 @@ class Chats extends Component
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
                 // 'participants',
                 'lastMessage.sendable',
-                'authParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at'),
-                'receiverParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at')->with('participantable'),
-                'group.cover'=> fn($query) =>  $query->select('id','url','attachable_type','attachable_id')
+                'authParticipant' => fn ($query) => $query->select('id', 'participantable_id', 'participantable_type', 'conversation_id', 'conversation_read_at'),
+                'receiverParticipant' => fn ($query) => $query->select('id', 'participantable_id', 'participantable_type', 'conversation_id', 'conversation_read_at')->with('participantable'),
+                'group.cover' => fn ($query) => $query->select('id', 'url', 'attachable_type', 'attachable_id'),
             ])
             ->when(trim($this->search ?? '') != '', fn ($query) => $this->applySearchConditions($query)) // Apply search.
             ->when(trim($this->search ?? '') == '', fn ($query) => $query->withoutDeleted()->withoutBlanks()) // Exclude blanks & deleted.
@@ -237,9 +236,9 @@ class Chats extends Component
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
                 //'messages',
                 'lastMessage',
-                'authParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at')->with('actions'),
-                'receiverParticipant'=> fn($query) => $query->select('id', 'participantable_id','participantable_type','conversation_id','conversation_read_at')->with('participantable','actions'),
-                'group.cover'=> fn($query) => $query->select('id','url','attachable_type','attachable_id'),
+                'authParticipant' => fn ($query) => $query->select('id', 'participantable_id', 'participantable_type', 'conversation_id', 'conversation_read_at')->with('actions'),
+                'receiverParticipant' => fn ($query) => $query->select('id', 'participantable_id', 'participantable_type', 'conversation_id', 'conversation_read_at')->with('participantable', 'actions'),
+                'group.cover' => fn ($query) => $query->select('id', 'url', 'attachable_type', 'attachable_id'),
             ]);
         });
     }
@@ -320,14 +319,13 @@ class Chats extends Component
         $showNewChatModalButton = null,
         $allowChatsSearch = null,
         $showHomeRouteButton = null,
-        $title = "Chats",
+        $title = 'Chats',
     ) {
         // If a value is passed, use it; otherwise fallback to WireChat defaults.
         $this->showNewChatModalButton = isset($showNewChatModalButton) ? $showNewChatModalButton : WireChat::showNewChatModalButton();
-        $this->allowChatsSearch         =  isset($allowChatsSearch) ? $allowChatsSearch  : WireChat::allowChatsSearch();
-        $this->showHomeRouteButton     =  isset($showHomeRouteButton) ? $showHomeRouteButton     : !$this->widget ;
-        $this->title     =  isset($title)? $title  : null ;
-
+        $this->allowChatsSearch = isset($allowChatsSearch) ? $allowChatsSearch : WireChat::allowChatsSearch();
+        $this->showHomeRouteButton = isset($showHomeRouteButton) ? $showHomeRouteButton : ! $this->widget;
+        $this->title = isset($title) ? $title : null;
 
         abort_unless(auth()->check(), 401);
         $this->selectedConversationId = request()->conversation;

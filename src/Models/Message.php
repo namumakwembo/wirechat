@@ -96,15 +96,14 @@ class Message extends Model
         return $this->morphOne(Attachment::class, 'attachable');
     }
 
-    public function hasAttachment():bool
+    public function hasAttachment(): bool
     {
         return $this->attachment()->exists();
     }
 
-
-    public function isAttachment():bool
+    public function isAttachment(): bool
     {
-        return $this->type== MessageType::ATTACHMENT;
+        return $this->type == MessageType::ATTACHMENT;
     }
 
     /**

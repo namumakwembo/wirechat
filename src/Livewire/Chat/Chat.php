@@ -18,10 +18,10 @@ use Namu\WireChat\Events\MessageDeleted;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Jobs\NotifyParticipants;
 use Namu\WireChat\Livewire\Chats\Chats;
+use Namu\WireChat\Livewire\Concerns\Widget;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message;
 use Namu\WireChat\Models\Participant;
-use Namu\WireChat\Livewire\Concerns\Widget;
 
 class Chat extends Component
 {

@@ -8,11 +8,10 @@ use Livewire\WithFileUploads;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Jobs\DeleteConversationJob;
-use Namu\WireChat\Livewire\Chat\Chat;
 use Namu\WireChat\Livewire\Chats\Chats;
 use Namu\WireChat\Livewire\Concerns\ModalComponent;
-use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Livewire\Concerns\Widget;
+use Namu\WireChat\Models\Conversation;
 
 class Info extends ModalComponent
 {
@@ -206,8 +205,6 @@ class Info extends ModalComponent
 
         abort_unless($participantCount == 0, 403, 'Cannot delete group: Please remove all members before attempting to delete the group.');
 
-        
-
         //handle widget termination
         $this->handleComponentTermination(
             redirectRoute: route(WireChat::indexRouteName()),
@@ -219,7 +216,7 @@ class Info extends ModalComponent
 
         //Soft Delete conversation
         $this->conversation->deleteFor(auth()->user());
-        
+
         //Dispatch job to delete conversation in backgroud
         //This is done to not hold up page for user incase of long running prcoess and to also give time for widget to settle avoiding 404 livewire hydrate errors
         DeleteConversationJob::dispatch($this->conversation);

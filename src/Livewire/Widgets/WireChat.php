@@ -96,7 +96,7 @@ class WireChat extends Component
                 return $enum;
             }
         }
-        
+
         $instance = app()->make($parameterClassName);
 
         if (! $model = $instance->resolveRouteBinding($parameterValue)) {

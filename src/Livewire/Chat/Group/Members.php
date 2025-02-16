@@ -11,13 +11,13 @@ use Livewire\WithPagination;
 use Namu\WireChat\Enums\Actions;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Facades\WireChat;
-use Namu\WireChat\Livewire\Concerns\ModalComponent;
-use Namu\WireChat\Livewire\Widgets\WireChat as WidgetsWireChat;
 use Namu\WireChat\Livewire\Chat\Info;
+use Namu\WireChat\Livewire\Concerns\ModalComponent;
+use Namu\WireChat\Livewire\Concerns\Widget;
+use Namu\WireChat\Livewire\Widgets\WireChat as WidgetsWireChat;
 use Namu\WireChat\Models\Action;
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Participant;
-use  Namu\WireChat\Livewire\Concerns\Widget;
 
 class Members extends ModalComponent
 {

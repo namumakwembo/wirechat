@@ -23,293 +23,282 @@ test('authenticaed user can access chatlist ', function () {
         ->assertStatus(200);
 });
 
-describe('Presence check',function(){
+describe('Presence check', function () {
 
-///Content validations
-it('has "chats title set in chatlist" as defualt', function () {
-    $auth = User::factory()->create();
-    Livewire::actingAs($auth)->test(Chatlist::class)
+    ///Content validations
+    it('has "chats title set in chatlist" as defualt', function () {
+        $auth = User::factory()->create();
+        Livewire::actingAs($auth)->test(Chatlist::class)
             ->assertSeeHtml('dusk="title"')
-            ->assertSet('title','Chats')
+            ->assertSet('title', 'Chats')
             ->assertSee('Chats');
-});
-
-
-test('chat title can be set manually', function () {
-    $auth = User::factory()->create();
-    Livewire::actingAs($auth)->test(Chatlist::class,['title'=>"Messages"])
-        ->assertSee('Messages')
-        ->assertSeeHtml('dusk="title"')
-        ->assertDontSee('Chats');
-});
-
-test('chat title can be set to Null', function () {
-    $auth = User::factory()->create();
-    Livewire::actingAs($auth)->test(Chatlist::class,['title'=>null])
-        ->assertDontSee('Chats')
-        ->assertDontSeeHtml('dusk="title"')
-        ->assertset('title',null);
-});
-
-
-it('shows_redirect_button', function () {
-
-    $auth = User::factory()->create();
-    Livewire::actingAs($auth)->test(Chatlist::class)
-        ->assertSeeHtml('id="redirect-button"');
-});
-
-it('shows_header ', function () {
-
-    $auth = User::factory()->create();
-    Livewire::actingAs($auth)->test(Chatlist::class)
-        ->assertSeeHtml('dusk="header"');
-});
-
-it('shows DOESNT show header when showNewChatModalButton && allowChatsSearch && showHomeRouteButton are false && title is NULL ', function () {
-
-    $auth = User::factory()->create();
-    Livewire::actingAs($auth)->test(Chatlist::class,[
-        'showNewChatModalButton'=>false,
-        'allowChatsSearch'=>false,
-        'showHomeRouteButton'=>false,
-        'title'=>null,
-    ])
-        ->assertDontSeeHtml('dusk="header"');
-});
-
-it('doesnt shows search field if search is disabled in wirechat.config:tesiting Search placeholder', function () {
-
-    Config::set('wirechat.allow_chats_search', false);
-
-    $auth = User::factory()->create();
-    Livewire::actingAs($auth)->test(Chatlist::class)
-        ->assertDontSee('Search')
-        ->assertPropertyNotWired('search')
-        ->assertDontSeeHtml('id="chats-search-field"');
-});
-
-
-it('doesnt shows search field if search MANUALLY disabled at widget level even if in wirechat.config.allow_chats_search is true', function () {
-
-    Config::set('wirechat.allow_chats_search',true);
-
-    $auth = User::factory()->create();
-    Livewire::actingAs($auth)->test(Chatlist::class,['allowChatsSearch'=>false])
-        ->assertDontSee('Search')
-        ->assertPropertyNotWired('search')
-        ->assertDontSeeHtml('id="chats-search-field"');
-});
-
-
-it('shows search field if search is enabled in wirechat.config.allow_chats_search Search placeholder', function () {
-
-    Config::set('wirechat.allow_chats_search', true);
-
-    $auth = User::factory()->create();
-    Livewire::actingAs($auth)->test(Chatlist::class)
-        ->assertSee('Search')
-        ->assertPropertyWired('search')
-        ->assertSeeHtml('id="chats-search-field"');
-});
-
-
-it('shows search field even if search is DISABLED in wirechat.config.allow_chats_search but ENABLED at component level', function () {
-
-    Config::set('wirechat.allow_chats_search', false);
-
-    $auth = User::factory()->create();
-    Livewire::actingAs($auth)->test(Chatlist::class,['allowChatsSearch'=>true])
-        ->assertSee('Search')
-        ->assertPropertyWired('search')
-        ->assertSeeHtml('id="chats-search-field"');
-});
-
-
-
-test('it_shows_new_chat_modal_button_if_enabled_in_config', function () {
-
-    Config::set('wirechat.show_new_chat_modal_button', true);
-    $auth = User::factory()->create();
-
-    Livewire::actingAs($auth)
-        ->test(Chatlist::class)
-        ->assertSeeHtml('id="open-new-chat-modal-button"');
-});
-
-test('if "showNewChatModalButton" DISABLED  at component level it doesnt shows_new_chat_modal_button event if enabled_in_config', function () {
-
-    Config::set('wirechat.show_new_chat_modal_button', true);
-    $auth = User::factory()->create();
-
-    Livewire::actingAs($auth)
-        ->test(Chatlist::class,['showNewChatModalButton'=>false])
-        ->assertDontSeeHtml('id="open-new-chat-modal-button"');
-});
-
-test('it_does_not_show_new_chat_modal_button_if_not_enabled_in_config', function () {
-
-    Config::set('wirechat.show_new_chat_modal_button', false);
-    $auth = User::factory()->create();
-
-    Livewire::actingAs($auth)
-        ->test(Chatlist::class)
-        ->assertDontSeeHtml('id="open-new-chat-modal-button"');
-});
-
-test('if "showNewChatModalButton" ENABLED  at component level it still shows_new_chat_modal_button_if_not enabled_in_config  ', function () {
-
-    Config::set('wirechat.show_new_chat_modal_button', false);
-    $auth = User::factory()->create();
-    Livewire::actingAs($auth)
-        ->test(Chatlist::class,['showNewChatModalButton'=>true])
-        ->assertSeeHtml('id="open-new-chat-modal-button"');
-});
-
-
-test('it_shows_load_more_button_if_user_can_load_more', function () {
-
-    $auth = User::factory()->create();
-
-    for ($i = 0; $i < 12; $i++) {
-
-        $user = User::factory()->create();
-
-        $auth->createConversationWith($user, 'hello');
-    }
-
-    // dd($conversation);
-    Livewire::actingAs($auth)->test(Chatlist::class)
-        ->assertSee('Load more')
-        ->assertSeeHtml('dusk="loadMoreButton"');
-});
-
-test('it_does_not_show_load_more_button_if_user_cannot_load_more', function () {
-
-    $auth = User::factory()->create();
-
-    for ($i = 0; $i < 4; $i++) {
-
-        $user = User::factory()->create();
-
-        $auth->createConversationWith($user, 'hello');
-    }
-
-    Livewire::actingAs($auth)->test(Chatlist::class)
-        ->assertDontSee('Load more')
-        ->assertDontSeeHtml('dusk="loadMoreButton"');
-});
-test('it shows dusk="disappearing_messages_icon" if disappearingTurnedOn for conversation', function () {
-
-    $auth = User::factory()->create(['name' => 'Namu']);
-
-    Carbon::setTestNowAndTimezone(now());
-    $conversation = $auth->createGroup('My Group');
-
-    $auth->sendMessageTo($conversation, 'hi');
-
-    //turn on disappearing
-
-    $conversation->turnOnDisappearing(3600);
-
-    // dd($conversation->hasDisappearingTurnedOn());
-    Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id])
-        ->assertSeeHtml('dusk="disappearing_messages_icon" ');
-});
-
-test('it doesnt shows dusk="disappearing_messages_icon" if disappearingTurnedOFF for conversation', function () {
-
-    $auth = User::factory()->create(['name' => 'Namu']);
-    $conversation = $auth->createGroup('My Group');
-
-    $auth->sendMessageTo($conversation, 'hi');
-
-    //turn on disappearing
-    $conversation->turnOffDisappearing();
-
-    // dd($conversation);
-    Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id])
-        ->assertDontSeeHtml('dusk="disappearing_messages_icon"');
-});
-
-describe('IsWidget', function () {
-
-    test('it doesnt  have dispatch "openChatWidget" when chats is not widget', function () {
-
-        $auth = User::factory()->create(['name' => 'Namu']);
-        $conversation = $auth->createGroup('My Group');
-
-        $auth->sendMessageTo($conversation, 'hi');
-
-        // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => false])
-            ->assertDontSeeHtml('dusk="openChatWidgetButton"');
     });
 
-    test('it  has dispatches "openChatWidget"when chats is widget', function () {
-
-        $auth = User::factory()->create(['name' => 'Namu']);
-        $conversation = $auth->createGroup('My Group');
-
-        $auth->sendMessageTo($conversation, 'hi');
-
-        // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => true])
-            ->assertSeeHtml('dusk="openChatWidgetButton"');
+    test('chat title can be set manually', function () {
+        $auth = User::factory()->create();
+        Livewire::actingAs($auth)->test(Chatlist::class, ['title' => 'Messages'])
+            ->assertSee('Messages')
+            ->assertSeeHtml('dusk="title"')
+            ->assertDontSee('Chats');
     });
 
-    test('it shows redirect home button when chats is NOT widget', function () {
+    test('chat title can be set to Null', function () {
+        $auth = User::factory()->create();
+        Livewire::actingAs($auth)->test(Chatlist::class, ['title' => null])
+            ->assertDontSee('Chats')
+            ->assertDontSeeHtml('dusk="title"')
+            ->assertset('title', null);
+    });
 
-        $auth = User::factory()->create(['name' => 'Namu']);
-        $conversation = $auth->createGroup('My Group');
+    it('shows_redirect_button', function () {
 
-        $auth->sendMessageTo($conversation, 'hi');
-
-        // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => false])
+        $auth = User::factory()->create();
+        Livewire::actingAs($auth)->test(Chatlist::class)
             ->assertSeeHtml('id="redirect-button"');
     });
 
-    test('it doesnt show redirect home button when chats is NOT widget and :showHomeRouteButton is false', function () {
+    it('shows_header ', function () {
+
+        $auth = User::factory()->create();
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertSeeHtml('dusk="header"');
+    });
+
+    it('shows DOESNT show header when showNewChatModalButton && allowChatsSearch && showHomeRouteButton are false && title is NULL ', function () {
+
+        $auth = User::factory()->create();
+        Livewire::actingAs($auth)->test(Chatlist::class, [
+            'showNewChatModalButton' => false,
+            'allowChatsSearch' => false,
+            'showHomeRouteButton' => false,
+            'title' => null,
+        ])
+            ->assertDontSeeHtml('dusk="header"');
+    });
+
+    it('doesnt shows search field if search is disabled in wirechat.config:tesiting Search placeholder', function () {
+
+        Config::set('wirechat.allow_chats_search', false);
+
+        $auth = User::factory()->create();
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertDontSee('Search')
+            ->assertPropertyNotWired('search')
+            ->assertDontSeeHtml('id="chats-search-field"');
+    });
+
+    it('doesnt shows search field if search MANUALLY disabled at widget level even if in wirechat.config.allow_chats_search is true', function () {
+
+        Config::set('wirechat.allow_chats_search', true);
+
+        $auth = User::factory()->create();
+        Livewire::actingAs($auth)->test(Chatlist::class, ['allowChatsSearch' => false])
+            ->assertDontSee('Search')
+            ->assertPropertyNotWired('search')
+            ->assertDontSeeHtml('id="chats-search-field"');
+    });
+
+    it('shows search field if search is enabled in wirechat.config.allow_chats_search Search placeholder', function () {
+
+        Config::set('wirechat.allow_chats_search', true);
+
+        $auth = User::factory()->create();
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertSee('Search')
+            ->assertPropertyWired('search')
+            ->assertSeeHtml('id="chats-search-field"');
+    });
+
+    it('shows search field even if search is DISABLED in wirechat.config.allow_chats_search but ENABLED at component level', function () {
+
+        Config::set('wirechat.allow_chats_search', false);
+
+        $auth = User::factory()->create();
+        Livewire::actingAs($auth)->test(Chatlist::class, ['allowChatsSearch' => true])
+            ->assertSee('Search')
+            ->assertPropertyWired('search')
+            ->assertSeeHtml('id="chats-search-field"');
+    });
+
+    test('it_shows_new_chat_modal_button_if_enabled_in_config', function () {
+
+        Config::set('wirechat.show_new_chat_modal_button', true);
+        $auth = User::factory()->create();
+
+        Livewire::actingAs($auth)
+            ->test(Chatlist::class)
+            ->assertSeeHtml('id="open-new-chat-modal-button"');
+    });
+
+    test('if "showNewChatModalButton" DISABLED  at component level it doesnt shows_new_chat_modal_button event if enabled_in_config', function () {
+
+        Config::set('wirechat.show_new_chat_modal_button', true);
+        $auth = User::factory()->create();
+
+        Livewire::actingAs($auth)
+            ->test(Chatlist::class, ['showNewChatModalButton' => false])
+            ->assertDontSeeHtml('id="open-new-chat-modal-button"');
+    });
+
+    test('it_does_not_show_new_chat_modal_button_if_not_enabled_in_config', function () {
+
+        Config::set('wirechat.show_new_chat_modal_button', false);
+        $auth = User::factory()->create();
+
+        Livewire::actingAs($auth)
+            ->test(Chatlist::class)
+            ->assertDontSeeHtml('id="open-new-chat-modal-button"');
+    });
+
+    test('if "showNewChatModalButton" ENABLED  at component level it still shows_new_chat_modal_button_if_not enabled_in_config  ', function () {
+
+        Config::set('wirechat.show_new_chat_modal_button', false);
+        $auth = User::factory()->create();
+        Livewire::actingAs($auth)
+            ->test(Chatlist::class, ['showNewChatModalButton' => true])
+            ->assertSeeHtml('id="open-new-chat-modal-button"');
+    });
+
+    test('it_shows_load_more_button_if_user_can_load_more', function () {
+
+        $auth = User::factory()->create();
+
+        for ($i = 0; $i < 12; $i++) {
+
+            $user = User::factory()->create();
+
+            $auth->createConversationWith($user, 'hello');
+        }
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertSee('Load more')
+            ->assertSeeHtml('dusk="loadMoreButton"');
+    });
+
+    test('it_does_not_show_load_more_button_if_user_cannot_load_more', function () {
+
+        $auth = User::factory()->create();
+
+        for ($i = 0; $i < 4; $i++) {
+
+            $user = User::factory()->create();
+
+            $auth->createConversationWith($user, 'hello');
+        }
+
+        Livewire::actingAs($auth)->test(Chatlist::class)
+            ->assertDontSee('Load more')
+            ->assertDontSeeHtml('dusk="loadMoreButton"');
+    });
+    test('it shows dusk="disappearing_messages_icon" if disappearingTurnedOn for conversation', function () {
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+
+        Carbon::setTestNowAndTimezone(now());
+        $conversation = $auth->createGroup('My Group');
+
+        $auth->sendMessageTo($conversation, 'hi');
+
+        //turn on disappearing
+
+        $conversation->turnOnDisappearing(3600);
+
+        // dd($conversation->hasDisappearingTurnedOn());
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id])
+            ->assertSeeHtml('dusk="disappearing_messages_icon" ');
+    });
+
+    test('it doesnt shows dusk="disappearing_messages_icon" if disappearingTurnedOFF for conversation', function () {
 
         $auth = User::factory()->create(['name' => 'Namu']);
         $conversation = $auth->createGroup('My Group');
 
         $auth->sendMessageTo($conversation, 'hi');
 
-        // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => false,'showHomeRouteButton'=>false])
-            ->assertDontSeeHtml('id="redirect-button"');
-    });
-
-    test('it doesnt shows redirect home button when chats is widget', function () {
-
-        $auth = User::factory()->create(['name' => 'Namu']);
-        $conversation = $auth->createGroup('My Group');
-
-        $auth->sendMessageTo($conversation, 'hi');
+        //turn on disappearing
+        $conversation->turnOffDisappearing();
 
         // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => true])
-            ->assertDontSeeHtml('id="redirect-button"');
+        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id])
+            ->assertDontSeeHtml('dusk="disappearing_messages_icon"');
     });
 
+    describe('IsWidget', function () {
 
-    test('it still shows redirect home button when chats is widget but :showHomeRouteButton is true', function () {
+        test('it doesnt  have dispatch "openChatWidget" when chats is not widget', function () {
 
-        $auth = User::factory()->create(['name' => 'Namu']);
-        $conversation = $auth->createGroup('My Group');
+            $auth = User::factory()->create(['name' => 'Namu']);
+            $conversation = $auth->createGroup('My Group');
 
-        $auth->sendMessageTo($conversation, 'hi');
+            $auth->sendMessageTo($conversation, 'hi');
 
-        // dd($conversation);
-        Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => true,'showHomeRouteButton'=>true])
-            ->assertSeeHtml('id="redirect-button"');
+            // dd($conversation);
+            Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => false])
+                ->assertDontSeeHtml('dusk="openChatWidgetButton"');
+        });
+
+        test('it  has dispatches "openChatWidget"when chats is widget', function () {
+
+            $auth = User::factory()->create(['name' => 'Namu']);
+            $conversation = $auth->createGroup('My Group');
+
+            $auth->sendMessageTo($conversation, 'hi');
+
+            // dd($conversation);
+            Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => true])
+                ->assertSeeHtml('dusk="openChatWidgetButton"');
+        });
+
+        test('it shows redirect home button when chats is NOT widget', function () {
+
+            $auth = User::factory()->create(['name' => 'Namu']);
+            $conversation = $auth->createGroup('My Group');
+
+            $auth->sendMessageTo($conversation, 'hi');
+
+            // dd($conversation);
+            Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => false])
+                ->assertSeeHtml('id="redirect-button"');
+        });
+
+        test('it doesnt show redirect home button when chats is NOT widget and :showHomeRouteButton is false', function () {
+
+            $auth = User::factory()->create(['name' => 'Namu']);
+            $conversation = $auth->createGroup('My Group');
+
+            $auth->sendMessageTo($conversation, 'hi');
+
+            // dd($conversation);
+            Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => false, 'showHomeRouteButton' => false])
+                ->assertDontSeeHtml('id="redirect-button"');
+        });
+
+        test('it doesnt shows redirect home button when chats is widget', function () {
+
+            $auth = User::factory()->create(['name' => 'Namu']);
+            $conversation = $auth->createGroup('My Group');
+
+            $auth->sendMessageTo($conversation, 'hi');
+
+            // dd($conversation);
+            Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => true])
+                ->assertDontSeeHtml('id="redirect-button"');
+        });
+
+        test('it still shows redirect home button when chats is widget but :showHomeRouteButton is true', function () {
+
+            $auth = User::factory()->create(['name' => 'Namu']);
+            $conversation = $auth->createGroup('My Group');
+
+            $auth->sendMessageTo($conversation, 'hi');
+
+            // dd($conversation);
+            Livewire::actingAs($auth)->test(Chatlist::class, ['conversation' => $conversation->id, 'widget' => true, 'showHomeRouteButton' => true])
+                ->assertSeeHtml('id="redirect-button"');
+        });
+
     });
-
-
-
-});
 });
 
 describe('List', function () {
@@ -655,13 +644,13 @@ describe('List', function () {
             'conversation_id' => $conversation->id,
             'sendable_type' => get_class($auth),
             'sendable_id' => $auth->id,
-            'type'=>MessageType::ATTACHMENT
+            'type' => MessageType::ATTACHMENT,
         ]);
 
         $createdAttachment = Attachment::factory()->for($message, 'attachable')->create();
 
         Livewire::actingAs($auth)->test(Chatlist::class)
-                 ->assertSee('📎 Attachment');
+            ->assertSee('📎 Attachment');
     });
 
     test('deleted conversation should not appear in user chats list', function () {
@@ -692,8 +681,6 @@ describe('List', function () {
             });
     });
 });
-
-
 
 describe('Search', function () {
 

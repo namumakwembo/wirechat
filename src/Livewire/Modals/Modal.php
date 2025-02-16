@@ -23,7 +23,6 @@ class Modal extends Component
         ];
     }
 
-
     public function resetState(): void
     {
         $this->components = [];
@@ -103,9 +102,8 @@ class Modal extends Component
         unset($this->components[$id]);
     }
 
-   
     public function render()
     {
-        return view('wirechat::livewire.modal');
+        return view('wirechat::livewire.modals.modal');
     }
 }

@@ -2010,7 +2010,7 @@ describe('Deleting Conversation', function () {
         expect($authParticipant->conversation_deleted_at)->toBe(null);
     });
 
-    describe('IsWidget:', function () {
+    describe('IsWidget:--', function () {
 
         test('it does not redirects to chats route after deleting conversation', function () {
             $auth = User::factory()->create();

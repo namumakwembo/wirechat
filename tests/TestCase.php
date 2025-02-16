@@ -23,7 +23,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     //use DatabaseMigrations;
 
     //use InteractsWithViews;
-    use RefreshDatabase;
+    //use RefreshDatabase;
 
     // use DatabaseTruncation;
     use WithWorkbench;

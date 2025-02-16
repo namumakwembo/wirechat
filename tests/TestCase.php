@@ -81,7 +81,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         //  $this->loadMigrationsFrom( );
         $this->withoutVite();
-        $this->loadMigrationsFrom([workbench_path('database/migrations'),__DIR__.'/../database/migrations']);
+        // $this->loadMigrationsFrom([workbench_path('database/migrations'),__DIR__.'/../database/migrations']);
 
         // $this->artisan('migrate:fresh ')->run();
         //  $this->loadRoutesFrom(workbench_path('routes/web.php'));
@@ -89,14 +89,14 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         /// $this->loadMigrationsFrom(__DIR__.'/migrations');
     }
 
-    // protected function defineDatabaseMigrations()
-    // {
-    //     ///$this->loadLaravelMigrations();
-    //     $this->loadMigrationsFrom([workbench_path('database/migrations'),__DIR__.'/../database/migrations']);
+    protected function defineDatabaseMigrations()
+    {
+        ///$this->loadLaravelMigrations();
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-    //     //   $this->loadMigrationsFrom(workbench_path('database/migrations'));
-    //     //     $this->artisan('orchid:install'); // installs migrations required for Orchid admin panel
-    // }
+        $this->loadMigrationsFrom(workbench_path('database/migrations'));
+        //     $this->artisan('orchid:install'); // installs migrations required for Orchid admin panel
+    }
 
     // public static function applicationBasePath()
     // {

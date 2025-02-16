@@ -4,8 +4,8 @@ providers:
   - Livewire\LivewireServiceProvider
 
 migrations:
-  - workbench\database\migrations
-  - database\migrations
+ # - workbench\database\migrations
+  #- database\migrations
 
 
 seeders:
@@ -27,7 +27,7 @@ workbench:
       - drop-sqlite-db
       - create-sqlite-db
       #- vendor:publish --tag="wirechat-migrations"
-      - migrate:refresh
+      #- migrate:refresh
 
   ]
   assets: []

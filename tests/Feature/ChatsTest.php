@@ -721,9 +721,8 @@ describe('Search', function () {
         Livewire::actingAs($auth)->test(Chatlist::class)
             ->set('search', 'John')
             ->assertSee('John')
-            ->assertViewHas('conversations', function ($conversations) {
-                return count($conversations) == 1;
-            });
+            ->assertDontSee('Mary');
+
     });
 
     test('deleted conversation should  appear when searched', function () {

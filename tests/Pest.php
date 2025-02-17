@@ -1,7 +1,6 @@
 <?php
 
 use Namu\WireChat\Tests\TestCase;
-use Pest\Arch\Contracts\ArchExpectation;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,8 +29,6 @@ expect()->extend('assertUsesTrait', function () {
     return $this->toBe(1);
 });
 
- 
-
 /*
 |--------------------------------------------------------------------------
 | Functions
@@ -47,5 +44,3 @@ function something()
 {
     // ..
 }
-
-

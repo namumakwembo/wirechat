@@ -142,13 +142,13 @@ class Participant extends Model
      */
     public function exitConversation(): bool
     {
-        //make sure conversation is not private
+        // make sure conversation is not private
         abort_if($this->conversation->isPrivate(), 403, 'Participant cannot exit a private conversation');
 
-        //make sure owner if group cannot be removed from chat
+        // make sure owner if group cannot be removed from chat
         abort_if($this->isOwner(), 403, 'Owner cannot exit conversation');
 
-        //update Role to Participant
+        // update Role to Participant
         $this->role = ParticipantRole::PARTICIPANT;
         $this->save();
 
@@ -202,7 +202,7 @@ class Participant extends Model
                 'type' => Actions::REMOVED_BY_ADMIN,  // Type of action
             ]);
         }
-        //update Role to Participant
+        // update Role to Participant
         $this->role = ParticipantRole::PARTICIPANT;
         $this->save();
     }
@@ -227,13 +227,13 @@ class Participant extends Model
             return false;
         }
 
-        //loadMissing Conversation
+        // loadMissing Conversation
         $this->loadMissing('conversation');
 
         // Get the latest updated_at timestamp for the conversation
         $conversation = $this->conversation;
 
-        //Expited conversation means hasDeletedConversation should return FALSE
+        // Expited conversation means hasDeletedConversation should return FALSE
         if ($checkDeletionExpired) {
             // Check if the deletion timestamp is older than the last update timestamp (i.e., check if deletion is expired)
             return $conversation->updated_at > $this->conversation_deleted_at ? false : true;

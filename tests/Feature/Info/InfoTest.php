@@ -210,10 +210,10 @@ describe('presence test', function () {
 
         $receiver = User::factory()->create();
 
-        //create conversation with user1
+        // create conversation with user1
         $conversation = $auth->createGroup('My Group');
 
-        //add participant
+        // add participant
         $conversation->addParticipant($receiver);
 
         Livewire::actingAs($receiver)->test(Info::class, ['conversation' => $conversation])
@@ -236,10 +236,10 @@ describe('presence test', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation with user1
+        // create conversation with user1
         $conversation = $auth->createGroup('My Group');
 
-        //add participant
+        // add participant
         $conversation->addParticipant($receiver);
 
         Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
@@ -316,7 +316,7 @@ describe('allowsMembersToEditGroupInfo() Permission accesibility ', function () 
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_edit_group_info = true;
         $group->save();
@@ -336,7 +336,7 @@ describe('allowsMembersToEditGroupInfo() Permission accesibility ', function () 
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_edit_group_info = true;
         $group->save();
@@ -357,7 +357,7 @@ describe('allowsMembersToEditGroupInfo() Permission accesibility ', function () 
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_edit_group_info = true;
         $group->save();
@@ -381,7 +381,7 @@ describe('allowsMembersToEditGroupInfo() Permission accesibility ', function () 
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_edit_group_info = false;
         $group->save();
@@ -401,7 +401,7 @@ describe('allowsMembersToEditGroupInfo() Permission accesibility ', function () 
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_edit_group_info = false;
         $group->save();
@@ -422,7 +422,7 @@ describe('allowsMembersToEditGroupInfo() Permission accesibility ', function () 
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_edit_group_info = false;
         $group->save();
@@ -450,7 +450,7 @@ describe('allowsMembersToAddOthers() Permission accesibility ', function () {
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_add_others = true;
         $group->save();
@@ -469,7 +469,7 @@ describe('allowsMembersToAddOthers() Permission accesibility ', function () {
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_add_others = true;
         $group->save();
@@ -489,7 +489,7 @@ describe('allowsMembersToAddOthers() Permission accesibility ', function () {
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_add_others = true;
         $group->save();
@@ -512,7 +512,7 @@ describe('allowsMembersToAddOthers() Permission accesibility ', function () {
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_add_others = false;
         $group->save();
@@ -531,7 +531,7 @@ describe('allowsMembersToAddOthers() Permission accesibility ', function () {
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_add_others = false;
         $group->save();
@@ -551,7 +551,7 @@ describe('allowsMembersToAddOthers() Permission accesibility ', function () {
         $auth = User::factory()->create(['id' => '345678']);
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //turn off feature
+        // turn off feature
         $group = $conversation->group;
         $group->allow_members_to_add_others = false;
         $group->save();
@@ -570,7 +570,7 @@ describe('allowsMembersToAddOthers() Permission accesibility ', function () {
 
 describe('updating group name and description', function () {
 
-    //Group name
+    // Group name
 
     test('group name is required', function () {
 
@@ -579,7 +579,7 @@ describe('updating group name and description', function () {
 
         $request = Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation]);
 
-        //update
+        // update
         $request->set('groupName', null)
             ->call('updateGroupName')
             ->assertHasErrors('groupName')
@@ -593,7 +593,7 @@ describe('updating group name and description', function () {
 
         $request = Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation]);
 
-        //update
+        // update
         $text = str()->random(150);
         $request->set('groupName', $text)
             ->call('updateGroupName')
@@ -609,7 +609,7 @@ describe('updating group name and description', function () {
 
         $request = Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation]);
 
-        //update
+        // update
         $request->set('groupName', 'New Name')
             ->call('updateGroupName')
             ->assertSee('New Name');
@@ -623,7 +623,7 @@ describe('updating group name and description', function () {
 
         $request = Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation]);
 
-        //update
+        // update
         $request->set('groupName', 'New Name')
             ->call('updateGroupName');
 
@@ -638,13 +638,13 @@ describe('updating group name and description', function () {
 
         $request = Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation]);
 
-        //update
+        // update
         $request->set('groupName', 'New Name')
             ->call('updateGroupName')
             ->assertDispatched('refresh');
     });
 
-    //Description
+    // Description
 
     test('description cannot exceed 500 chars', function () {
 
@@ -653,7 +653,7 @@ describe('updating group name and description', function () {
 
         $request = Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation]);
 
-        //update
+        // update
         $text = str()->random(501);
         $request->set('description', $text)
             ->assertHasErrors('description')
@@ -668,7 +668,7 @@ describe('updating group name and description', function () {
 
         $request = Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation]);
 
-        //update
+        // update
         $request->set('description', 'New description')
             ->assertSee('New description');
     });
@@ -681,13 +681,13 @@ describe('updating group name and description', function () {
 
         $request = Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation]);
 
-        //update
+        // update
         $request->set('description', 'New description');
 
         expect($conversation->group()->first()->description)->toBe('New description');
     });
 
-    //Photo
+    // Photo
 
     test('it can save photo to database', function () {
         UploadedFile::fake();
@@ -700,7 +700,7 @@ describe('updating group name and description', function () {
 
         $file = UploadedFile::fake()->create('photo.png');
 
-        //update
+        // update
         $request->set('photo', $file);
 
         expect($conversation->group()->first()->cover_url)->not->toBe(null);
@@ -717,18 +717,18 @@ describe('updating group name and description', function () {
 
         $file = UploadedFile::fake()->create('photo.png');
 
-        //upload
+        // upload
         $request->set('photo', $file);
 
         $previousAttachment = $conversation->group()->first()->cover;
 
-        //upload  again
+        // upload  again
         $request->set('photo', UploadedFile::fake()->create('new.png'));
 
-        //expect previuus photo no onger available
+        // expect previuus photo no onger available
         expect(Attachment::find($previousAttachment->id))->toBe(null);
 
-        //assert new photo available
+        // assert new photo available
 
         expect($conversation->group()->first()->cover_url)->not->toBe(null);
         expect($conversation->group()->count())->toBe(1);
@@ -745,7 +745,7 @@ describe('updating group name and description', function () {
 
         $file = UploadedFile::fake()->create('photo.png');
 
-        //update
+        // update
         $request->set('photo', $file);
 
         $attachment = $conversation->group()->first()->cover;
@@ -764,7 +764,7 @@ describe('updating group name and description', function () {
 
         $file = UploadedFile::fake()->create('photo.png');
 
-        //update
+        // update
         $request->set('photo', $file)
             ->assertDispatched('refresh');
     });
@@ -818,20 +818,20 @@ describe('Deleting Chat', function () {
 
         $conversation = $auth->createConversationWith($receiver, 'hello');
 
-        //Load Chats component
+        // Load Chats component
         $CHATLIST = Livewire::actingAs($auth)->test(Chats::class);
 
-        //Assert conversation is visible
+        // Assert conversation is visible
         $CHATLIST->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 1;
         });
 
-        //Load Info component
+        // Load Info component
         Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
             ->call('deleteChat')
             ->assertStatus(200);
 
-        //Assert conversation no longer visible
+        // Assert conversation no longer visible
         $CHATLIST->dispatch('chat-deleted', $conversation->id)->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 0;
         });
@@ -895,7 +895,7 @@ describe('Deleting Chat', function () {
 describe('Deleting Group', function () {
 
     test('it deletes group from database after delete is successful', function () {
-        //Queue::fake();
+        // Queue::fake();
         Carbon::setTestNow(now()->subMinutes(4));
 
         $auth = User::factory()->create();
@@ -921,7 +921,7 @@ describe('Deleting Group', function () {
 
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //add members
+        // add members
         $conversation->addParticipant(Admin::factory()->create())->exitConversation();
         $conversation->addParticipant(User::factory()->create())->exitConversation();
         $conversation->addParticipant(User::factory()->create())->removeByAdmin($auth);
@@ -949,10 +949,10 @@ describe('Deleting Group', function () {
 
         $authParticipant = $conversation->participant($auth);
 
-        //assert false
+        // assert false
         expect($authParticipant->hasDeletedConversation())->toBe(false);
 
-        //add members & remove members
+        // add members & remove members
         $conversation->addParticipant(Admin::factory()->create())->exitConversation();
         $conversation->addParticipant(User::factory()->create())->exitConversation();
         $conversation->addParticipant(User::factory()->create())->removeByAdmin($auth);
@@ -964,7 +964,7 @@ describe('Deleting Group', function () {
             ->assertStatus(200);
 
         //   dd($authParticipant);
-        //now assert true
+        // now assert true
         expect($auth->hasDeletedConversation($conversation))->toBe(true);
 
     });
@@ -1037,20 +1037,20 @@ describe('Deleting Group', function () {
 
         $auth->sendMessageTo($conversation, 'hello');
 
-        //Load Chats component
+        // Load Chats component
         $CHATLIST = Livewire::actingAs($auth)->test(Chats::class, ['widget' => true]);
 
-        //Assert conversation is visible
+        // Assert conversation is visible
         $CHATLIST->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 1;
         });
 
-        //Load Info component
+        // Load Info component
         Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation])
             ->call('deleteGroup')
             ->assertStatus(200);
 
-        //Assert conversation no longer visible
+        // Assert conversation no longer visible
         $CHATLIST->dispatch('chat-deleted', $conversation->id)->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 0;
         });
@@ -1066,21 +1066,21 @@ describe('Deleting Group', function () {
 
         $auth->sendMessageTo($conversation, 'hello');
 
-        //Load Chats component
+        // Load Chats component
         $CHATLIST = Livewire::actingAs($auth)->test(Chats::class, ['widget' => true]);
 
-        //Assert conversation is visible
+        // Assert conversation is visible
         $CHATLIST->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 1;
         });
 
-        //Load Info component
+        // Load Info component
         Livewire::actingAs($auth)->test(Info::class, ['conversation' => $conversation, 'widget' => true])
             ->call('deleteGroup')
             ->assertDispatched('chat-deleted')
             ->assertStatus(200);
 
-        //Assert conversation no longer visible
+        // Assert conversation no longer visible
         $CHATLIST->dispatch('chat-deleted', $conversation->id)->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 0;
         });
@@ -1092,7 +1092,7 @@ describe('Deleting Group', function () {
 
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //add members
+        // add members
         $conversation->addParticipant(User::factory()->create());
         $conversation->addParticipant(User::factory()->create());
         $conversation->addParticipant(User::factory()->create());
@@ -1108,7 +1108,7 @@ describe('Deleting Group', function () {
 
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //add members
+        // add members
         $conversation->addParticipant(User::factory()->create());
         $conversation->addParticipant(User::factory()->create());
         $conversation->addParticipant(User::factory()->create());
@@ -1124,7 +1124,7 @@ describe('Deleting Group', function () {
 
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //add members
+        // add members
         $conversation->addParticipant(User::factory()->create())->exitConversation();
         $conversation->addParticipant(User::factory()->create())->exitConversation();
         $conversation->addParticipant(User::factory()->create())->removeByAdmin($auth);
@@ -1142,7 +1142,7 @@ describe('Deleting Group', function () {
 
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //add members
+        // add members
         $conversation->addParticipant(Admin::factory()->create())->exitConversation();
         $conversation->addParticipant(User::factory()->create())->exitConversation();
         $conversation->addParticipant(User::factory()->create())->removeByAdmin($auth);
@@ -1160,7 +1160,7 @@ describe('Deleting Group', function () {
 
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //add members
+        // add members
         $nonOwner = User::factory()->create();
         $conversation->addParticipant($nonOwner);
         $conversation->addParticipant(User::factory()->create());
@@ -1218,26 +1218,26 @@ describe('Exiting Chat', function () {
 
         $conversation = $auth->createGroup(name: 'My Group', description: 'This is a good group');
 
-        //Add particitpant
+        // Add particitpant
         $conversation->addParticipant($user);
-        //add message
+        // add message
         $user->sendMessageTo($conversation, 'Never let go ');
 
-        //Load Chats component
+        // Load Chats component
         $CHATLIST = Livewire::actingAs($user)->test(Chats::class);
 
-        //Assert conversation is visible
+        // Assert conversation is visible
         $CHATLIST->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 1;
         });
 
-        //Load Info component
+        // Load Info component
         Livewire::actingAs($user)->test(Info::class, ['conversation' => $conversation, 'widget' => true])
             ->call('exitConversation')
             ->assertStatus(200)
             ->assertDispatched('chat-exited');
 
-        //Assert conversation no longer visible
+        // Assert conversation no longer visible
         $CHATLIST->dispatch('chat-exited', $conversation->id)->assertViewHas('conversations', function ($conversation) {
             return count($conversation) == 0;
         });

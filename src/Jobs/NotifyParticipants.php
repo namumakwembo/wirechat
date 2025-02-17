@@ -47,10 +47,10 @@ class NotifyParticipants implements ShouldQueue
         //  $this->delay(now()->addSeconds(3)); // Delay
         $this->auth = $message->sendable;
 
-        //Get table
+        // Get table
         $this->participantsTable = (new Participant)->getTable();
 
-        //dd($this);
+        // dd($this);
 
     }
 
@@ -73,10 +73,10 @@ class NotifyParticipants implements ShouldQueue
         // Check if the message is too old
         $messageAgeInSeconds = now()->diffInSeconds($this->message->created_at);
 
-        //delete the job if it is greater then 60 seconds
+        // delete the job if it is greater then 60 seconds
         if ($messageAgeInSeconds > 60) {
             // Delete the job and stop further processing
-            //$this->fail();
+            // $this->fail();
             $this->delete();
             Log::error('Participants not notified : Job older than '.$messageAgeInSeconds.'seconds');
 

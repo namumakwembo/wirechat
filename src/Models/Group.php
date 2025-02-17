@@ -40,10 +40,10 @@ class Group extends Model
 
             if ($group->cover?->exists()) {
 
-                //delete cover
+                // delete cover
                 $group->cover?->delete();
 
-                //also delete from storage
+                // also delete from storage
                 if (Storage::disk(WireChat::storageDisk())->exists($group->cover->file_path)) {
                     Storage::disk(WireChat::storageDisk())->delete($group->cover->file_path);
                 }

@@ -234,7 +234,7 @@ class Chats extends Component
 
             return $conversation->loadMissing([
                 // 'lastMessage' ,//=> fn($query) => $query->select('id', 'sendable_id','sendable_type', 'created_at'),
-                //'messages',
+                // 'messages',
                 'lastMessage',
                 'authParticipant' => fn ($query) => $query->select('id', 'participantable_id', 'participantable_type', 'conversation_id', 'conversation_read_at')->with('actions'),
                 'receiverParticipant' => fn ($query) => $query->select('id', 'participantable_id', 'participantable_type', 'conversation_id', 'conversation_read_at')->with('participantable', 'actions'),

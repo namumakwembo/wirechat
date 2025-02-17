@@ -52,7 +52,7 @@ trait Chatable
     public function createConversationWith(Model $participant, ?string $message = null)
     {
 
-        //abort if is not allowed to create new chats
+        // abort if is not allowed to create new chats
         abort_unless($this->canCreateChats(), 403, 'You do not have permission to create chats.');
 
         $participantId = $participant->id;
@@ -140,27 +140,27 @@ trait Chatable
     public function createGroup(string $name, ?string $description = null, ?UploadedFile $photo = null): Conversation
     {
 
-        //abort if is not allowed to create new groups
+        // abort if is not allowed to create new groups
         abort_unless($this->canCreateGroups(), 403, 'You do not have permission to create groups.');
 
-        //create rooom
-        //Otherwise, create a new conversation
+        // create rooom
+        // Otherwise, create a new conversation
         $conversation = new Conversation;
         $conversation->type = ConversationType::GROUP;
         $conversation->save();
 
-        //create room
+        // create room
         $group = $conversation->group()->create([
             'name' => $name,
             'description' => $description,
         ]);
 
-        //create and save photo is present
+        // create and save photo is present
         if ($photo) {
-            //save photo to disk
+            // save photo to disk
             $path = $photo->store(WireChat::storageFolder(), WireChat::storageDisk());
 
-            //create attachment
+            // create attachment
             $group->cover()->create([
                 'file_path' => $path,
                 'file_name' => basename($path),
@@ -170,7 +170,7 @@ trait Chatable
             ]);
         }
 
-        //create participant as owner
+        // create participant as owner
         Participant::create([
             'conversation_id' => $conversation->id,
             'participantable_id' => $this->id,
@@ -187,7 +187,7 @@ trait Chatable
     public function exitConversation(Conversation $conversation): bool
     {
 
-        //get participant
+        // get participant
         $participant = $conversation->participant($this);
 
         return $participant ? $participant->exitConversation() : false;
@@ -232,7 +232,7 @@ trait Chatable
                 'body' => $message,
             ]);
 
-            //update auth participant last active
+            // update auth participant last active
             $participant = $conversation->participant($this);
             $participant->update(['last_active_at' => now()]);
 
@@ -332,14 +332,14 @@ trait Chatable
     public function deleteConversation(Conversation $conversation)
     {
 
-        //use already created methods inside conversation model
+        // use already created methods inside conversation model
         $conversation->deleteFor($this);
     }
 
     public function clearConversation(Conversation $conversation)
     {
 
-        //use already created methods inside conversation model
+        // use already created methods inside conversation model
         $conversation->clearFor($this);
     }
 
@@ -487,12 +487,12 @@ trait Chatable
     public function isAdminIn(Group|Conversation $entity): bool
     {
 
-        //check if is not Conversation model
+        // check if is not Conversation model
         if (! ($entity instanceof Conversation)) {
 
             $conversation = $entity->conversation;
         }
-        //means it is group to get Parent Relationship
+        // means it is group to get Parent Relationship
         else {
 
             $conversation = $entity;
@@ -509,12 +509,12 @@ trait Chatable
     public function isOwnerOf(Group|Conversation $entity): bool
     {
 
-        //check if is not Conversation model
+        // check if is not Conversation model
         if (! ($entity instanceof Conversation)) {
 
             $conversation = $entity->conversation;
         }
-        //means it is group to get Parent Relationship
+        // means it is group to get Parent Relationship
         else {
 
             $conversation = $entity;

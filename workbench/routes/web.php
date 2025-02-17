@@ -15,12 +15,12 @@ use Namu\WireChat\Livewire\Pages\Chats;
 |
 */
 
-//Needed for testing purposes
+// Needed for testing purposes
 Route::get('/', function () {
     return 'welcome';
 });
 
-//Needed for testing purposes
+// Needed for testing purposes
 Route::middleware('guest')->get('/login', function () {
     return 'login page';
 })->name('login');

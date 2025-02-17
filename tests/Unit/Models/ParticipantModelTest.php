@@ -14,11 +14,11 @@ describe('Delete Permanently', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup('My Group');
 
-        //add participant
+        // add participant
         $user = User::factory()->create(['name' => 'Micheal']);
         $participant = $conversation->addParticipant($user);
 
-        //remove by admin
+        // remove by admin
 
         Action::create([
             'actionable_id' => $participant->id,
@@ -28,10 +28,10 @@ describe('Delete Permanently', function () {
             'type' => Actions::REMOVED_BY_ADMIN,  // Type of action
         ]);
 
-        //assert removed
+        // assert removed
         expect($participant->actions()->count())->toBe(1);
 
-        //now forcifully delete
+        // now forcifully delete
 
         $participant->delete();
 
@@ -46,19 +46,19 @@ describe('exitingConversation()', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup('My Group');
 
-        //add participant
+        // add participant
         $user = User::factory()->create(['name' => 'Micheal']);
         $participant = $conversation->addParticipant($user);
 
-        //assert
+        // assert
         expect($participant->exited_at)->toBe(null);
 
-        //action
+        // action
         $participant->exitConversation();
 
         $participant = $participant->refresh();
 
-        //assert
+        // assert
         expect($participant->exited_at)->not->toBe(null);
     });
 
@@ -67,20 +67,20 @@ describe('exitingConversation()', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup('My Group');
 
-        //add participant
+        // add participant
         $user = User::factory()->create(['name' => 'Micheal']);
         $participant = $conversation->addParticipant($user);
 
-        //assert
+        // assert
         expect($participant->conversation_deleted_at)->toBe(null);
         expect($participant->conversation_cleared_at)->toBe(null);
 
-        //action
+        // action
         $participant->exitConversation();
 
         $participant = $participant->refresh();
 
-        //assert
+        // assert
         expect($participant->conversation_deleted_at)->toBe(null);
         expect($participant->conversation_cleared_at)->toBe(null);
 
@@ -91,19 +91,19 @@ describe('exitingConversation()', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup('My Group');
 
-        //add participant
+        // add participant
         $user = User::factory()->create(['name' => 'Micheal']);
         $participant = $conversation->addParticipant($user);
 
-        //assert
+        // assert
         expect($user->belongsToConversation($conversation))->toBe(true);
 
-        //action
+        // action
         $participant->exitConversation();
 
         $participant = $participant->refresh();
 
-        //assert
+        // assert
         expect($user->belongsToConversation($conversation))->toBe(false);
     });
 
@@ -112,19 +112,19 @@ describe('exitingConversation()', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup('My Group');
 
-        //add participant
+        // add participant
         $user = User::factory()->create(['name' => 'Micheal']);
         $participant = $conversation->addParticipant($user, role: ParticipantRole::ADMIN);
 
-        //assert
+        // assert
         expect($participant->role)->toBe(ParticipantRole::ADMIN);
 
-        //exit
+        // exit
         $participant->exitConversation();
 
         $participant->refresh();
 
-        //assert
+        // assert
         expect($participant->role)->toBe(ParticipantRole::PARTICIPANT);
     });
 
@@ -141,7 +141,7 @@ describe('hasDeletedConversation()', function () {
 
         $conversation->deleteFor($auth);
 
-        //assert
+        // assert
         expect($auth->hasDeletedConversation($conversation))->toBe(true);
 
     });
@@ -153,13 +153,13 @@ describe('hasDeletedConversation()', function () {
 
         $conversation = $auth->createConversationWith($user);
 
-        //delete conversation
+        // delete conversation
         $conversation->deleteFor($auth);
 
-        //send message
+        // send message
         $user->sendMessageTo($conversation, 'hi');
 
-        //assert
+        // assert
         expect($auth->hasDeletedConversation($conversation, checkDeletionExpired: false))->toBe(true);
 
     });
@@ -173,15 +173,15 @@ describe('hasDeletedConversation()', function () {
 
         Carbon::setTestNow(now()->addSecond(5));
 
-        //delete conversation
+        // delete conversation
         $conversation->deleteFor($auth);
 
         Carbon::setTestNow();
 
-        //send message
+        // send message
         $user->sendMessageTo($conversation, 'hi');
 
-        //assert
+        // assert
         expect($auth->hasDeletedConversation($conversation, checkDeletionExpired: true))->toBe(false);
 
     });
@@ -195,10 +195,10 @@ describe('hasDeletedConversation()', function () {
 
         $participant = $conversation->participant($user);
 
-        //delete conversation
+        // delete conversation
         $conversation->deleteFor($auth);
 
-        //assert
+        // assert
         expect($participant->hasDeletedConversation())->toBe(false);
 
     });
@@ -212,19 +212,19 @@ describe('removeByAdmin()', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup('My Group');
 
-        //add participant
+        // add participant
         $user = User::factory()->create(['name' => 'Micheal']);
         $participant = $conversation->addParticipant($user);
 
-        //assert
+        // assert
         expect($participant->isRemovedByAdmin())->toBe(false);
 
-        //action
+        // action
         $participant->removeByAdmin($auth);
 
         $participant = $participant->refresh();
 
-        //assert
+        // assert
         expect($participant->isRemovedByAdmin())->toBe(true);
 
         $actionsCount = Action::where('type', Actions::REMOVED_BY_ADMIN)
@@ -240,11 +240,11 @@ describe('removeByAdmin()', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup('My Group');
 
-        //add participant
+        // add participant
         $user = User::factory()->create(['name' => 'Micheal']);
         $participant = $conversation->addParticipant($user);
 
-        //action - call 3 times
+        // action - call 3 times
         $participant->removeByAdmin($auth);
         $participant->removeByAdmin($auth);
         $participant->removeByAdmin($auth);
@@ -264,19 +264,19 @@ describe('removeByAdmin()', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup('My Group');
 
-        //add participant
+        // add participant
         $user = User::factory()->create(['name' => 'Micheal']);
         $participant = $conversation->addParticipant($user, role: ParticipantRole::ADMIN);
 
-        //assert
+        // assert
         expect($participant->role)->toBe(ParticipantRole::ADMIN);
 
-        //action
+        // action
         $participant->removeByAdmin($auth);
 
         $participant = $participant->refresh();
 
-        //assert
+        // assert
         expect($participant->role)->toBe(ParticipantRole::PARTICIPANT);
 
     });

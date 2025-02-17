@@ -64,7 +64,7 @@ describe(' Data verifiction ', function () {
 
             $broadcastOn = $event->broadcastOn();
 
-            //resolve morphClass=
+            // resolve morphClass=
             $encodedType = MorphClassResolver::encode($participant->participantable_type);
             expect($broadcastOn[0]->name)->toBe('private-participant.'.$encodedType.'.'.$participant->participantable_id);
 
@@ -84,7 +84,7 @@ describe(' Data verifiction ', function () {
 
             $broadcastOn = $event->broadcastOn();
 
-            //resolve morphClass=
+            // resolve morphClass=
             $encodedType = MorphClassResolver::encode($receiver->getMorphClass());
             expect($broadcastOn[0]->name)->toBe('private-participant.'.$encodedType.'.'.$receiver->id);
 
@@ -104,7 +104,7 @@ describe(' Data verifiction ', function () {
 
             $broadcastOn = $event->broadcastOn();
 
-            //resolve morphClass=
+            // resolve morphClass=
             $encodedType = MorphClassResolver::encode($receiver->getMorphClass());
             expect($broadcastOn[0]->name)->toBe('private-participant.'.$encodedType.'.'.$receiver->id);
 
@@ -207,12 +207,12 @@ describe('Actions', function () {
 
         $participant = $message->conversation->participant($receiver);
 
-        //set future time
+        // set future time
         Carbon::setTestNowAndTimezone(now()->addMinutes(3));
 
         NotifyParticipant::dispatch($participant, $message);
 
-        //assert event disptaches but fails
+        // assert event disptaches but fails
         Event::assertDispatched(NotifyParticipant::class, function ($event) {
             $broadcastOn = $event->broadcastWhen();
 

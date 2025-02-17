@@ -37,13 +37,13 @@ class WireChatService
         return $fieldsToCheck ?: null;
     }
 
-    //Get table prefix from congif
+    // Get table prefix from congif
     public static function tablePrefix(): ?string
     {
         return config('wirechat.table_prefix');
     }
 
-    //return a formatted tabel name
+    // return a formatted tabel name
     public static function formatTableName($table): string
     {
         return config('wirechat.table_prefix').$table;

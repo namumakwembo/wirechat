@@ -5,7 +5,7 @@ namespace Namu\WireChat\Livewire\Chat\Group;
 use App\Models\User;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Validate;
-//use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+// use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Chat\Info;
@@ -67,7 +67,7 @@ class AddMembers extends ModalComponent
     public function updatedSearch()
     {
 
-        //Make sure it's not empty
+        // Make sure it's not empty
         if (blank($this->search)) {
 
             $this->users = null;
@@ -84,7 +84,7 @@ class AddMembers extends ModalComponent
 
         if ($model) {
 
-            //abort if member already belong to conversation
+            // abort if member already belong to conversation
             abort_if($model->belongsToConversation($this->conversation), 403, $model->display_name.' Is already a member');
 
             if ($this->selectedMembers->contains(fn ($member) => $member->id == $model->id && get_class($member) == get_class($model))) {
@@ -94,18 +94,18 @@ class AddMembers extends ModalComponent
                 });
             } else {
 
-                //validate members count
+                // validate members count
                 if ($this->newTotalCount >= WireChat::maxGroupMembers()) {
                     return $this->dispatch('show-member-limit-error');
                 }
 
                 $participant = $this->conversation->participant($model, withoutGlobalScopes: true);
 
-                //abort if member already exited group
+                // abort if member already exited group
                 abort_if($participant?->hasExited(), 403, 'Cannot add '.$model->display_name.' because they left the group');
 
-                //check if is removed - if true then
-                //abort if non admin member tries to add a participant previously removed by admin
+                // check if is removed - if true then
+                // abort if non admin member tries to add a participant previously removed by admin
                 if ($participant?->isRemovedByAdmin()) {
                     $authParticipant = $this->conversation->participant(auth()->user());
 
@@ -117,8 +117,8 @@ class AddMembers extends ModalComponent
                 $this->selectedMembers->push($model);
             }
 
-            //update total count
-            //dd($this->conversation);
+            // update total count
+            // dd($this->conversation);
             $this->newTotalCount = count($this->selectedMembers) + $this->exitingMembersCount;
         }
     }
@@ -130,8 +130,8 @@ class AddMembers extends ModalComponent
 
         foreach ($this->selectedMembers as $key => $member) {
 
-            //make sure user does not belong to conversation already
-            //we set gloabl scopes to true to as to also check members hidden by scopes- to avoid duplicate constraint error
+            // make sure user does not belong to conversation already
+            // we set gloabl scopes to true to as to also check members hidden by scopes- to avoid duplicate constraint error
             $alreadyExists = $member->belongsToConversation($this->conversation);
 
             if (! $alreadyExists) {

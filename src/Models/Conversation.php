@@ -46,7 +46,7 @@ class Conversation extends Model
         parent::boot();
 
         // static::addGlobalScope(new WithoutDeletedScope());
-        //DELETED event
+        // DELETED event
         static::deleted(function ($conversation) {
 
             // Use a DB transaction to ensure atomicity
@@ -60,10 +60,10 @@ class Conversation extends Model
                 // Delete associated messages
                 $conversation->messages()?->withoutGlobalScopes()?->forceDelete();
 
-                //Delete actions
+                // Delete actions
                 $conversation->actions()?->delete();
 
-                //Delete group
+                // Delete group
                 $conversation->group()?->delete();
             });
         });
@@ -490,7 +490,7 @@ class Conversation extends Model
         // Query builder for unread messages
         $query = $this->messages();
 
-        //WORKING
+        // WORKING
         $messages = $query->whereIsNotOwnedBy($user)->when($lastReadAt, function ($query) use ($lastReadAt) {
 
             $query->where('created_at', '>', $lastReadAt);
@@ -567,15 +567,15 @@ class Conversation extends Model
         // Ensure the participant belongs to the conversation
         abort_unless($user->belongsToConversation($this), 403, 'User does not belong to conversation');
 
-        //Clear conversation history for this user
+        // Clear conversation history for this user
         $this->clearFor($user);
 
-        //Mark this participant's conversation_deleted_at
+        // Mark this participant's conversation_deleted_at
         $participant = $this->participant($user);
         $participant->conversation_deleted_at = Carbon::now();
         $participant->save();
 
-        //Then force delete it
+        // Then force delete it
         if ($this->isSelfConversation($user)) {
             return $this->forceDelete();
         }
@@ -583,11 +583,11 @@ class Conversation extends Model
         // Check if the conversation is private or self
         if ($this->isPrivate()) {
 
-            //set variable and default value
+            // set variable and default value
             $deletedByBothParticipants = true;
 
             // Get Participants
-            //!use make sure to get new query() otherwise participants wont be retrieved correctly
+            // !use make sure to get new query() otherwise participants wont be retrieved correctly
             $participants = $this->participants()->get();
 
             // Check if all participants have deleted the conversation

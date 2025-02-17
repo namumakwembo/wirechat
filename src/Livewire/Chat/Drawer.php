@@ -53,7 +53,7 @@ class Drawer extends Component
 
         $this->activeDrawerComponent = $id;
 
-        /*! Changed listener name to activeChatDrawerComponentChanged to not interfer with main modal*/
+        /* ! Changed listener name to activeChatDrawerComponentChanged to not interfer with main modal */
         $this->dispatch('activeChatDrawerComponentChanged', id: $id);
 
     }

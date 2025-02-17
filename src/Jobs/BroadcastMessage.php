@@ -31,7 +31,7 @@ class BroadcastMessage implements ShouldQueue
         $this->onQueue(WireChat::messagesQueue());
         $this->auth = auth()->user();
 
-        //Get table
+        // Get table
         $this->messagesTable = (new Message)->getTable();
         $this->participantsTable = (new Participant)->getTable();
     }
@@ -41,7 +41,7 @@ class BroadcastMessage implements ShouldQueue
      */
     public function handle(): void
     {
-        //Broadcast to the conversation channel for all participants
+        // Broadcast to the conversation channel for all participants
         event(new MessageCreated($this->message));
     }
 }

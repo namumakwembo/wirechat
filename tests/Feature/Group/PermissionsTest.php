@@ -122,13 +122,13 @@ describe('Actions', function () {
 
         $request = Livewire::actingAs($auth)->test(Permissions::class, ['conversation' => $conversation]);
 
-        //toggle true
+        // toggle true
         $request->set('allow_members_to_edit_group_info', true);
         $group = $conversation->group;
         $group->refresh();
         expect($group->allow_members_to_edit_group_info)->toBe(true);
 
-        //toggle false
+        // toggle false
         $request->set('allow_members_to_edit_group_info', false);
         $group = $conversation->group;
         $group->refresh();
@@ -146,13 +146,13 @@ describe('Actions', function () {
 
         $request = Livewire::actingAs($auth)->test(Permissions::class, ['conversation' => $conversation]);
 
-        //toggle true
+        // toggle true
         $request->set('allow_members_to_add_others', true);
         $group = $conversation->group;
         $group->refresh();
         expect($group->allow_members_to_add_others)->toBe(true);
 
-        //toggle false
+        // toggle false
         $request->set('allow_members_to_add_others', false);
         $group = $conversation->group;
         $group->refresh();
@@ -170,13 +170,13 @@ describe('Actions', function () {
 
         $request = Livewire::actingAs($auth)->test(Permissions::class, ['conversation' => $conversation]);
 
-        //toggle true
+        // toggle true
         $request->set('allow_members_to_send_messages', true);
         $group = $conversation->group;
         $group->refresh();
         expect($group->allow_members_to_send_messages)->toBe(true);
 
-        //toggle false
+        // toggle false
         $request->set('allow_members_to_send_messages', false);
         $group = $conversation->group;
         $group->refresh();

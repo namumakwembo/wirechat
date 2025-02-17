@@ -34,12 +34,12 @@ trait Widget
     public function handleComponentTermination(?string $redirectRoute = null, ?array $events = null)
     {
 
-        //set redirect route
+        // set redirect route
         if ($redirectRoute == null) {
             $redirectRoute = route(WireChat::indexRouteName());
         }
 
-        //set events to dispatch on termination
+        // set events to dispatch on termination
         if ($events == null) {
             $events = [
                 ['close-chat',  ['conversation' => $this->conversation->id]],

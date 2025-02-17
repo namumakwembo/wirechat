@@ -5,7 +5,7 @@ namespace Namu\WireChat\Livewire\Chat\Group;
 use App\Models\User;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Attributes\Locked;
-//use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+// use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Namu\WireChat\Enums\Actions;
@@ -79,7 +79,7 @@ class Members extends ModalComponent
 
         abort_unless(auth()->check(), 401);
 
-        //Load missing relationship in case of strict models types
+        // Load missing relationship in case of strict models types
         $participant->loadMissing('participantable');
 
         $conversation = auth()->user()->createConversationWith($participant->participantable);
@@ -107,7 +107,7 @@ class Members extends ModalComponent
      * Admin actions */
     public function dismissAdmin(Participant $participant)
     {
-        //Load missing relationship in case of strict models types
+        // Load missing relationship in case of strict models types
         $participant->loadMissing('participantable');
 
         $this->toggleAdmin($participant);
@@ -115,7 +115,7 @@ class Members extends ModalComponent
 
     public function makeAdmin(Participant $participant)
     {
-        //Load missing relationship in case of strict models types
+        // Load missing relationship in case of strict models types
         $participant->loadMissing('participantable');
 
         $this->toggleAdmin($participant);
@@ -126,15 +126,15 @@ class Members extends ModalComponent
 
         abort_unless(auth()->check(), 401);
 
-        //Load missing relationship in case of strict models types
+        // Load missing relationship in case of strict models types
         $participant->loadMissing('participantable');
-        //abort if user does not belong to conversation
+        // abort if user does not belong to conversation
         abort_unless($participant->participantable->belongsToConversation($this->conversation), 403, 'This user does not belong to conversation');
 
-        //abort if user participants is owner
+        // abort if user participants is owner
         abort_if($participant->isOwner(), 403, 'Owner role cannot be changed');
 
-        //toggle
+        // toggle
         if ($participant->isAdmin()) {
             $participant->update(['role' => ParticipantRole::PARTICIPANT]);
         } else {
@@ -191,23 +191,23 @@ class Members extends ModalComponent
         $this->participants = $this->participants->merge($additionalParticipants->items())->unique('id');
     }
 
-    /*Deleting from group*/
+    /* Deleting from group */
     public function removeFromGroup(Participant $participant)
     {
 
-        //Load missing relationship in case of strict models types
+        // Load missing relationship in case of strict models types
         $participant->loadMissing('participantable');
-        //abort if user does not belong to conversation
+        // abort if user does not belong to conversation
         abort_unless($participant->participantable->belongsToConversation($this->conversation), 403, 'This user does not belong to conversation');
 
-        //abort if auth is not admin
+        // abort if auth is not admin
         abort_unless(auth()->user()->isAdminIn($this->conversation), 403, 'You do not have permission to perform this action in this group. Only admins can proceed.');
 
-        //abort if user participants is owner
+        // abort if user participants is owner
         abort_if($participant->isOwner(), 403, 'Owner cannot be removed from group');
 
-        //remove from group
-        //Create the 'remove' action record in the actions table
+        // remove from group
+        // Create the 'remove' action record in the actions table
         Action::create([
             'actionable_id' => $participant->id,
             'actionable_type' => Participant::class,
@@ -216,13 +216,13 @@ class Members extends ModalComponent
             'type' => Actions::REMOVED_BY_ADMIN,  // Type of action
         ]);
 
-        //remove from
+        // remove from
         // Remove member if they are already selected
         $this->participants = $this->participants->reject(function ($member) use ($participant) {
             return $member->id == $participant->id && get_class($member) == get_class($participant);
         });
 
-        //subtract one from total members and update chat list
+        // subtract one from total members and update chat list
         $this->totalMembersCount = $this->totalMembersCount - 1;
 
         $this->dispatch('participantsCountUpdated', $this->totalMembersCount)->to(Info::class);
@@ -236,7 +236,7 @@ class Members extends ModalComponent
     public function loadMore()
     {
 
-        //Check if no more conversations
+        // Check if no more conversations
         if (! $this->canLoadMore) {
             return null;
         }

@@ -54,7 +54,7 @@ class WireChat extends Component
         $this->widgetComponents = [
             $id => [
                 'name' => $component,
-                //'conversationId' => $conversation,
+                // 'conversationId' => $conversation,
                 'conversation' => $conversation,
                 'modalAttributes' => $modalAttributes,
             ],
@@ -62,10 +62,10 @@ class WireChat extends Component
 
         $this->activeWireChatWidgetComponent = $id;
 
-        //Set the selected conversationId
+        // Set the selected conversationId
         $this->selectedConversationId = $conversation;
 
-        /*! Changed listener name to activeChatWidgetComponentChanged to not interfere with main modal */
+        /* ! Changed listener name to activeChatWidgetComponentChanged to not interfere with main modal */
         $this->dispatch('activeChatWidgetComponentChanged', id: $id);
     }
 

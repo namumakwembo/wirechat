@@ -22,7 +22,7 @@ describe('Getting conversations', function () {
         $conversations = Conversation::factory(3)->withParticipants([$auth])->create();
 
         //  dd($conversations);
-        //assert conversation belongs to user
+        // assert conversation belongs to user
         foreach ($conversations as $key => $conversation) {
 
             $conversationExists = $conversation->participants()
@@ -39,7 +39,7 @@ describe('Getting conversations', function () {
 
         $conversations = Conversation::factory(3)->withParticipants([$auth])->create();
 
-        //assert count
+        // assert count
         expect(count($conversations))->toBe(3);
 
     });
@@ -53,13 +53,13 @@ describe('createConversationWith() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //assert
+        // assert
         $conversation = $auth->createConversationWith($receiver);
-        //assert
+        // assert
         expect($conversation)->not->toBe(null);
 
         expect($conversation)->toBeInstanceOf(Conversation::class);
-        //check database
+        // check database
         $conversation = Conversation::first();
         expect($conversation)->not->toBe(null);
 
@@ -70,10 +70,10 @@ describe('createConversationWith() ', function () {
         $auth = User::factory()->create(['email_verified_at' => null]);
         $receiver = User::factory()->create();
 
-        //action
+        // action
         $auth->createConversationWith($receiver);
 
-        //check database
+        // check database
         $conversation = Conversation::withoutGlobalScopes()->get();
         expect($conversation)->toBe(null);
 
@@ -84,14 +84,14 @@ describe('createConversationWith() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation
+        // create conversation
         $conversation = $auth->createConversationWith($receiver);
 
         // Eager load the participants relationship
 
         $conversation = Conversation::find($conversation->id);
 
-        //check database
+        // check database
         expect(count($conversation->participants))->toBe(2);
 
     });
@@ -101,7 +101,7 @@ describe('createConversationWith() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation
+        // create conversation
         $conversation = $auth->createConversationWith($receiver);
 
         // Eager load the participants relationship
@@ -116,7 +116,7 @@ describe('createConversationWith() ', function () {
             // code...
         }
 
-        //check database
+        // check database
         expect($bothAreOwners)->toBe(true);
 
     });
@@ -126,20 +126,20 @@ describe('createConversationWith() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation
+        // create conversation
         $conversation = $auth->createConversationWith($receiver);
 
         // Eager load the participants relationship
 
         $conversation = Conversation::find($conversation->id);
 
-        //assert partipant $auth
+        // assert partipant $auth
         expect($conversation->participants()
             ->where('participantable_id', $auth->id)
             ->where('participantable_type', get_class($auth))
             ->exists())->toBe(true);
 
-        //assert partipant $receiver
+        // assert partipant $receiver
         expect($conversation->participants()
             ->where('participantable_id', $receiver->id)
             ->where('participantable_type', get_class($receiver))
@@ -152,10 +152,10 @@ describe('createConversationWith() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation
+        // create conversation
         $conversation = $auth->createConversationWith($receiver);
 
-        //check database
+        // check database
         expect($conversation->type)->toBe(ConversationType::PRIVATE);
 
     });
@@ -165,14 +165,14 @@ describe('createConversationWith() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation attempt 1
+        // create conversation attempt 1
         $conversation1 = $auth->createConversationWith($receiver);
 
-        //create conversation attempt 2
+        // create conversation attempt 2
         $conversation2 = $receiver->createConversationWith($auth);
         expect($conversation2->id)->toBe($conversation1->id);
 
-        //assert $auth and $receiver only has one conversation
+        // assert $auth and $receiver only has one conversation
 
         expect(count($auth->conversations))->toBe(1);
 
@@ -185,10 +185,10 @@ describe('createConversationWith() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation
+        // create conversation
         $conversation = $auth->createConversationWith($receiver, message: 'Hello');
 
-        //assert
+        // assert
         expect(count($conversation->messages))->toBe(1);
 
     });
@@ -198,7 +198,7 @@ describe('createConversationWith() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation
+        // create conversation
         $conversation = $auth->createConversationWith($auth, message: 'Hello');
 
         // Eager load the participants relationship
@@ -223,7 +223,7 @@ describe('createConversationWith() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation
+        // create conversation
         $conversation = $auth->createConversationWith($auth, message: 'Hello');
         $conversation = $auth->createConversationWith($auth);
         $conversation = $auth->createConversationWith($auth);
@@ -246,7 +246,7 @@ describe('sendMessageTo() ', function () {
 
         $participant = $conversation->participant($auth);
 
-        //pass participant model - which does not use Triat Chatable
+        // pass participant model - which does not use Triat Chatable
         $auth->sendMessageTo($participant, 'hello');
 
     })->throws(Exception::class, 'The provided model does not support chat functionality.');
@@ -261,7 +261,7 @@ describe('sendMessageTo() ', function () {
         $randomUser = User::factory()->create();
         $randomUserConversation = $randomUser->createConversationWith(User::factory()->create());
 
-        //pass participant model - which does not use Triat Chatable
+        // pass participant model - which does not use Triat Chatable
         $auth->sendMessageTo($randomUserConversation, 'hello');
 
     })->throws(Exception::class, 'You do not have access to this conversation.');
@@ -275,13 +275,13 @@ describe('sendMessageTo() ', function () {
 
         $message = $auth->sendMessageTo($conversation, 'hello');
 
-        //assert
+        // assert
         expect($message)->not->toBe(null);
 
-        //check database
+        // check database
         $messageFromDB = Message::find($message->id);
 
-        //assert content
+        // assert content
         expect($messageFromDB->id)->toBe($message->id);
         expect($messageFromDB->body)->toBe($message->body);
         expect($messageFromDB->conversation_id)->toBe($conversation->id);
@@ -295,13 +295,13 @@ describe('sendMessageTo() ', function () {
 
         $message = $auth->sendMessageTo($receiver, 'hello');
 
-        //assert
+        // assert
         expect($message)->not->toBe(null);
 
-        //check database
+        // check database
         $messageFromDB = Message::find($message->id);
 
-        //assert content
+        // assert content
         expect($messageFromDB->id)->toBe($message->id);
         expect($messageFromDB->body)->toBe($message->body);
 
@@ -314,13 +314,13 @@ describe('sendMessageTo() ', function () {
 
         $message = $auth->sendMessageTo($receiver, 'hello');
 
-        //assert
+        // assert
         expect($message)->not->toBe(null);
 
-        //check database
+        // check database
         $messageFromDB = Message::find($message->id);
 
-        //assert content
+        // assert content
         expect($messageFromDB->type)->toBe(MessageType::TEXT);
 
     });
@@ -331,14 +331,14 @@ describe('sendMessageTo() ', function () {
         $receiver = User::factory()->create();
 
         $message = $auth->sendMessageTo($receiver, 'hello');
-        //assert
+        // assert
 
         $conversation = Conversation::first();
 
-        //assert conversation id
+        // assert conversation id
         expect($conversation)->not->toBe(null);
 
-        //assert conversation id
+        // assert conversation id
         expect($message->conversation_id)->toBe($conversation->id);
 
     });
@@ -349,11 +349,11 @@ describe('sendMessageTo() ', function () {
         $receiver = User::factory()->create();
 
         $message = $auth->sendMessageTo($receiver, 'hello');
-        //assert
+        // assert
         expect($message)->not->toBe(null);
 
         expect($message)->toBeInstanceOf(Message::class);
-        //check database
+        // check database
         $conversation = Conversation::first();
         expect($conversation)->not->toBe(null);
 
@@ -366,13 +366,13 @@ describe('sendMessageTo() ', function () {
 
         $message = $auth->sendMessageTo($receiver, 'hello');
 
-        //assert
+        // assert
         expect($message)->not->toBe(null);
 
-        //check database
+        // check database
         $messageFromDB = Message::find($message->id);
 
-        //assert content
+        // assert content
         expect($messageFromDB->id)->toBe($message->id);
         expect($messageFromDB->body)->toBe($message->body);
 
@@ -383,10 +383,10 @@ describe('sendMessageTo() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation
+        // create conversation
         $conversation = $auth->createConversationWith($receiver);
 
-        //send message
+        // send message
 
         $message = $auth->sendMessageTo($receiver, 'hello');
 
@@ -399,10 +399,10 @@ describe('sendMessageTo() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation
+        // create conversation
         $conversation = $auth->createConversationWith($receiver);
 
-        //we use sleep to avoid timestamps being the same during test
+        // we use sleep to avoid timestamps being the same during test
         sleep(1);
 
         $auth->sendMessageTo($receiver, 'hello');
@@ -418,13 +418,13 @@ describe('sendMessageTo() ', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //create conversation
+        // create conversation
         $conversation = $auth->createConversationWith($receiver);
 
         $participant = $conversation->participant($auth);
         expect($participant->last_active_at)->toBe(null);
 
-        //we use sleep to avoid timestamps being the same during test
+        // we use sleep to avoid timestamps being the same during test
         sleep(1);
 
         Carbon::setTestNow(now()->addSeconds(3));
@@ -447,10 +447,10 @@ describe('belongsToConversation() ', function () {
         $receiver = User::factory()->create();
         $conversation = $auth->createConversationWith($receiver);
 
-        //create conversation
+        // create conversation
         $randomUser = User::factory()->create();
 
-        //assert
+        // assert
         expect($randomUser->belongsToConversation($conversation))->toBe(false);
 
     });
@@ -461,7 +461,7 @@ describe('belongsToConversation() ', function () {
         $receiver = User::factory()->create();
         $conversation = $auth->createConversationWith($receiver);
 
-        //assert
+        // assert
         expect($auth->belongsToConversation($conversation))->toBe(true);
 
     });
@@ -471,15 +471,15 @@ describe('belongsToConversation() ', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup('Test', 'hello');
 
-        //add member
+        // add member
         $receiver = User::factory()->create();
         $participant = $conversation->addParticipant($receiver);
 
         expect($receiver->belongsToConversation($conversation))->toBe(true);
 
-        //exit conversation
+        // exit conversation
         $participant->exitConversation();
-        //assert
+        // assert
         expect($receiver->belongsToConversation($conversation))->toBe(false);
 
     });
@@ -489,16 +489,16 @@ describe('belongsToConversation() ', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup('Test', 'hello');
 
-        //add member
+        // add member
         $receiver = User::factory()->create();
         $participant = $conversation->addParticipant($receiver);
 
         expect($receiver->belongsToConversation($conversation))->toBe(true);
 
-        //exit conversation
+        // exit conversation
 
         $participant->removeByAdmin($auth);
-        //assert
+        // assert
         expect($receiver->belongsToConversation($conversation))->toBe(false);
 
     });
@@ -513,10 +513,10 @@ describe('hasConversationWith() ', function () {
         $receiver = User::factory()->create();
         $conversation = $auth->createConversationWith($receiver);
 
-        //create conversation
+        // create conversation
         $randomUser = User::factory()->create();
 
-        //assert
+        // assert
         expect($randomUser->hasConversationWith($auth))->toBe(false);
 
     });
@@ -527,7 +527,7 @@ describe('hasConversationWith() ', function () {
         $receiver = User::factory()->create();
         $conversation = $auth->createConversationWith($receiver);
 
-        //assert
+        // assert
         expect($receiver->hasConversationWith($auth))->toBe(true);
 
     });
@@ -538,7 +538,7 @@ describe('hasConversationWith() ', function () {
         $receiver = Admin::factory()->create();
         $conversation = $auth->createConversationWith($receiver);
 
-        //assert
+        // assert
         expect($receiver->hasConversationWith($auth))->toBe(true);
 
     });
@@ -549,7 +549,7 @@ describe('hasConversationWith() ', function () {
 
         $conversation = $auth->createConversationWith($auth);
 
-        //assert
+        // assert
         expect($auth->hasConversationWith($auth))->toBe(true);
 
     });
@@ -563,23 +563,23 @@ describe('getUnreadCount()', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //Authenticate $auth
+        // Authenticate $auth
         $this->actingAs($auth);
 
-        //Create conversation
+        // Create conversation
         $conversation = Conversation::factory()->withParticipants([$auth, $receiver])->create();
 
-        //auth -> receiver
+        // auth -> receiver
         $auth->sendMessageTo($receiver, message: '1');
         $auth->sendMessageTo($receiver, message: '2');
         $auth->sendMessageTo($receiver, message: '3');
 
-        //send message to auth
-        //receiver -> auth
+        // send message to auth
+        // receiver -> auth
         $receiver->sendMessageTo($auth, message: '4');
         $receiver->sendMessageTo($auth, message: '5');
 
-        //Assert number of unread messages for $auth
+        // Assert number of unread messages for $auth
         expect($auth->getUnreadCount($conversation))->toBe(2);
 
     });
@@ -598,15 +598,15 @@ describe('getUnreadCount()', function () {
         $conversation->addParticipant($OtherAdmin);
         $conversation->addParticipant($OtherUser);
 
-        //Authenticate $auth
+        // Authenticate $auth
         $this->actingAs($auth);
 
-        //Create conversation
-        /// $conversation = Conversation::factory()->withParticipants([$auth, $receiver])->create();
+        // Create conversation
+        // / $conversation = Conversation::factory()->withParticipants([$auth, $receiver])->create();
 
-        //Mark as read
+        // Mark as read
 
-        //auth -> receiver
+        // auth -> receiver
         $auth->sendMessageTo($conversation, message: '1');
         $auth->sendMessageTo($conversation, message: '2');
         $auth->sendMessageTo($conversation, message: '3');
@@ -616,8 +616,8 @@ describe('getUnreadCount()', function () {
 
         Carbon::setTestNowAndTimezone(now()->subSeconds(10));
 
-        //send message to auth
-        //receiver -> auth
+        // send message to auth
+        // receiver -> auth
         $receiver->sendMessageTo($conversation, message: 'From Admin-1');
         $receiver->sendMessageTo($conversation, message: 'From Admin-2');
 
@@ -627,10 +627,10 @@ describe('getUnreadCount()', function () {
         $OtherUser->sendMessageTo($conversation, message: 'From User-1');
         $OtherUser->sendMessageTo($conversation, message: 'From User-2');
 
-        //Assert number of unread messages for $auth
+        // Assert number of unread messages for $auth
         expect($auth->getUnreadCount($conversation))->toBe(6);
 
-        //verify that all unread messages do not belong to user
+        // verify that all unread messages do not belong to user
         $unreadMessages = $conversation->unreadMessages($auth);
 
         $allDoNotBelongToAuth = true;
@@ -656,10 +656,10 @@ describe('getUnreadCount()', function () {
         $conversation->addParticipant($OtherAdmin);
         $conversation->addParticipant($OtherUser);
 
-        //time travel
+        // time travel
         Carbon::setTestNowAndTimezone(now()->subSeconds(30));
 
-        //receiver -> auth
+        // receiver -> auth
         $receiver->sendMessageTo($conversation, message: 'From Admin-1');
         $receiver->sendMessageTo($conversation, message: 'From Admin-2');
 
@@ -667,13 +667,13 @@ describe('getUnreadCount()', function () {
         $OtherAdmin->sendMessageTo($conversation, message: 'From OtherAdmin-1');
         $OtherAdmin->sendMessageTo($conversation, message: 'From OtherAdmin-2');
 
-        //move 10 seconds fron last 20 mins
+        // move 10 seconds fron last 20 mins
         Carbon::setTestNow(now()->addSeconds(10));
 
-        //mark as read
+        // mark as read
         $conversation->markAsRead($auth);
 
-        //reset fake time
+        // reset fake time
         Carbon::setTestNow();
 
         //  Carbon::setTestNow(now()->subSeconds(10));
@@ -681,7 +681,7 @@ describe('getUnreadCount()', function () {
         //  $OtherUser->sendMessageTo($conversation, message: 'From User-1');
         //  $OtherUser->sendMessageTo($conversation, message: 'From User-2');
 
-        //Assert number of unread messages for $auth
+        // Assert number of unread messages for $auth
         expect($auth->getUnreadCount($conversation))->toBe(0);
 
     });
@@ -700,10 +700,10 @@ describe('getUnreadCount()', function () {
         $conversation->addParticipant($OtherAdmin);
         $conversation->addParticipant($OtherUser);
 
-        //time travel
+        // time travel
         Carbon::setTestNowAndTimezone(now()->subSeconds(30));
 
-        //receiver -> auth
+        // receiver -> auth
         $receiver->sendMessageTo($conversation, message: 'From Admin-1');
         $receiver->sendMessageTo($conversation, message: 'From Admin-2');
 
@@ -711,20 +711,20 @@ describe('getUnreadCount()', function () {
         $OtherAdmin->sendMessageTo($conversation, message: 'From OtherAdmin-1');
         $OtherAdmin->sendMessageTo($conversation, message: 'From OtherAdmin-2');
 
-        //move 10 seconds fron last 20 mins
+        // move 10 seconds fron last 20 mins
         Carbon::setTestNow(now()->addSeconds(10));
 
-        //mark as read
+        // mark as read
         $conversation->markAsRead($auth);
 
-        //reset fake time
+        // reset fake time
         Carbon::setTestNow();
 
-        //New Unread messages
+        // New Unread messages
         $OtherUser->sendMessageTo($conversation, message: 'From User-1');
         $OtherUser->sendMessageTo($conversation, message: 'From User-2');
 
-        //Assert number of unread messages for $auth
+        // Assert number of unread messages for $auth
         expect($auth->getUnreadCount($conversation))->toBe(2);
 
     });
@@ -734,22 +734,22 @@ describe('getUnreadCount()', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //Authenticate $auth
+        // Authenticate $auth
         $this->actingAs($auth);
 
-        //create first conversation and receiver messages
+        // create first conversation and receiver messages
         Conversation::factory()->withParticipants([$auth, $receiver])->create();
         $receiver->sendMessageTo($auth, message: '1');
         $receiver->sendMessageTo($auth, message: '1');
 
-        //create new conversation and receive messages
+        // create new conversation and receive messages
         $receiver2 = User::factory()->create();
         Conversation::factory()->withParticipants([$auth, $receiver2])->create();
         $receiver2->sendMessageTo($auth, message: 'new 1');
         $receiver2->sendMessageTo($auth, message: 'new 2');
         $receiver2->sendMessageTo($auth, message: 'new 3');
 
-        //Assert number of total unread  count for $auth
+        // Assert number of total unread  count for $auth
         expect($auth->getUnreadCount())->toBe(5);
 
     });
@@ -759,23 +759,23 @@ describe('getUnreadCount()', function () {
         $auth = User::factory()->create();
         $receiver = User::factory()->create();
 
-        //Authenticate $auth
+        // Authenticate $auth
         $this->actingAs($auth);
 
-        //Create conversation
+        // Create conversation
         $conversation = Conversation::factory()->withParticipants([$auth, $receiver])->create();
 
-        //auth -> receiver
+        // auth -> receiver
         $auth->sendMessageTo($receiver, message: '1');
         $auth->sendMessageTo($receiver, message: '2');
         $auth->sendMessageTo($receiver, message: '3');
 
-        //send message to auth
-        //receiver -> auth
+        // send message to auth
+        // receiver -> auth
         $receiver->sendMessageTo($auth, message: '4');
         $receiver->sendMessageTo($auth, message: '5');
 
-        //Assert number of unread messages for $auth
+        // Assert number of unread messages for $auth
         expect($auth->getUnreadCount($conversation))->toBeNumeric();
 
     });
@@ -789,7 +789,7 @@ describe('createGroup', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup(name: 'New group', description: 'description');
 
-        //assert
+        // assert
         expect(Conversation::find($conversation))->not->toBe(null);
 
     });
@@ -802,7 +802,7 @@ describe('createGroup', function () {
 
         $group = $conversation->group;
 
-        //assert
+        // assert
         expect(Group::find($group->id)->id)->toBe($group->id);
 
     });
@@ -814,7 +814,7 @@ describe('createGroup', function () {
         $conversation = $auth->createGroup(name: 'New group', description: 'description', photo: $photo);
 
         $group = $conversation->group;
-        //assert
+        // assert
 
         expect($group->name)->toBe('New group');
         expect($group->description)->toBe('description');
@@ -831,7 +831,7 @@ describe('createGroup', function () {
 
         $participant = $conversation->participants()->first();
 
-        //assert
+        // assert
         expect($participant->participantable_id)->toEqual($auth->id);
 
     });
@@ -869,7 +869,7 @@ describe('Exit conversation', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createGroup(name: 'New group', description: 'description');
 
-        //assert
+        // assert
         expect($auth->exitConversation($conversation))->toBe(false);
 
     })->throws(Exception::class, 'Owner cannot exit conversation');
@@ -879,7 +879,7 @@ describe('Exit conversation', function () {
         $auth = User::factory()->create();
         $conversation = $auth->createConversationWith(User::factory()->create());
 
-        //assert
+        // assert
         expect($auth->exitConversation($conversation))->toBe(false);
 
     })->throws(Exception::class, 'Participant cannot exit a private conversation');
@@ -895,10 +895,10 @@ describe('Exit conversation', function () {
 
         $user->exitConversation($conversation);
 
-        //get participant set withoutGlobalScopes =true becuaes at this point the user should be added to query
+        // get participant set withoutGlobalScopes =true becuaes at this point the user should be added to query
         $participant = $conversation->participant($user, true);
 
-        //assert
+        // assert
         expect($participant->hasExited())->toBe(true);
         expect($participant->exited_at)->not->toBe(null);
 
@@ -913,17 +913,17 @@ describe('Exit conversation', function () {
         $user = User::factory()->create();
         $conversation->addParticipant($user);
 
-        //Send to conversation
+        // Send to conversation
         $user->sendMessageTo($conversation, 'hello-1');
         $user->sendMessageTo($conversation, 'hello-2');
         $user->sendMessageTo($conversation, 'hello-3');
 
         $conversation = $user->sendMessageTo($conversation, 'hello-4')->conversation;
 
-        //Assert Count
+        // Assert Count
         expect($conversation->messages()->count())->toBe(4);
 
-        //Authenticate
+        // Authenticate
 
         $user->exitConversation($conversation);
 
@@ -946,10 +946,10 @@ describe('Exit conversation', function () {
 
         $user->exitConversation($conversation);
 
-        //get participant
+        // get participant
         $participant = $conversation->participant($user);
 
-        //assert
+        // assert
         expect($user->belongsToConversation($conversation))->toBe(false);
 
     });

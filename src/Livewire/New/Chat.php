@@ -32,7 +32,7 @@ class Chat extends ModalComponent
     public function updatedsearch()
     {
 
-        //Make sure it's not empty
+        // Make sure it's not empty
         if (blank($this->search)) {
 
             $this->users = null;
@@ -45,7 +45,7 @@ class Chat extends ModalComponent
     public function createConversation($id, string $class)
     {
 
-        //resolve model from params -get model class
+        // resolve model from params -get model class
         $model = app($class);
         $model = $model::find($id);
 
@@ -54,10 +54,10 @@ class Chat extends ModalComponent
 
             if ($createdConversation) {
 
-                //close dialog
+                // close dialog
                 $this->closeWireChatModal();
 
-                //redirect to conversation
+                // redirect to conversation
                 $this->handleComponentTermination(
                     redirectRoute: route(WireChat::viewRouteName(), [$createdConversation->id]),
                     events: [

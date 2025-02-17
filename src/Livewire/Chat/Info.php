@@ -109,7 +109,7 @@ class Info extends ModalComponent
     {
 
         abort_unless($this->conversation->isGroup(), 405);
-        //delete photo from group
+        // delete photo from group
 
         $this->group?->cover()?->delete();
 
@@ -128,20 +128,20 @@ class Info extends ModalComponent
 
         abort_unless($this->conversation->isGroup(), 405);
 
-        //validate
+        // validate
         $this->validate([
             'photo' => 'image|max:12024|nullable|mimes:png,jpg,jpeg,webp',
         ]);
 
-        //create and save photo is present
+        // create and save photo is present
         if ($photo) {
 
-            //remove current photo
+            // remove current photo
             $this->group?->cover?->delete();
-            //save photo to disk
+            // save photo to disk
             $path = $photo->store(WireChat::storageFolder(), WireChat::storageDisk());
             $url = Storage::url($path);
-            //create attachment
+            // create attachment
             $this->conversation->group?->cover()?->create([
                 'file_path' => $path,
                 'file_name' => basename($path),
@@ -169,12 +169,12 @@ class Info extends ModalComponent
         abort_unless(auth()->user()->belongsToConversation($this->conversation), 403);
         abort_unless($this->conversation->isSelf() || $this->conversation->isPrivate(), 403, 'This operation is not available for Groups.');
 
-        //delete conversation
+        // delete conversation
         $this->conversation->deleteFor(auth()->user());
 
-        //redirect to chats page pr
-        //Dispatach event instead if isWidget
-        //handle widget termination
+        // redirect to chats page pr
+        // Dispatach event instead if isWidget
+        // handle widget termination
         $this->handleComponentTermination(
             redirectRoute: route(WireChat::indexRouteName()),
             events: [
@@ -197,7 +197,7 @@ class Info extends ModalComponent
 
         abort_unless(auth()->user()->isOwnerOf($this->conversation), 403, 'Forbidden: You do not have permission to delete this group.');
 
-        //Ensure all participants are removed before deleting the group
+        // Ensure all participants are removed before deleting the group
         $participantCount = $this->conversation->participants()
             ->withoutParticipantable(auth()->user())
             ->where('role', '!=', ParticipantRole::OWNER)
@@ -205,7 +205,7 @@ class Info extends ModalComponent
 
         abort_unless($participantCount == 0, 403, 'Cannot delete group: Please remove all members before attempting to delete the group.');
 
-        //handle widget termination
+        // handle widget termination
         $this->handleComponentTermination(
             redirectRoute: route(WireChat::indexRouteName()),
             events: [
@@ -214,11 +214,11 @@ class Info extends ModalComponent
             ]
         );
 
-        //Soft Delete conversation
+        // Soft Delete conversation
         $this->conversation->deleteFor(auth()->user());
 
-        //Dispatch job to delete conversation in backgroud
-        //This is done to not hold up page for user incase of long running prcoess and to also give time for widget to settle avoiding 404 livewire hydrate errors
+        // Dispatch job to delete conversation in backgroud
+        // This is done to not hold up page for user incase of long running prcoess and to also give time for widget to settle avoiding 404 livewire hydrate errors
         DeleteConversationJob::dispatch($this->conversation);
 
     }
@@ -229,10 +229,10 @@ class Info extends ModalComponent
 
         $auth = auth()->user();
 
-        //make sure owner if group cannot be removed from chat
+        // make sure owner if group cannot be removed from chat
         abort_if($auth->isOwnerOf($this->conversation), 403, 'Owner cannot exit conversation');
 
-        //delete conversation
+        // delete conversation
         $auth->exitConversation($this->conversation);
 
         $this->handleComponentTermination(

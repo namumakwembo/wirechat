@@ -12,10 +12,10 @@ class Chat extends Component
 
     public function mount()
     {
-        ///make sure user is authenticated
+        // /make sure user is authenticated
         abort_unless(auth()->check(), 401);
 
-        //We remove deleted conversation incase the user decides to visit the delted conversation
+        // We remove deleted conversation incase the user decides to visit the delted conversation
         $this->conversation = Conversation::where('id', $this->conversation)->firstOrFail();
 
         // Check if the user belongs to the conversation

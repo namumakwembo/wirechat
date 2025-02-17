@@ -55,7 +55,7 @@ class Action extends Model
         return $this->morphTo('actor', 'actor_type', 'actor_id', 'id');
     }
 
-    //scope by Actor
+    // scope by Actor
     public function scopeWhereActor(Builder $query, Model $actor)
     {
 

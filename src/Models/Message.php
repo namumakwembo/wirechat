@@ -74,10 +74,10 @@ class Message extends Model
 
             if ($message->attachment?->exists()) {
 
-                //delete attachment
+                // delete attachment
                 $message->attachment?->delete();
 
-                //also delete from storage
+                // also delete from storage
                 if (Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->exists($message->attachment->file_path)) {
                     Storage::disk(config('wirechat.attachments.storage_disk', 'public'))->delete($message->attachment->file_path);
                 }
@@ -208,7 +208,7 @@ class Message extends Model
         // If it's a private conversation (only 2 users), then check if both users have deleted the message
         if ($conversation->isPrivate()) {
 
-            //Eager load particiapnts
+            // Eager load particiapnts
             $conversation->loadMissing('participants.participantable');
             $deletedByBothParticipants = true;
 
@@ -238,10 +238,10 @@ class Message extends Model
         // Make sure auth belongs to conversation for this message
         abort_unless($user->belongsToConversation($conversation), 403, 'You do not belong to this conversation');
 
-        //make sure user owns message OR allow if is admin in group
+        // make sure user owns message OR allow if is admin in group
         abort_unless($message->ownedBy($user) || ($participant->isAdmin() && $message->conversation->isGroup()), 403, 'You do not have permission to delete this message');
 
-        //if message has reply then only-soft delete it
+        // if message has reply then only-soft delete it
         if ($message->hasReply()) {
             $message->delete();
         } else {

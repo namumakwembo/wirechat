@@ -62,18 +62,18 @@ describe('Actions', function () {
 
         $conversation = $auth->createGroup(name: 'New group', description: 'description');
 
-        //add user and exit conversation
+        // add user and exit conversation
         for ($i = 0; $i < 20; $i++) {
             $conversation->addParticipant(User::factory()->create());
         }
 
         $message = $auth->sendMessageTo($conversation, 'hello');
 
-        //Create Job in database
+        // Create Job in database
         $job = (new NotifyParticipants($conversation, $message));
 
-        //Travel future JUst 5 seconds
-        $this->travelTo(now()->addSeconds(5)); //VALID
+        // Travel future JUst 5 seconds
+        $this->travelTo(now()->addSeconds(5)); // VALID
 
         $job->handle();
 
@@ -89,7 +89,7 @@ describe('Actions', function () {
 
         $conversation = $auth->createGroup(name: 'New group', description: 'description');
 
-        //add user and exit conversation
+        // add user and exit conversation
         for ($i = 0; $i <= 20; $i++) {
             $conversation->addParticipant(User::factory()->create());
         }
@@ -97,10 +97,10 @@ describe('Actions', function () {
         Carbon::setTestNowAndTimezone(now()->subSeconds(200));
         $message = $auth->sendMessageTo($conversation, 'hello');
 
-        //Create Job instance
+        // Create Job instance
         $job = (new NotifyParticipants($conversation, $message));
 
-        //Travel future
+        // Travel future
         Carbon::setTestNowAndTimezone(now()->subSeconds(139));
 
         $job->handle();
@@ -118,14 +118,14 @@ describe('Actions', function () {
 
         $conversation = $auth->createGroup(name: 'New group', description: 'description');
 
-        //add user and exit conversation
+        // add user and exit conversation
         for ($i = 0; $i < 20; $i++) {
             $conversation->addParticipant(User::factory()->create());
         }
 
         $message = $auth->sendMessageTo($conversation, 'hello');
 
-        //Create Job in database
+        // Create Job in database
         $job = (new NotifyParticipants($conversation, $message));
 
         $job->handle();
@@ -148,7 +148,7 @@ describe('Actions', function () {
 
         $conversation = $auth->createGroup(name: 'New group', description: 'description');
 
-        //add user and exit conversation
+        // add user and exit conversation
         for ($i = 0; $i < 10; $i++) {
             $conversation->addParticipant(User::factory()->create());
             $conversation->addParticipant(Admin::factory()->create());
@@ -157,7 +157,7 @@ describe('Actions', function () {
 
         $message = $auth->sendMessageTo($conversation, 'hello');
 
-        //Create Job in database
+        // Create Job in database
         $job = (new NotifyParticipants($conversation, $message));
 
         $job->handle();

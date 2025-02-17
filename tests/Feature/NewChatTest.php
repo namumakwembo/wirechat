@@ -1,6 +1,6 @@
 <?php
 
-///Presence test
+// /Presence test
 
 use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
@@ -37,7 +37,7 @@ it('Title is set ', function () {
 it('can filter users if search input is set', function () {
     $auth = ModelsUser::factory()->create();
 
-    //create user
+    // create user
     ModelsUser::factory()->create(['name' => 'John']);
 
     $request = Livewire::actingAs($auth)->test(NewChat::class);
@@ -113,18 +113,18 @@ describe('Creating conversation', function () {
 
         $auth = ModelsUser::factory()->create();
 
-        //create user
+        // create user
         $otherUser = ModelsUser::factory()->create(['name' => 'John']);
 
-        //assert user doenst have conversation
+        // assert user doenst have conversation
         expect($auth->hasConversationWith($otherUser))->toBeFalse();
 
         $request = Livewire::actingAs($auth)->test(NewChat::class);
 
-        //search
+        // search
         $request->set('search', 'Joh')->assertSee('John');
 
-        //create conversation
+        // create conversation
         $request->call('createConversation', $otherUser->id, ModelsUser::class);
 
         expect($auth->hasConversationWith($otherUser))->toBeTrue();
@@ -135,18 +135,18 @@ describe('Creating conversation', function () {
 
         $auth = ModelsUser::factory()->create();
 
-        //create user
+        // create user
         $otherUser = ModelsUser::factory()->create(['name' => 'John']);
 
         $request = Livewire::actingAs($auth)->test(NewChat::class);
 
-        //search
+        // search
         $request->set('search', 'Joh')->assertSee('John');
 
-        //create conversation
+        // create conversation
         $request->call('createConversation', $otherUser->id, ModelsUser::class);
 
-        //assert redirect
+        // assert redirect
         $request->assertDispatched('closeWireChatModal');
 
     });
@@ -155,20 +155,20 @@ describe('Creating conversation', function () {
 
         $auth = ModelsUser::factory()->create();
 
-        //create user
+        // create user
         $otherUser = ModelsUser::factory()->create(['name' => 'John']);
 
         $request = Livewire::actingAs($auth)->test(NewChat::class);
 
-        //search
+        // search
         $request->set('search', 'Joh')->assertSee('John');
 
-        //create conversation
+        // create conversation
         $request->call('createConversation', $otherUser->id, ModelsUser::class);
 
         $conversation = $auth->conversations()->first();
 
-        //assert redirect
+        // assert redirect
         $request
             ->assertRedirect(route(WireChat::viewRouteName(), $conversation->id))
             ->assertNotDispatched('open-chat');
@@ -179,20 +179,20 @@ describe('Creating conversation', function () {
 
         $auth = ModelsUser::factory()->create();
 
-        //create user
+        // create user
         $otherUser = ModelsUser::factory()->create(['name' => 'John']);
 
         $request = Livewire::actingAs($auth)->test(NewChat::class, ['widget' => true]);
 
-        //search
+        // search
         $request->set('search', 'Joh')->assertSee('John');
 
-        //create conversation
+        // create conversation
         $request->call('createConversation', $otherUser->id, ModelsUser::class);
 
         $conversation = $auth->conversations()->first();
 
-        //assert redirect
+        // assert redirect
         $request
             ->assertNoRedirect(route(WireChat::viewRouteName(), $conversation->id))
             ->assertDispatched('open-chat');

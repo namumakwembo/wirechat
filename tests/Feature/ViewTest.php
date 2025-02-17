@@ -73,17 +73,17 @@ test('it marks messages as read when conversation is open ', function () {
     $receiver = User::factory()->create(['name' => 'John']);
     $conversation = Conversation::factory()->withParticipants([$auth, $receiver])->create();
 
-    //send messages to auth
+    // send messages to auth
     $receiver->sendMessageTo($auth, message: 'how is it going');
     $receiver->sendMessageTo($auth, message: 'i am good thanks');
 
-    //confirm unread cound is 2 before user opens the chat
+    // confirm unread cound is 2 before user opens the chat
     expect($auth->getUnReadCount())->toBe(2);
 
-    //visit page
+    // visit page
     $this->actingAs($auth)->get(route(WireChat::viewRouteName(), $conversation->id));
 
-    //noq assert that unread cound is now 0
+    // noq assert that unread cound is now 0
     expect($auth->getUnReadCount())->toBe(0);
 
 });

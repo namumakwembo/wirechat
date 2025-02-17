@@ -36,10 +36,10 @@ class Group extends ModalComponent
     public function deletePhoto()
     {
 
-        //delete from tmp-folder
+        // delete from tmp-folder
         // $this->removeUpload('photo', $this->photo->temporaryUrl());
 
-        //delete photo
+        // delete photo
         $this->reset('photo');
     }
 
@@ -60,7 +60,7 @@ class Group extends ModalComponent
     public function updatedSearch()
     {
 
-        //Make sure it's not empty
+        // Make sure it's not empty
         if (blank($this->search)) {
 
             $this->users = null;
@@ -70,7 +70,7 @@ class Group extends ModalComponent
         }
     }
 
-    //Add members to selectedMembers list
+    // Add members to selectedMembers list
     public function addMember($id, string $class)
     {
         try {
@@ -89,7 +89,7 @@ class Group extends ModalComponent
         }
     }
 
-    //Remove Member from   selectedMembers list
+    // Remove Member from   selectedMembers list
     public function removeMember($id, string $class)
     {
         // Filter out the member with the specified ID and class
@@ -111,7 +111,7 @@ class Group extends ModalComponent
                 });
             } else {
 
-                //validte members count
+                // validte members count
                 if (count($this->selectedMembers) >= WireChat::maxGroupMembers()) {
                     return $this->dispatch('show-member-limit-error');
                 }
@@ -129,7 +129,7 @@ class Group extends ModalComponent
 
         $this->validate();
 
-        //if validation passed then show members to true
+        // if validation passed then show members to true
         $this->showAddMembers = true;
     }
 
@@ -139,26 +139,26 @@ class Group extends ModalComponent
 
         $this->validate();
 
-        //create group
+        // create group
         $conversation = auth()->user()->createGroup($this->name, $this->description, $this->photo);
 
-        //Add participants
+        // Add participants
         foreach ($this->selectedMembers as $key => $participant) {
 
-            //make sure user does not belong to conversation already
-            //mostly this is the auth user
+            // make sure user does not belong to conversation already
+            // mostly this is the auth user
             $alreadyExists = $conversation->participants()->where('participantable_id', $participant->id)->where('participantable_type', $participant->getMorphClass())->exists();
             if (! $alreadyExists) {
                 $conversation->addParticipant($participant);
             }
         }
 
-        //close dialog
-        //The froce close is importnat because it will close all dialogs including parents or children
+        // close dialog
+        // The froce close is importnat because it will close all dialogs including parents or children
         $this->forceClose();
         $this->closeWireChatModal();
 
-        //redirect to conversation
+        // redirect to conversation
         $this->handleComponentTermination(
             redirectRoute: route(WireChat::viewRouteName(), [$conversation->id]),
             events: [

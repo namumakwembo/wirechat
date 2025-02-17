@@ -20,10 +20,10 @@ use function Orchestra\Testbench\workbench_path;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
-    //use DatabaseMigrations;
+    // use DatabaseMigrations;
 
-    //use InteractsWithViews;
-    //use RefreshDatabase;
+    // use InteractsWithViews;
+    // use RefreshDatabase;
 
     // use DatabaseTruncation;
     use WithWorkbench;
@@ -57,7 +57,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
                 'prefix' => '',
             ]);
 
-            //set up user model
+            // set up user model
             $config->set('wirechat.user_model', \Workbench\App\Models\User::class);
 
             // Setup queue database connections.
@@ -74,10 +74,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        //Config::set(\Namu\WireChat\Workbench\App\Models\User::class, \App\Models\User::class);
+        // Config::set(\Namu\WireChat\Workbench\App\Models\User::class, \App\Models\User::class);
 
         // dd(             __DIR__.'../../database/migrations');
-        //$this->loadMigrationsFrom(__DIR__.'/../database/migrations', workbench_path('database/migrations'));
+        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations', workbench_path('database/migrations'));
 
         //  $this->loadMigrationsFrom( );
         $this->withoutVite();
@@ -85,13 +85,13 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         // $this->artisan('migrate:fresh ')->run();
         //  $this->loadRoutesFrom(workbench_path('routes/web.php'));
-        //here we add a new ile in the name of the mixture of the berir d
-        /// $this->loadMigrationsFrom(__DIR__.'/migrations');
+        // here we add a new ile in the name of the mixture of the berir d
+        // / $this->loadMigrationsFrom(__DIR__.'/migrations');
     }
 
     protected function defineDatabaseMigrations()
     {
-        ///$this->loadLaravelMigrations();
+        // /$this->loadLaravelMigrations();
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         $this->loadMigrationsFrom(workbench_path('database/migrations'));

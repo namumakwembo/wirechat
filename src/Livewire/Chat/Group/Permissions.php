@@ -3,7 +3,7 @@
 namespace Namu\WireChat\Livewire\Chat\Group;
 
 use Livewire\Attributes\Locked;
-//use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+// use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Livewire\Concerns\ModalComponent;
@@ -55,7 +55,7 @@ class Permissions extends ModalComponent
 
     public function updating($field, $value)
     {
-        //dd($field, $value);
+        // dd($field, $value);
         $this->group->setAttribute($field, $value)->save();
     }
 

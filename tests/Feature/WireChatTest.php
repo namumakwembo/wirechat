@@ -48,7 +48,7 @@ test('it renders Chat when "openChatWidget" event is selected ', function () {
 
     $response->dispatch('openChatWidget', conversation: $conversation->id);
 
-    //dd($response);
+    // dd($response);
     $response->assertSeeLivewire(Chat::class);
 
 });
@@ -59,19 +59,19 @@ test('it removes Chat when "closeChatWidget" event is selected ', function () {
     $conversation = $auth->createConversationWith(User::factory()->create());
     $response = Livewire::actingAs($auth)->test(WireChat::class);
 
-    //assert
+    // assert
     $response->assertDontSeeLivewire(Chat::class);
 
-    //open
+    // open
     $response->dispatch('openChatWidget', conversation: $conversation->id);
 
-    //assert
+    // assert
     $response->assertSeeLivewire(Chat::class);
 
-    //open
+    // open
     $response->dispatch('closeChatWidget');
 
-    //assert
+    // assert
     $response->assertDontSeeLivewire(Chat::class);
 
 });

@@ -23,9 +23,9 @@ class WorkbenchServiceProvider extends ServiceProvider
         //
         //  \Livewire\Livewire::forceAssetInjection();
 
-      //  Livewire::component('chat-list', Chats::class);
+        //  Livewire::component('chat-list', Chats::class);
 
-       // $this->app->register(WireChatServiceProvider::class);
+        // $this->app->register(WireChatServiceProvider::class);
         //$this->app->register(LivewireServiceProvider::class);
 
         // Register the WireChatServiceProvider

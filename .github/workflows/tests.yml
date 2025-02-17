@@ -51,7 +51,7 @@ jobs:
             pest-plugin: ^3.0
             php: 8.4
 
-    name: PHP${{ matrix.php }} - Laravel${{ matrix.laravel }} - ${{ matrix.dependency-version }}
+    name: PHP${{ matrix.php }} - Laravel${{ matrix.laravel }} - Testbench${{ matrix.testbench }} - Pest${{ matrix.pest }}  - Pest-Plugin${{ matrix.pest-plugin }} -  ${{ matrix.dependency-version }}
 
     steps:
       - name: Checkout code

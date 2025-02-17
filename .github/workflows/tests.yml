@@ -12,7 +12,8 @@ on:
 jobs:
   php-tests:
     runs-on: ubuntu-latest
-    continue-on-error: false
+    continue-on-error: false  # keep this if you want the workflow to continue even if the tests fail
+    
 
     strategy:
       matrix:
@@ -24,15 +25,15 @@ jobs:
           - laravel: 10.*
             testbench: 8.*
             php: 8.2
-            pest: "2"
+            pest: "3"
           - laravel: 10.*
             testbench: 8.*
             php: 8.3
-            pest: "2"
+            pest: "3"
           - laravel: 10.*
             testbench: 8.*
             php: 8.4
-            pest: "2"
+            pest: "3"
           - laravel: 11.*
             testbench: 9.*
             php: 8.2
@@ -46,7 +47,8 @@ jobs:
             php: 8.4
             pest: "3"
 
-    name: PHP${{ matrix.php }} - Laravel${{ matrix.laravel }} - Testbench${{ matrix.testbench }} - ${{ matrix.dependency-version }} - Pest${{ matrix.pest }}
+
+    name: PHP${{ matrix.php }} - Laravel${{ matrix.laravel }} - Testbench${{ matrix.testbench }} - ${{ matrix.dependency-version }}
 
     steps:
       - name: Checkout code
@@ -63,19 +65,12 @@ jobs:
         run: |
           # Install Laravel and Testbench based on the matrix
           composer require --dev "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-
-          # Conditionally install Pest based on the matrix value
-          if [[ "${{ matrix.pest }}" == "2" ]]; then
-            composer require --dev "pestphp/pest:^2.4" --no-update;
-          elif [[ "${{ matrix.pest }}" == "3" ]]; then
-            composer require --dev "pestphp/pest:^3.0" --no-update;
-          fi
-
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
 
       - name: Run tests
         run: vendor/bin/pest --ci
 
+# Job for running Pint (linting) checks
   lint-tests:
     runs-on: ubuntu-latest
     steps:
@@ -89,7 +84,7 @@ jobs:
           extensions: mbstring, dom, curl
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction
+        run: composer install --no-interaction 
 
       - name: Run Pint for linting
-        run: vendor/bin/pint --test
+        run: vendor/bin/pint --test 

@@ -2,6 +2,7 @@
 
 namespace Namu\WireChat\Livewire\Chats;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
@@ -29,6 +30,8 @@ class Chats extends Component
      * @var mixed
      */
     public $search;
+
+    public $psychologist;
 
     /**
      * The list of conversations.
@@ -197,9 +200,9 @@ class Chats extends Component
         $additionalConversations = $this->auth->conversations()
             ->with([
                 'lastMessage.sendable',
-                'group.cover' => fn ($query) => $query->select('id', 'url', 'attachable_type', 'attachable_id', 'file_path'),
+                'group.cover' => fn($query) => $query->select('id', 'url', 'attachable_type', 'attachable_id', 'file_path'),
             ])
-            ->when(trim($this->search ?? '') != '', fn ($query) => $this->applySearchConditions($query))
+            ->when(trim($this->search ?? '') != '', fn($query) => $this->applySearchConditions($query))
             ->when(trim($this->search ?? '') == '', function ($query) {
                 /** @phpstan-ignore-next-line */
                 return $query->withoutDeleted()->withoutBlanks();
@@ -252,7 +255,7 @@ class Chats extends Component
 
             return $conversation->loadMissing([
                 'lastMessage',
-                'group.cover' => fn ($query) => $query->select('id', 'url', 'attachable_type', 'attachable_id', 'file_path'),
+                'group.cover' => fn($query) => $query->select('id', 'url', 'attachable_type', 'attachable_id', 'file_path'),
             ]);
         });
     }
@@ -289,7 +292,7 @@ class Chats extends Component
                         $table = $query3->getModel()->getTable();
                         foreach ($searchableFields as $field) {
                             if ($this->columnExists($table, $field, $columnCache)) {
-                                $query3->orWhere($field, 'LIKE', '%'.$this->search.'%');
+                                $query3->orWhere($field, 'LIKE', '%' . $this->search . '%');
                             }
                         }
                     });
@@ -300,7 +303,7 @@ class Chats extends Component
             return $query->orWhereHas('group', function ($groupQuery) use ($groupSearchableFields) {
                 $groupQuery->where(function ($query4) use ($groupSearchableFields) {
                     foreach ($groupSearchableFields as $field) {
-                        $query4->orWhere($field, 'LIKE', '%'.$this->search.'%');
+                        $query4->orWhere($field, 'LIKE', '%' . $this->search . '%');
                     }
                 });
             });
@@ -344,6 +347,19 @@ class Chats extends Component
         abort_unless(auth()->check(), 401);
         $this->selectedConversationId = request()->conversation;
         $this->conversations = collect();
+
+        if (auth()->user()->can('chat-specific')) {
+            $this->psychologist = auth()->user()->can('chat-specific') ? User::with('psychologist')
+                ->whereHas('psychologist', function ($query) {
+                    $query->where('online_chat', '=', 1);
+                })
+                ->get() : collect();
+
+            if (request()->is('chats') && count($psychologist) == 1) {
+                header('Location: ' . route('create-conversation', $psychologist[0]->id));
+                exit;
+            }
+        }
     }
 
     /**

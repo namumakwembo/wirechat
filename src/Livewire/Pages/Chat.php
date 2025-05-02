@@ -23,7 +23,7 @@ class Chat extends Component
 
     }
 
-    #[Title('Chats')]
+    #[Title('Online Chat | e-Counseling Sleman')]
     public function render()
     {
         return view('wirechat::livewire.pages.chat')

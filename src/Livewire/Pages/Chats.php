@@ -7,11 +7,10 @@ use Livewire\Component;
 
 class Chats extends Component
 {
-    #[Title('Chats')]
+    #[Title('Online Chat | e-Counseling Sleman')]
     public function render()
     {
         return view('wirechat::livewire.pages.chats')
             ->layout(config('wirechat.layout', 'wirechat::layouts.app'));
-
     }
 }

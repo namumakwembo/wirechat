@@ -77,8 +77,8 @@ class Chat extends Component
 
         return [
             'refresh' => '$refresh',
-            'echo-private:conversation.'.$conversationId.',.Namu\\WireChat\\Events\\MessageCreated' => 'appendNewMessage',
-            'echo-private:conversation.'.$conversationId.',.Namu\\WireChat\\Events\\MessageDeleted' => 'removeDeletedMessage',
+            'echo-private:conversation.' . $conversationId . ',.Namu\\WireChat\\Events\\MessageCreated' => 'appendNewMessage',
+            'echo-private:conversation.' . $conversationId . ',.Namu\\WireChat\\Events\\MessageDeleted' => 'removeDeletedMessage',
 
             //  'echo-private:conversation.' .$this->conversation->id. ',.Namu\\WireChat\\Events\\MessageDeleted' => 'removeDeletedMessage',
         ];
@@ -145,6 +145,9 @@ class Chat extends Component
             // refresh chatlist
             // dispatch event 'refresh ' to chatlist
             $this->dispatch('refresh')->to(Chats::class);
+
+            // Play notification sound
+            $this->dispatch('play-notification-sound');
 
             // broadcast
             // $this->selectedConversation->getReceiver()->notify(new MessageRead($this->selectedConversation->id));
@@ -291,12 +294,12 @@ class Chat extends Component
     {
         $perMinute = 60;
 
-        if (RateLimiter::tooManyAttempts('send-message:'.auth()->id(), $perMinute)) {
+        if (RateLimiter::tooManyAttempts('send-message:' . auth()->id(), $perMinute)) {
 
             return abort(429, __('wirechat::chat.messages.rate_limit'));
         }
 
-        RateLimiter::increment('send-message:'.auth()->id());
+        RateLimiter::increment('send-message:' . auth()->id());
     }
 
     /**
@@ -345,7 +348,6 @@ class Chat extends Component
                     'media.*' => "max:$mediaMaxUploadSize|mimes:$mediaMimes",
 
                 ]);
-
             } catch (\Illuminate\Validation\ValidationException $th) {
 
                 $errors = $th->errors();
@@ -786,7 +788,6 @@ class Chat extends Component
             $this->receiver = $participant
                 ? $participant->participantable
                 : null;
-
         } else {
             $this->authParticipant = Participant::where('conversation_id', $this->conversation->id)->whereParticipantable($this->auth)->first();
             $this->receiver = null;

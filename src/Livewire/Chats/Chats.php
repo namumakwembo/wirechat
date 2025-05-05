@@ -355,8 +355,8 @@ class Chats extends Component
                 })
                 ->get() : collect();
 
-            if (request()->is('chats') && count($psychologist) == 1) {
-                header('Location: ' . route('create-conversation', $psychologist[0]->id));
+            if (request()->is('chats') && count($this->psychologist) == 1) {
+                header('Location: ' . route('create-conversation', $this->psychologist[0]->id));
                 exit;
             }
         }

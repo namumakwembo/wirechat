@@ -16,8 +16,8 @@ use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Events\MessageCreated;
 use Namu\WireChat\Events\MessageDeleted;
+use Namu\WireChat\Events\UserTyping;
 use Namu\WireChat\Facades\WireChat;
-use Namu\WireChat\Jobs\NotifyParticipants;
 use Namu\WireChat\Livewire\Chats\Chats;
 use Namu\WireChat\Livewire\Concerns\Widget;
 use Namu\WireChat\Models\Conversation;
@@ -79,7 +79,7 @@ class Chat extends Component
             'refresh' => '$refresh',
             'echo-private:conversation.' . $conversationId . ',.Namu\\WireChat\\Events\\MessageCreated' => 'appendNewMessage',
             'echo-private:conversation.' . $conversationId . ',.Namu\\WireChat\\Events\\MessageDeleted' => 'removeDeletedMessage',
-
+            'echo-private:conversation.' . $conversationId . ',.Namu\\WireChat\\Events\\UserTyping' => 'handleUserTyping',
             //  'echo-private:conversation.' .$this->conversation->id. ',.Namu\\WireChat\\Events\\MessageDeleted' => 'removeDeletedMessage',
         ];
     }
@@ -624,12 +624,6 @@ class Chat extends Component
             // sleep(3);
             broadcast(new MessageCreated($message))->toOthers();
 
-            // notify participants if conversation is NOT self
-            $isSelf = $this->conversation->isSelf();
-            /** @var bool $isSelf */
-            if (! $isSelf) {
-                NotifyParticipants::dispatch($this->conversation, $message);
-            }
         } catch (\Throwable $th) {
 
             Log::error($th->getMessage());
@@ -813,5 +807,16 @@ class Chat extends Component
     public function render()
     {
         return view('wirechat::livewire.chat.chat');
+    }
+
+    public function emitUserTyping()
+    {
+        broadcast(new UserTyping($this->conversation->id, $this->auth->id()))->toOthers();
+    }
+
+    public function handleUserTyping($event)
+    {
+        // Handle the typing indicator event
+        // You can update the UI to show the typing indicator for the corresponding user
     }
 }

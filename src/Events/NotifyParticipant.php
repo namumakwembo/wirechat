@@ -41,14 +41,6 @@ class NotifyParticipant implements ShouldBroadcastNow
 
     }
 
-    /**
-     * The name of the queue on which to place the broadcasting job.
-     */
-    public function broadcastQueue(): string
-    {
-        return $this->message->conversation->isPrivate() ? WireChat::messagesQueue() : WireChat::notificationsQueue();
-    }
-
     public function broadcastWhen(): bool
     {
         // Check if the message is not older than 60 seconds

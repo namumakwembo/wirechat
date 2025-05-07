@@ -91,6 +91,7 @@ class Chats extends Component
             'hardRefresh',
             // Construct the channel name using the encoded type and user ID.
             "echo-private:participant.{$encodedType}.{$userId},.Namu\\WireChat\\Events\\NotifyParticipant" => 'refreshComponent',
+            "echo-private:conversation.{$this->selectedConversationId},.Namu\\WireChat\\Events\\MessageCreated" => 'refreshComponent',
         ];
     }
 

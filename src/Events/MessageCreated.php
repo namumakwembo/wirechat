@@ -5,24 +5,19 @@ namespace Namu\WireChat\Events;
 use Carbon\Carbon;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Models\Message;
 
 class MessageCreated implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithQueue,InteractsWithSockets, Queueable ,SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $message;
-    // public $receiver;
 
     public function __construct(Message $message)
     {
-        $this->onQueue(WireChat::messagesQueue());
         $this->message = $message->load([]);
     }
 
@@ -47,14 +42,6 @@ class MessageCreated implements ShouldBroadcast
     }
 
     /**
-     * The name of the queue on which to place the broadcasting job.
-     */
-    public function broadcastQueue(): string
-    {
-        return WireChat::messagesQueue();
-    }
-
-    /**
      * Get the data to broadcast.
      *
      * @return array<string, mixed>
@@ -66,7 +53,6 @@ class MessageCreated implements ShouldBroadcast
                 'id' => $this->message->id,
                 'conversation_id' => $this->message->conversation_id,
             ],
-
         ];
     }
 }

@@ -7,7 +7,6 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Namu\WireChat\Facades\WireChat;
 use Namu\WireChat\Models\Message;
 
 class MessageDeleted implements ShouldBroadcastNow
@@ -32,14 +31,6 @@ class MessageDeleted implements ShouldBroadcastNow
         return [
             new PrivateChannel('conversation.'.$this->message->conversation_id),
         ];
-    }
-
-    /**
-     * The name of the queue on which to place the broadcasting job.
-     */
-    public function broadcastQueue(): string
-    {
-        return WireChat::notificationsQueue();
     }
 
     /**

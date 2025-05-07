@@ -132,3 +132,20 @@
 
     <livewire:wirechat.chat.drawer />
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const chatInputField = document.getElementById('chat-input-field');
+
+        chatInputField.addEventListener('input', function () {
+            @this.emit('emitUserTyping');
+        });
+
+        window.Echo.private('conversation.{{ $conversation->id }}')
+            .listen('.Namu\\WireChat\\Events\\UserTyping', (e) => {
+                // Handle the typing indicator event
+                console.log('User is typing:', e.user_id);
+                // You can update the UI to show the typing indicator for the corresponding user
+            });
+    });
+</script>

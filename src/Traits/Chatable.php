@@ -166,7 +166,7 @@ trait Chatable
                 'file_name' => basename($path),
                 'original_name' => $photo->getClientOriginalName(),
                 'mime_type' => $photo->getMimeType(),
-                'url' => Storage::url($path),
+                'url' => Storage::disk(WireChat::storageDisk())->url($path),
             ]);
         }
 
@@ -308,7 +308,7 @@ trait Chatable
             }
 
             return $participants->contains(function ($participant) {
-                return $participant->participantable_id == $this->id &&
+                return $participant->participantable_id == $this->getKey() &&
                     $participant->participantable_type == $this->getMorphClass();
             });
         }
@@ -321,7 +321,7 @@ trait Chatable
 
         // If not loaded, perform the query
         return $participants
-            ->where('participantable_id', $this->id)
+            ->where('participantable_id', $this->getKey())
             ->where('participantable_type', $this->getMorphClass())
             ->exists();
     }

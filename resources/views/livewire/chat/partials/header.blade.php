@@ -10,7 +10,7 @@
     <div class="  flex  w-full items-center   px-2 py-2   lg:px-4 gap-2 md:gap-5 ">
 
         {{-- Return --}}
-        <a @if ($this->isWidget()) @click="$dispatch('close-chat',{conversation: {{ $conversation->id }}})"
+        <a @if ($this->isWidget()) @click="$dispatch('close-chat',{conversation: @js($conversation->id)})"
             dusk="return_to_home_button_dispatch"
         @else
             href="{{ route(WireChat::indexRouteName(), $conversation->id) }}"
@@ -35,7 +35,7 @@
                         widget="{{ $this->isWidget() }}">
                         <div class="flex items-center gap-2 cursor-pointer ">
                             <x-wirechat::avatar disappearing="{{ $conversation->hasDisappearingTurnedOn() }}"
-                                :group="true" src="{{ $group?->cover_url ?? null }}"
+                                :group="true" :src="$group?->cover_url ?? null "
                                 class="h-8 w-8 lg:w-10 lg:h-10 " />
                             <h6 class="font-bold text-base text-gray-800 dark:text-white w-full truncate">
                                 {{ $group?->name }}
@@ -48,7 +48,7 @@
                         widget="{{ $this->isWidget() }}">
                         <div class="flex items-center gap-2 cursor-pointer ">
                             <x-wirechat::avatar disappearing="{{ $conversation->hasDisappearingTurnedOn() }}"
-                                :group="false" src="{{ $receiver?->cover_url ?? null }}"
+                                :group="false" :src="$receiver?->cover_url ?? null"
                                 class="h-8 w-8 lg:w-10 lg:h-10 " />
                             <h6 class="font-bold text-base text-gray-800 dark:text-white w-full truncate">
                                 {{ $receiver?->display_name }} @if ($conversation->isSelfConversation())
@@ -103,7 +103,7 @@
 
                         @if ($this->isWidget())
                             <x-wirechat::dropdown-link
-                                @click="$dispatch('close-chat',{conversation: {{ $conversation->id }}})">
+                                @click="$dispatch('close-chat',{conversation: @js($conversation->id)})">
                                 @lang('wirechat::chat.actions.close_chat.label')
                             </x-wirechat::dropdown-link>
                         @else

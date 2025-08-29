@@ -5,7 +5,7 @@
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg> </button>
-        <h3>{{__('wirechat::chat.group.permisssions.heading.label')}} </h3>
+        <h3>{{__('wirechat::chat.group.permissions.heading.label')}} </h3>
     </section>
 
 
@@ -14,7 +14,7 @@
 
             <h5 class="w-full text-start py-4 bg-[var(--wc-light-secondary)] dark:bg-[var(--wc-dark-secondary)] px-4">
                 
-                {{__('wirechat::chat.group.permisssions.labels.members_can')}}:
+                {{__('wirechat::chat.group.permissions.labels.members_can')}}:
             </h5>
 
             <ul class="space-y-2">
@@ -30,8 +30,8 @@
                     </span>
 
                     <span class="w-full text-start">
-                        <h5 class="font-medium">{{__('wirechat::chat.group.permisssions.actions.edit_group_information.label')}}</h5>
-                        <p>@lang('wirechat::chat.group.permisssions.actions.edit_group_information.helper_text')</p>
+                        <h5 class="font-medium">{{__('wirechat::chat.group.permissions.actions.edit_group_information.label')}}</h5>
+                        <p>@lang('wirechat::chat.group.permissions.actions.edit_group_information.helper_text')</p>
                     </span>
 
 
@@ -68,7 +68,7 @@
                     </span>
 
                     <span class="w-full text-start">
-                        <h5 class="font-medium">@lang('wirechat::chat.group.permisssions.actions.send_messages.label')</h5>
+                        <h5 class="font-medium">@lang('wirechat::chat.group.permissions.actions.send_messages.label')</h5>
                     </span>
 
 
@@ -106,7 +106,7 @@
                     </span>
 
                     <span class="w-full text-start">
-                        <h5 class="font-medium">@lang('wirechat::chat.group.permisssions.actions.add_other_members.label')</h5>
+                        <h5 class="font-medium">@lang('wirechat::chat.group.permissions.actions.add_other_members.label')</h5>
                     </span>
 
 

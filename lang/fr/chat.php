@@ -54,7 +54,6 @@ return [
             'label' => 'Supprimer le chat',
             'confirmation_message' => 'Êtes-vous sûr de vouloir supprimer ce chat? Cela ne supprimera le chat que de votre côté et ne le supprimera pas pour les autres participants.',
         ],
-
         'delete_for_everyone' => [
             'label' => 'Supprimer pour tout le monde',
             'confirmation_message' => 'Êtes-vous sûr?',
@@ -66,7 +65,6 @@ return [
         'reply' => [
             'label' => 'Répondre',
         ],
-
         'exit_group' => [
             'label' => 'Quitter le groupe',
             'confirmation_message' => 'Êtes-vous sûr de vouloir quitter ce groupe?',
@@ -91,7 +89,6 @@ return [
     /**-------------------------
      * Info Component
      *------------------------*/
-
     'info' => [
         'heading' => [
             'label' => 'Infos du chat',
@@ -103,14 +100,13 @@ return [
             ],
         ],
         'messages' => [
-            'invalid_conversation_type_error' =>'Seules les conversations privées et avec soi-même sont autorisées',
+            'invalid_conversation_type_error' => 'Seules les conversations privées et avec soi-même sont autorisées',
         ],
     ],
 
     /**-------------------------
      * Group Folder
      *------------------------*/
-
     'group' => [
         // Group info component
         'info' => [

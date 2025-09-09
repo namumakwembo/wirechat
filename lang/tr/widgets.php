@@ -2,7 +2,7 @@
 
 return [
 
-    // chat component
+    // Widget component
     'wirechat' => [
         'messages' => [
             'welcome' => 'Mesajlaşmaya başlamak için bir sohbet seçin',

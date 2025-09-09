@@ -1,13 +1,13 @@
 <?php
 
-namespace Namu\WireChat\Models;
+namespace Wirechat\Wirechat\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
-use Namu\WireChat\Facades\WireChat;
+use Wirechat\Wirechat\Facades\Wirechat;
 
 /**
  * @property int $id
@@ -47,7 +47,7 @@ class Attachment extends Model
 
     public function __construct(array $attributes = [])
     {
-        $this->table = WireChat::formatTableName('attachments');
+        $this->table = Wirechat::formatTableName('attachments');
 
         parent::__construct($attributes);
     }
@@ -59,7 +59,22 @@ class Attachment extends Model
      */
     protected static function newFactory()
     {
-        return \Namu\WireChat\Workbench\Database\Factories\AttachmentFactory::new();
+        return \Wirechat\Wirechat\Workbench\Database\Factories\AttachmentFactory::new();
+    }
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        // listen to deleted
+        static::deleted(function (Attachment $media) {
+
+            $disk = Wirechat::storage()->disk();
+
+            if (Storage::disk($disk)->exists($media->file_path)) {
+                Storage::disk($disk)->delete($media->file_path);
+            }
+        });
     }
 
     /**
@@ -87,8 +102,8 @@ class Attachment extends Model
             return null;
         }
 
-        $diskVisibility = WireChat::diskVisibility();
-        $storageDisk = WireChat::storageDisk();
+        $diskVisibility = Wirechat::storage()->visibility();
+        $storageDisk = Wirechat::storage()->disk();
 
         $disk = Storage::disk($storageDisk);
 

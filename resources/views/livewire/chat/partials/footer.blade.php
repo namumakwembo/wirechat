@@ -1,7 +1,7 @@
 @php
 
     $hasEmojiPicker= $this->panel()->hasEmojiPicker();
-    $floatingEmojiPicker=$this->panel()->emojiPickerPosition()===\Namu\WireChat\Support\Enums\EmojiPickerPosition::Floating;
+    $floatingEmojiPicker=$this->panel()->emojiPickerPosition()===\Wirechat\Wirechat\Support\Enums\EmojiPickerPosition::Floating;
 @endphp
 <footer class="shrink-0 h-auto relative   sticky bottom-0 mt-auto">
 
@@ -13,7 +13,7 @@
         </div>
     @else
         <div id="chat-footer" x-data="{ 'openEmojiPicker': false }"
-            class=" px-3 md:px-1 border-t  shadow-sm bg-[var(--wc-light-secondary)]  dark:bg-[var(--wc-dark-secondary)]   z-50   border-[var(--wc-light-primary)] dark:border-[var(--wc-dark-primary)] flex flex-col gap-3 items-center  w-full   mx-auto">
+            class=" px-3 md:px-1 border-t  shadow-sm bg-[var(--wc-light-primary)]   dark:bg-[var(--wc-dark-secondary)]   z-50   border-[var(--wc-light-border)] dark:border-[var(--wc-dark-primary)] flex flex-col gap-3 items-center  w-full   mx-auto">
 
             {{-- Emoji section , we put it seperate to avoid interfering as overlay for form when opened --}}
             @if($hasEmojiPicker)
@@ -42,7 +42,7 @@
                          dusk="docked-emojipicker"
                     @endif
                     @class([
-                            "max-w-xl z-50 shadow-xl bg-[var(--wc-light-primary)] dark:bg-[var(--wc-dark-primary)] border border-[var(--wc-light-border)] dark:border-[var(--wc-dark-border)]   rounded-xl  h-[490px]"=>$floatingEmojiPicker,
+                            "max-w-lg h-[450px] xl:h-[520px] z-50 shadow-sm  bg-[var(--wc-light-primary)] dark:bg-[var(--wc-dark-primary)] border border-[var(--wc-light-border)] dark:border-[var(--wc-dark-border)] rounded-xl"=>$floatingEmojiPicker,
                             "min-w-full  border-b  h-96 border-[var(--wc-light-primary)] dark:border-[var(--wc-dark-primary)] "=>!$floatingEmojiPicker,
                             "w-full flex hidden sm:flex  inset-x-auto py-2 sm:px-4 py-1.5  "])>
 
@@ -72,7 +72,7 @@
 
             {{-- form and detail section  --}}
             <section
-                class=" py-2 sm:px-4 py-1.5    z-50  dark:bg-[var(--wc-dark-secondary)]  bg-[var(--wc-light-secondary)]   flex flex-col gap-3 items-center  w-full mx-auto">
+                class=" py-2 sm:px-4 py-1.5    z-50     flex flex-col gap-3 items-center  w-full mx-auto">
 
                 {{-- Media preview section --}}
                 <section x-show="$wire.media.length>0 ||$wire.files.length>0" x-cloak
@@ -312,7 +312,7 @@
                 @endif
                     "
                     @submit.prevent="((body && body?.trim().length > 0) || ($wire.media && $wire.media.length > 0)|| ($wire.files && $wire.files.length > 0)) ? $wire.sendMessage() : null"
-                    method="POST" autocapitalize="off" @class(['flex items-center col-span-12 w-full  gap-2 gap-5'])>
+                    method="POST" autocapitalize="off" @class(['flex  items-center col-span-12 w-full  gap-2 gap-5'])>
                     @csrf
 
                     <input type="hidden" autocomplete="false" style="display: none">
@@ -461,7 +461,7 @@
                             @keydown.shift.enter.prevent="insertNewLine($el)" {{-- @keydown.enter.prevent prevents the
                                default behavior of Enter key press only if Shift is not held down. --}} @keydown.enter.prevent=""
                             @keyup.enter.prevent="$event.shiftKey ? null : (((body && body?.trim().length > 0) || ($wire.media && $wire.media.length > 0)) ? $wire.sendMessage() : null)"
-                            class="w-full disabled:cursor-progress resize-none h-auto max-h-20  sm:max-h-72 flex grow border-0 outline-0 focus:border-0 focus:ring-0  hover:ring-0 rounded-lg   dark:text-white bg-none dark:bg-inherit  focus:outline-hidden   "
+                            class="wc-textarea bg-inherit dark:bg-inherit w-full disabled:cursor-progress resize-none h-auto max-h-20  sm:max-h-72 flex grow border-0 outline-0 focus:border-0 focus:ring-0  hover:ring-0 rounded-lg   dark:text-white bg-none dark:bg-inherit  focus:outline-hidden   "
                             x-init="
                               @if($hasEmojiPicker)
                             document.querySelector('emoji-picker')
@@ -522,9 +522,12 @@
 
 
                         {{-- send Like button --}}
+                        @if($this->panel()->hasHeart())
+
                         <button
                             x-show="!((body?.trim()?.length>0) || $wire.media.length > 0 || $wire.files.length > 0 )"
                             wire:loading.attr="disabled" wire:target="sendMessage" wire:click='sendLike()'
+                            dusk="heart-button"
                             type="button" class="hover:scale-105 transition-transform cursor-pointer group disabled:cursor-progress">
 
                             <!-- outlined heart -->
@@ -546,6 +549,7 @@
                             </span>
 
                         </button>
+                        @endif
 
 
                     </div>

@@ -1,0 +1,21 @@
+<?php
+
+namespace {{ namespace }};
+
+use Wirechat\Wirechat\Panel;
+use Wirechat\Wirechat\PanelProvider;
+
+class {{ className }} extends PanelProvider
+{
+    public function panel(Panel $panel): Panel
+    {
+        return $panel
+             ->id('{{ panelId }}')
+             ->path('{{ panelId }}')
+             ->middleware(['web','auth'])
+             ->emojiPicker()
+             ->createChatAction()
+             ->attachments()
+             ->default();
+    }
+}

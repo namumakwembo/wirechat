@@ -224,7 +224,7 @@
                                         </x-slot>
                                         <x-slot name="content">
 
-                                            @if ($message->ownedBy($this->auth)|| ($authParticipant->isAdmin() && $isGroup))
+                                            @if (($message->ownedBy($this->auth)|| ($authParticipant->isAdmin() && $isGroup)) && $this->panel()->hasDeleteMessageActions())
                                                 <button dusk="delete_message_for_everyone" wire:click="deleteForEveryone('{{ encrypt($message->id) }}')"
                                                     wire:confirm="{{ __('wirechat::chat.actions.delete_for_everyone.confirmation_message') }}" class="w-full text-start">
                                                     <x-wirechat::dropdown-link>
@@ -235,7 +235,7 @@
 
 
                                             {{-- Dont show delete for me if is group --}}
-                                            @if (!$isGroup)
+                                            @if (!$isGroup && $this->panel()->hasDeleteMessageActions())
                                             <button dusk="delete_message_for_me" wire:click="deleteForMe('{{ encrypt($message->id) }}')"
                                                 wire:confirm="{{ __('wirechat::chat.actions.delete_for_me.confirmation_message') }}" class="w-full text-start">
                                                 <x-wirechat::dropdown-link>

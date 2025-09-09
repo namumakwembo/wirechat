@@ -3,11 +3,11 @@
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
-use Namu\WireChat\Enums\MessageType;
-use Namu\WireChat\Livewire\Chats\Chats as Chatlist;
-use Namu\WireChat\Models\Attachment;
-use Namu\WireChat\Models\Conversation;
-use Namu\WireChat\Models\Message;
+use Wirechat\Wirechat\Enums\MessageType;
+use Wirechat\Wirechat\Livewire\Chats\Chats as Chatlist;
+use Wirechat\Wirechat\Models\Attachment;
+use Wirechat\Wirechat\Models\Conversation;
+use Wirechat\Wirechat\Models\Message;
 use Workbench\App\Models\Admin;
 use Workbench\App\Models\User;
 
@@ -88,7 +88,7 @@ describe('Presence check', function () {
             ->assertSeeHtml('dusk="header"');
     });
 
-    it('shows DOESNT show header when newChatAction && chatsSearch && redirectToHomeAction are set false && heading is emtpy at component level', function () {
+    it('shows DOESNT show header when createChatAction && chatsSearch && redirectToHomeAction are set false && heading is emtpy at component level', function () {
 
         $auth = User::factory()->create();
 
@@ -101,13 +101,13 @@ describe('Presence check', function () {
             ->assertDontSeeHtml('dusk="header"');
     });
 
-    it('shows DOESNT show header when panel values; newChatAction && chatsSearch && redirectToHomeAction are set false && heading is emtpy at Panel level', function () {
+    it('shows DOESNT show header when panel values; createChatAction && chatsSearch && redirectToHomeAction are set false && heading is emtpy at Panel level', function () {
 
         $auth = User::factory()->create();
 
         testPanelProvider()
             ->chatsSearch(false)
-            ->newChatAction(false)
+            ->createChatAction(false)
             ->redirectToHomeAction(false)
             ->heading(null);
 
@@ -167,7 +167,7 @@ describe('Presence check', function () {
 
         // Config::set('wirechat.show_new_chat_modal_button', true);
 
-        testPanelProvider()->newChatAction();
+        testPanelProvider()->createChatAction();
 
         $auth = User::factory()->create();
 
@@ -180,7 +180,7 @@ describe('Presence check', function () {
 
         //  Config::set('wirechat.show_new_chat_modal_button', true);
 
-        testPanelProvider()->newChatAction();
+        testPanelProvider()->createChatAction();
 
         $auth = User::factory()->create();
 
@@ -191,7 +191,7 @@ describe('Presence check', function () {
 
     test('it_does_not_show_new_chat_modal_button_if_not_enabled_in_config', function () {
 
-        testPanelProvider()->newChatAction(false);
+        testPanelProvider()->createChatAction(false);
 
         $auth = User::factory()->create();
 
@@ -204,7 +204,7 @@ describe('Presence check', function () {
 
         //    Config::set('wirechat.show_new_chat_modal_button', false);
 
-        testPanelProvider()->newChatAction(false);
+        testPanelProvider()->createChatAction(false);
 
         $auth = User::factory()->create();
         Livewire::actingAs($auth)

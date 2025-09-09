@@ -1,10 +1,10 @@
 {
-    "name": "namu/wirechat",
+    "name": "wirechat/wirechat",
     "description": "A Laravel Livewire messaging app for teams with private chats and group conversations.",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Namu\\WireChat\\": "src/"
+            "Wirechat\\Wirechat\\": "src/"
         },
         "files": [
             "src/Support/helpers.php"
@@ -13,10 +13,10 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Namu\\WireChat\\Tests\\": "tests/",
+            "Wirechat\\Wirechat\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/",
-            "Namu\\WireChat\\Workbench\\Database\\Factories\\": "workbench/database/factories/",
-            "Namu\\WireChat\\Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+            "Wirechat\\Wirechat\\Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Wirechat\\Wirechat\\Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
         }
     },
     "authors": [
@@ -27,7 +27,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Namu\\WireChat\\WireChatServiceProvider"
+                "Wirechat\\Wirechat\\WirechatServiceProvider"
             ]
         }
     },
@@ -35,7 +35,7 @@
         "php": "^8.1|^8.2|^8.3|^8.4",
         "livewire/livewire": "^3.2.3",
         "laravel/framework": "^10.0|^11.0|^12.0",
-        "laravel/prompts": "^0.3.5"
+        "laravel/prompts": "^0.1.0|^0.3.5"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

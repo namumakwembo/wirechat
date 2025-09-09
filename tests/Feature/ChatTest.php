@@ -8,20 +8,20 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
-use Namu\WireChat\Enums\ConversationType;
-use Namu\WireChat\Enums\MessageType;
-use Namu\WireChat\Enums\ParticipantRole;
-use Namu\WireChat\Events\MessageCreated;
-use Namu\WireChat\Events\MessageDeleted;
-use Namu\WireChat\Facades\WireChat;
-use Namu\WireChat\Helpers\Helper;
-use Namu\WireChat\Jobs\BroadcastMessage;
-use Namu\WireChat\Jobs\NotifyParticipants;
-use Namu\WireChat\Livewire\Chat\Chat as ChatBox;
-use Namu\WireChat\Livewire\Chats\Chats as Chatlist;
-use Namu\WireChat\Models\Attachment;
-use Namu\WireChat\Models\Conversation;
-use Namu\WireChat\Models\Message;
+use Wirechat\Wirechat\Enums\ConversationType;
+use Wirechat\Wirechat\Enums\MessageType;
+use Wirechat\Wirechat\Enums\ParticipantRole;
+use Wirechat\Wirechat\Events\MessageCreated;
+use Wirechat\Wirechat\Events\MessageDeleted;
+use Wirechat\Wirechat\Facades\Wirechat;
+use Wirechat\Wirechat\Helpers\Helper;
+use Wirechat\Wirechat\Jobs\BroadcastMessage;
+use Wirechat\Wirechat\Jobs\NotifyParticipants;
+use Wirechat\Wirechat\Livewire\Chat\Chat as ChatBox;
+use Wirechat\Wirechat\Livewire\Chats\Chats as Chatlist;
+use Wirechat\Wirechat\Models\Attachment;
+use Wirechat\Wirechat\Models\Conversation;
+use Wirechat\Wirechat\Models\Message;
 use Workbench\App\Models\Admin;
 use Workbench\App\Models\User;
 
@@ -804,14 +804,112 @@ describe('Box presence test: ', function () {
 
 });
 
-describe('Emoji', function () {
-    test('it doesnt show emoji picker is not enabled in chat', function () {
+describe('Heart', function () {
+
+    test('it doesnt show heart if not enabled in chat', function () {
 
         $auth = User::factory()->create(['name' => 'Namu']);
         $conversation = $auth->createGroup('My Group');
 
-        // turn on disappearing
-        $conversation->turnOffDisappearing();
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertDontSeeHtml('dusk="heart-button"');
+    });
+
+    test('it  shows heart if not enabled in chat', function () {
+
+        testPanelProvider()->heart();
+        $auth = User::factory()->create(['name' => 'Namu']);
+        $conversation = $auth->createGroup('My Group');
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertSeeHtml('dusk="heart-button"');
+    });
+
+});
+
+describe('Chat Actions', function () {
+
+    // Delete Chat
+    test('it doesnt show delete-chat-action if not enabled in chat', function () {
+
+        testPanelProvider()->deleteChatAction(fn () => false);
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+        $conversation = $auth->createConversationWith(User::factory()->create());
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertDontSeeHtml('dusk="delete-chat-action"');
+    });
+
+    test('it  shows delete-chat-action if  enabled in chat', function () {
+        testPanelProvider()->deleteChatAction(fn () => true);
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+        $conversation = $auth->createConversationWith(User::factory()->create());
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertSeeHtml('dusk="delete-chat-action"');
+    });
+
+    // Clear Chat
+    test('it doesnt show clear-chat-action if not enabled in chat', function () {
+        testPanelProvider()->clearChatAction(false);
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+        $conversation = $auth->createConversationWith(User::factory()->create());
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertDontSeeHtml('dusk="clear-chat-action"');
+    });
+
+    test('it  shows clear-chat-action if  enabled in chat', function () {
+        testPanelProvider()->clearChatAction(true);
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+        $conversation = $auth->createConversationWith(User::factory()->create());
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertSeeHtml('dusk="clear-chat-action"');
+    });
+
+    // Delete Chat
+    test('it doesnt show create-chat-action if not enabled in chat', function () {
+
+        testPanelProvider()->deleteChatAction(false);
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+
+        $conversation = $auth->createConversationWith(User::factory()->create());
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertDontSeeHtml('dusk="create-chat-action"');
+    });
+
+    test('it  shows create-chat-action if not enabled in chat', function () {
+        testPanelProvider()->createChatAction(fn () => true);
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+        $conversation = $auth->createConversationWith(User::factory()->create());
+
+        // dd($conversation);
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertDontSeeHtml('dusk="create-chat-action"');
+    });
+
+});
+
+describe('Emoji', function () {
+    test('it doesnt show emoji picker if not enabled in chat', function () {
+
+        $auth = User::factory()->create(['name' => 'Namu']);
+        $conversation = $auth->createGroup('My Group');
 
         // dd($conversation);
         Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
@@ -837,7 +935,7 @@ describe('Emoji', function () {
 
         $auth = User::factory()->create(['name' => 'Test']);
 
-        testPanelProvider()->emojiPicker(position: \Namu\WireChat\Support\Enums\EmojiPickerPosition::Floating);
+        testPanelProvider()->emojiPicker(position: \Wirechat\Wirechat\Support\Enums\EmojiPickerPosition::Floating);
 
         // create conversation with user1
         $conversation = $auth->createConversationWith($auth, 'hello');
@@ -853,7 +951,7 @@ describe('Emoji', function () {
 
         $auth = User::factory()->create(['name' => 'Test']);
 
-        testPanelProvider()->emojiPicker(position: \Namu\WireChat\Support\Enums\EmojiPickerPosition::Docked);
+        testPanelProvider()->emojiPicker(position: \Wirechat\Wirechat\Support\Enums\EmojiPickerPosition::Docked);
 
         // create conversation with user1
         $conversation = $auth->createConversationWith($auth, 'hello');
@@ -903,6 +1001,40 @@ describe('Message actions: Viewing Private Chat', function () {
             ->assertSeeHtml('dusk="delete_message_for_everyone"');
     });
 
+    test('it shows dusk selector : "delete_message_for_everyone"  on auths own message if deleteMessageActions is on ', function () {
+
+        testPanelProvider()->deleteMessageActions();
+        $auth = User::factory()->create(['name' => 'test']);
+
+        $receiver = User::factory()->create(['name' => 'User']);
+        $conversation = $auth->createConversationWith($receiver);
+
+        // add participant
+        $auth->sendMessageTo($conversation, 'Nice things');
+
+        //
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertSee('Nice things') // assert can see message
+            ->assertSeeHtml('dusk="delete_message_for_everyone"');
+    });
+
+    test('it doesnt show dusk selector : "delete_message_for_everyone"  on auths own message if deleteMessageActions are off ', function () {
+
+        testPanelProvider()->deleteMessageActions(false);
+        $auth = User::factory()->create(['name' => 'test']);
+
+        $receiver = User::factory()->create(['name' => 'User']);
+        $conversation = $auth->createConversationWith($receiver);
+
+        // add participant
+        $auth->sendMessageTo($conversation, 'Nice things');
+
+        //
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertSee('Nice things') // assert can see message
+            ->assertDontSeeHtml('dusk="delete_message_for_everyone"');
+    });
+
     /**
      * Delete for me
      */
@@ -936,6 +1068,40 @@ describe('Message actions: Viewing Private Chat', function () {
         Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
             ->assertSee('Nice things') // assert can see message
             ->assertSeeHtml('dusk="delete_message_for_me"');
+    });
+
+    test('it shows dusk selector : "delete_message_for_me"  when auths own\'s message  and deleteMessageActions if ON', function () {
+        testPanelProvider()->deleteMessageActions();
+
+        $auth = User::factory()->create(['name' => 'test']);
+
+        $receiver = User::factory()->create(['name' => 'User']);
+        $conversation = $auth->createConversationWith($receiver);
+
+        // add participant
+        $auth->sendMessageTo($conversation, 'Nice things');
+
+        //
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertSee('Nice things') // assert can see message
+            ->assertSeeHtml('dusk="delete_message_for_me"');
+    });
+
+    test('it dosnt show dusk selector : "delete_message_for_me"  when auths own\'s message  and deleteMessageActions if off', function () {
+        testPanelProvider()->deleteMessageActions(false);
+
+        $auth = User::factory()->create(['name' => 'test']);
+
+        $receiver = User::factory()->create(['name' => 'User']);
+        $conversation = $auth->createConversationWith($receiver);
+
+        // add participant
+        $auth->sendMessageTo($conversation, 'Nice things');
+
+        //
+        Livewire::actingAs($auth)->test(ChatBox::class, ['conversation' => $conversation->id])
+            ->assertSee('Nice things') // assert can see message
+            ->assertDontSeeHtml('dusk="delete_message_for_me"');
     });
 });
 
@@ -1711,8 +1877,6 @@ describe('Sending messages ', function () {
     test('it saves image to storage when created & clears files properties when done', function () {
         Storage::fake('public');
 
-        Config::set('wirechat.storage.disk', 'public');
-
         $auth = User::factory()->create();
         $receiver = User::factory()->create(['name' => 'John']);
         $conversation = Conversation::factory()->withParticipants([$auth, $receiver])->create();
@@ -1725,14 +1889,12 @@ describe('Sending messages ', function () {
             ->assertSet('media', []);
 
         $attachment = Attachment::first();
-        Storage::disk('public')->assertExists(WireChat::storageFolder().'/'.$attachment->file_anme);
+        Storage::disk('public')->assertExists(Wirechat::storage()->attachmentsDirectory().'/'.$attachment->file_anme);
     });
 
     test('it saves file visibility as public when storage_disk is public', function () {
         Storage::fake('public');
 
-        Config::set('wirechat.storage.disk', 'public');
-
         $auth = User::factory()->create();
         $receiver = User::factory()->create(['name' => 'John']);
         $conversation = Conversation::factory()->withParticipants([$auth, $receiver])->create();
@@ -1745,7 +1907,7 @@ describe('Sending messages ', function () {
             ->assertSet('media', []);
 
         $attachment = Attachment::first();
-        $visibility = Storage::disk('public')->getVisibility(WireChat::storageFolder().'/'.$attachment->file_anme);
+        $visibility = Storage::disk('public')->getVisibility(Wirechat::storage()->attachmentsDirectory().'/'.$attachment->file_anme);
 
         expect($visibility)->toBe('public');
     });
@@ -1768,7 +1930,7 @@ describe('Sending messages ', function () {
             ->assertSet('media', []);
 
         $attachment = Attachment::first();
-        $visibility = Storage::disk('s3')->getVisibility(WireChat::storageFolder().'/'.$attachment->file_anme);
+        $visibility = Storage::disk('s3')->getVisibility(Wirechat::storage()->attachmentsDirectory().'/'.$attachment->file_anme);
 
         expect($visibility)->toBe('public');
     });
@@ -1830,8 +1992,6 @@ describe('Sending messages ', function () {
     test('it saves video to storage when created', function () {
         Storage::fake('public');
 
-        Config::set('wirechat.storage.disk', 'public');
-
         $auth = User::factory()->create();
         $receiver = User::factory()->create(['name' => 'John']);
         $conversation = Conversation::factory()
@@ -1844,7 +2004,7 @@ describe('Sending messages ', function () {
             ->call('sendMessage');
 
         $attachment = Attachment::first();
-        Storage::disk('public')->assertExists(WireChat::storageFolder().'/'.$attachment->file_anme);
+        Storage::disk('public')->assertExists(Wirechat::storage()->attachmentsDirectory().'/'.$attachment->file_anme);
     });
 
     test('it saves video: message type as attachemnt', function () {
@@ -1867,7 +2027,6 @@ describe('Sending messages ', function () {
     test('it saves file to databse when created & clears files properties when done', function () {
 
         config::set('wirechat.storage.disk', 'public');
-        Storage::fake(config('wirechat.storage.disk', 'public'));
         $auth = User::factory()->create();
         $receiver = User::factory()->create(['name' => 'John']);
         $conversation = Conversation::factory()
@@ -1888,8 +2047,7 @@ describe('Sending messages ', function () {
 
     test('it saves file to storage when created & clears files properties when done', function () {
 
-        config::set('wirechat.storage.disk', 'public');
-        Storage::fake(config('wirechat.storage.disk', 'public'));
+        Storage::fake(Wirechat::storage()->disk());
         $auth = User::factory()->create();
         $receiver = User::factory()->create(['name' => 'John']);
         $conversation = Conversation::factory()
@@ -1904,7 +2062,7 @@ describe('Sending messages ', function () {
             ->assertSet('files', []);
 
         $attachment = Attachment::first();
-        Storage::disk('public')->assertExists(WireChat::storageFolder().'/'.$attachment->file_anme);
+        Storage::disk('public')->assertExists(Wirechat::storage()->attachmentsDirectory().'/'.$attachment->file_anme);
     });
 
     test('dispatched event is listened to in chatlist after message is created', function () {
@@ -2940,7 +3098,7 @@ describe('deleteMessage ForEveryone', function () {
 
     test('it deletes attachment from database when message is deleted ', function () {
 
-        Storage::fake(config('wirechat.storage.disk', 'public'));
+        Storage::fake(Wirechat::storage()->disk());
 
         $auth = User::factory()->create();
         $receiver = User::factory()->create(['name' => 'John']);
@@ -2968,7 +3126,7 @@ describe('deleteMessage ForEveryone', function () {
 
     test('it deletes attachment file from folder when message is deleted ', function () {
 
-        Storage::fake(config('wirechat.storage.disk', 'public'));
+        Storage::fake(Wirechat::storage()->disk());
 
         $auth = User::factory()->create();
         $receiver = User::factory()->create(['name' => 'John']);
@@ -2989,12 +3147,12 @@ describe('deleteMessage ForEveryone', function () {
         // here assuming that the message ID is 1 since it is the first one
         $request->call('deleteForMe', encrypt($messageModel->id));
 
-        Storage::disk(config('wirechat.storage.disk', 'public'))->assertMissing($attachmentModel->file_name);
+        Storage::disk(Wirechat::storage()->disk())->assertMissing($attachmentModel->file_name);
     });
 
     test('it disptaches refresh event and removes deleted message from chatlist', function () {
 
-        Storage::fake(config('wirechat.storage.disk', 'public'));
+        Storage::fake(Wirechat::storage()->disk());
 
         $auth = User::factory()->create();
         $receiver = User::factory()->create(['name' => 'John']);

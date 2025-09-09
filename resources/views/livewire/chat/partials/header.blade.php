@@ -1,11 +1,11 @@
-@use('Namu\WireChat\Facades\WireChat')
+@use('Wirechat\Wirechat\Facades\Wirechat')
 
 @php
     $group = $conversation->group;
 @endphp
 
 <header
-    class="w-full  sticky inset-x-0 flex pb-[5px] pt-[7px] top-0 z-10 dark:bg-[var(--wc-dark-secondary)] bg-[var(--wc-light-secondary)] border-[var(--wc-light-primary)] dark:border-[var(--wc-dark-secondary)]   border-b">
+    class="w-full   sticky inset-x-0 flex pb-[5px] pt-[7px] top-0 z-10 bg-[var(--wc-light-primary)] dark:bg-[var(--wc-dark-secondary)]  border-[var(--wc-light-border)] dark:border-[var(--wc-dark-secondary)]   border-b">
 
     <div class="  flex  w-full items-center   px-2 py-2   lg:px-4 gap-2 md:gap-5 ">
 
@@ -114,15 +114,18 @@
 
                         {{-- Only show delete and clear if conversation is NOT group --}}
                         @if (!$conversation->isGroup())
-                            <button class="w-full" wire:click="clearConversation"
+                            @if($this->panel()->hasClearChatAction())
+                            <button dusk="clear-chat-action" class="w-full" wire:click="clearConversation"
                                 wire:confirm="{{ __('wirechat::chat.actions.clear_chat.confirmation_message') }}">
 
                                 <x-wirechat::dropdown-link>
                                     @lang('wirechat::chat.actions.clear_chat.label')
                                 </x-wirechat::dropdown-link>
                             </button>
+                            @endif
 
-                            <button wire:click="deleteConversation"
+                           @if($this->panel()->hasDeleteChatAction())
+                            <button dusk="delete-chat-action" wire:click="deleteConversation"
                                 wire:confirm="{{ __('wirechat::chat.actions.delete_chat.confirmation_message') }}"
                                 class="w-full text-start">
 
@@ -131,6 +134,8 @@
                                 </x-wirechat::dropdown-link>
 
                             </button>
+                           @endif
+
                         @endif
 
 

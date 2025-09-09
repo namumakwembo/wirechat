@@ -1,13 +1,12 @@
 <?php
 
-namespace Namu\WireChat\Services;
+namespace Wirechat\Wirechat\Services;
 
-use Illuminate\Support\Facades\Schema;
-use Namu\WireChat\Exceptions\NoPanelProvidedException;
-use Namu\WireChat\Panel;
-use Namu\WireChat\PanelRegistry;
+use Wirechat\Wirechat\Exceptions\NoPanelProvidedException;
+use Wirechat\Wirechat\Panel;
+use Wirechat\Wirechat\PanelRegistry;
 
-class WireChatService
+class WirechatService
 {
     protected PanelRegistry $registry;
 
@@ -35,6 +34,12 @@ class WireChatService
 
     }
 
+    public function storage(): StorageService
+    {
+
+        return new StorageService;
+    }
+
     public function currentPanel(): ?Panel
     {
         return $this->registry->getCurrent();
@@ -56,29 +61,6 @@ class WireChatService
     public static function getColor(): string
     {
         return config('wirechat.color', '#3b82f6');
-    }
-
-    /**
-     * Retrieve the searchable fields defined in configuration
-     * and check if they exist in the database table schema.
-     *
-     * @return array|null The array of searchable fields or null if none found.
-     */
-    public function searchableFields(): ?array
-    {
-        // Define the fields specified as searchable in the configuration
-        $fieldsToCheck = config('wirechat.user_searchable_fields');
-
-        //  // Get the table name associated with the model
-        //  $tableName = $this->getTable();
-
-        //  // Get the list of columns in the database table
-        //  $tableColumns = Schema::getColumnListing($tableName);
-
-        //  // Filter the fields to include only those that exist in the table schema
-        //  $searchableFields = array_intersect($fieldsToCheck, $tableColumns);
-
-        return $fieldsToCheck ?: null;
     }
 
     /**
@@ -113,16 +95,6 @@ class WireChatService
     }
 
     /**
-     * Check if chat search is allowed.
-     *
-     * @return bool True if chat search is allowed, false otherwise.
-     */
-    public static function allowChatsSearch(): bool
-    {
-        return config('wirechat.allow_chats_search', false);
-    }
-
-    /**
      * Check if the new chat modal button can be shown.
      *
      * @return bool True if the new chat modal button can be shown, false otherwise.
@@ -143,70 +115,39 @@ class WireChatService
     }
 
     /**
-     * @deprecated Use WireChat::storage()->disk() instead.
-     *
-     * Get the wirechat storage disk from the configuration.
-     *
-     * @return string The storage disk.
-     */
-    public static function storageDisk(): string
-    {
-        return (string) config('wirechat.storage.disk')
-            ?: config('wirechat.attachments.storage_disk', 'public');
-    }
-
-    /**
-     * @deprecated Use WireChat::storage()->directory() instead.
-     *
      * Get the wirechat storage folder from the configuration.
      *
      * @return string The storage folder.
+     *
+     * @deprecated Use Wirechat::storage()->directory() instead.
      */
     public static function storageFolder(): string
     {
-        return (string) config('wirechat.storage.directory')
-            ?: config('wirechat.attachments.storage_folder', 'attachments');
+        return (new StorageService)->attachmentsDirectory();
     }
 
     /**
-     * @deprecated Use WireChat::storage()->visibility() instead.
-     *
      * Get the wirechat disk visibility from the configuration.
      *
      * @return string The disk visibility.
+     *
+     * @deprecated Use Wirechat::storage()->visibility() instead.
      */
     public static function diskVisibility(): string
     {
-        return (string) config('wirechat.storage.visibility')
-            ?: config('wirechat.attachments.disk_visibility', 'public');
+        return (new StorageService)->visibility();
     }
 
     /**
-     * Get the configured storage directory for WireChat.
+     * Get the wirechat disk visibility from the configuration.
      *
-     * Uses `wirechat.storage.directory` as the new location.
-     * Falls back to `wirechat.attachments.storage_folder`.
+     * @return string The disk visibility.
      *
-     * @return string The storage directory path.
+     * @deprecated Use Wirechat::storage()->visibility() instead.
      */
-    public static function storageDirectory(): string
+    public static function storageDisk(): string
     {
-        return (string) config('wirechat.storage.directory')
-            ?: config('wirechat.attachments.storage_folder', 'attachments');
-    }
-
-    /**
-     * Get the configured storage visibility for WireChat.
-     *
-     * Reads from `wirechat.storage.visibility`.
-     * Falls back to `wirechat.attachments.disk_visibility`.
-     *
-     * @return string Either 'public' or 'private'.
-     */
-    public static function storageVisibility(): string
-    {
-        return (string) config('wirechat.storage.visibility')
-            ?: config('wirechat.attachments.disk_visibility', 'public');
+        return (new StorageService)->disk();
     }
 
     /**

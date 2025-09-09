@@ -1,12 +1,12 @@
 <?php
 
-namespace Namu\WireChat\Console\Commands;
+namespace Wirechat\Wirechat\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 
-class InstallWireChat extends Command
+class InstallWirechat extends Command
 {
     protected $signature = 'wirechat:install';
 
@@ -30,8 +30,12 @@ class InstallWireChat extends Command
             }
         }
 
+        // Create deafult panel
+        $this->createDefaultPanel();
+
         // create storage sym link
         $this->comment('Creating storage symlink...');
+
         Artisan::call('storage:link');
         $this->info('[✓] Storage linked.');
         // Publish migrations
@@ -55,10 +59,19 @@ class InstallWireChat extends Command
         );
     }
 
+    private function createDefaultPanel(): void
+    {
+
+        $this->call('make:wirechat-panel', [
+            'id' => 'chats',
+        ]);
+
+    }
+
     private function publishConfiguration($forcePublish = false)
     {
         $params = [
-            '--provider' => "Namu\WireChat\WireChatServiceProvider",
+            '--provider' => "Wirechat\Wirechat\WirechatServiceProvider",
             '--tag' => 'wirechat-config',
         ];
 
@@ -71,7 +84,7 @@ class InstallWireChat extends Command
     private function publishMigrations()
     {
         $this->call('vendor:publish', [
-            '--provider' => "Namu\WireChat\WireChatServiceProvider",
+            '--provider' => "Wirechat\Wirechat\WirechatServiceProvider",
             '--tag' => 'wirechat-migrations',
         ]);
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Namu\WireChat\Console\Commands;
+namespace Wirechat\Wirechat\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
@@ -10,16 +10,16 @@ class MigrateConfigToPanelCommand extends Command
 {
     protected $signature = 'wirechat:upgrade-to-v0.3x {--dry-run : Show what would be done without making changes}';
 
-    protected $description = 'Upgrade WireChat by creating a panel provider and migrating old config values';
+    protected $description = 'Upgrade Wirechat by creating a panel provider and migrating old config values';
 
     public function handle()
     {
-        $this->info('Starting WireChat upgrade to panel...');
+        $this->info('Starting Wirechat upgrade to panel...');
 
         $id = 'chats';
         $className = Str::studly($id).'PanelProvider';
-        $namespace = 'App\\Providers\\WireChat';
-        $path = app_path("Providers/WireChat/{$className}.php");
+        $namespace = 'App\\Providers\\Wirechat';
+        $path = app_path("Providers/Wirechat/{$className}.php");
         $displayPath = Str::after($path, base_path().DIRECTORY_SEPARATOR);
 
         // Exit if panel file already exists
@@ -82,10 +82,10 @@ class MigrateConfigToPanelCommand extends Command
 
         $panelConfig[] = "->colors([\n                'primary' => Color::Blue,\n            ])";
         if (($config['show_new_chat_modal_button'] ?? true) !== $defaults['show_new_chat_modal_button']) {
-            $panelConfig[] = '->newChatAction()';
+            $panelConfig[] = '->createChatAction()';
         }
         if (($config['show_new_group_modal_button'] ?? true) !== $defaults['show_new_group_modal_button']) {
-            $panelConfig[] = '->newGroupAction()';
+            $panelConfig[] = '->createGroupAction()';
         }
 
         if (($config['allow_chats_search'] ?? true) !== $defaults['allow_chats_search']) {
@@ -128,9 +128,9 @@ class MigrateConfigToPanelCommand extends Command
 
 namespace '.$namespace.";
 
-use Namu\WireChat\Panel;
-use Namu\WireChat\PanelProvider;
-use Namu\WireChat\Support\Color;
+use Wirechat\Wirechat\Panel;
+use Wirechat\Wirechat\PanelProvider;
+use Wirechat\Wirechat\Support\Color;
 
 class ".$className.' extends PanelProvider
 {
@@ -160,10 +160,45 @@ class ".$className.' extends PanelProvider
         file_put_contents($path, $panelCode);
         $this->info("Panel provider created at: {$displayPath}");
 
+        // Update namespaces
+        $this->updateNamespaces();
+
         // Register provider
         $this->registerProvider($namespace, $className);
 
-        $this->info('WireChat upgrade complete! Review the panel for any custom logic.');
+        $this->info('Wirechat upgrade complete! Review the panel for any custom logic.');
+    }
+
+    protected function updateNamespaces()
+    {
+        $files = [];
+        $command = "find . -type f -name '*.php' -not -path './vendor/*' -not -path './storage/*' -exec grep -l 'Namu\\\\WireChat' {} \;";
+        exec($command, $files);
+
+        if ($this->option('dry-run')) {
+            if (empty($files)) {
+                $this->info('Dry run: No files found with Namu\\WireChat to update.');
+            } else {
+                $this->info('Dry run: Files that would be updated:');
+                foreach ($files as $file) {
+                    $this->info($file);
+                }
+            }
+
+            return;
+        }
+
+        $command = "find . -type f -name '*.php' -not -path './vendor/*' -not -path './storage/*' -exec sed -i '' 's/Namu\\\\WireChat/Wirechat\\\\Wirechat/g' {} \;";
+        exec($command);
+
+        if (empty($files)) {
+            $this->info('No files found with Namu\\WireChat to update.');
+        } else {
+            $this->info('Updated namespaces in the following files:');
+            foreach ($files as $file) {
+                $this->info($file);
+            }
+        }
     }
 
     protected function registerProvider(string $namespace, string $className)

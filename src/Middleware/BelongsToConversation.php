@@ -1,11 +1,11 @@
 <?php
 
-namespace Namu\WireChat\Middleware;
+namespace Wirechat\Wirechat\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Namu\WireChat\Models\Conversation;
 use Symfony\Component\HttpFoundation\Response;
+use Wirechat\Wirechat\Models\Conversation;
 
 class BelongsToConversation
 {

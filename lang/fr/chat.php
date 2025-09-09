@@ -48,13 +48,11 @@ return [
         ],
         'clear_chat' => [
             'label' => "Effacer l'historique du chat",
-            'confirmation_message' =>
-                "Êtes-vous sûr de vouloir effacer votre historique de chat? Cela n'effacera que votre chat et n'affectera pas les autres participants.",
+            'confirmation_message' => "Êtes-vous sûr de vouloir effacer votre historique de chat? Cela n'effacera que votre chat et n'affectera pas les autres participants.",
         ],
         'delete_chat' => [
             'label' => 'Supprimer le chat',
-            'confirmation_message' =>
-                'Êtes-vous sûr de vouloir supprimer ce chat? Cela ne supprimera le chat que de votre côté et ne le supprimera pas pour les autres participants.',
+            'confirmation_message' => 'Êtes-vous sûr de vouloir supprimer ce chat? Cela ne supprimera le chat que de votre côté et ne le supprimera pas pour les autres participants.',
         ],
 
         'delete_for_everyone' => [
@@ -82,8 +80,7 @@ return [
     ],
 
     'messages' => [
-        'cannot_exit_self_or_private_conversation' =>
-            'Impossible de quitter une conversation avec soi-même ou une conversation privée',
+        'cannot_exit_self_or_private_conversation' => 'Impossible de quitter une conversation avec soi-même ou une conversation privée',
         'owner_cannot_exit_conversation' => 'Le propriétaire ne peut pas quitter la conversation',
         'rate_limit' => 'Trop de tentatives! Veuillez ralentir',
         'conversation_not_found' => 'Conversation introuvable.',
@@ -102,13 +99,11 @@ return [
         'actions' => [
             'delete_chat' => [
                 'label' => 'Supprimer le chat',
-                'confirmation_message' =>
-                    'Êtes-vous sûr de vouloir supprimer ce chat? Cela ne supprimera le chat que de votre côté et ne le supprimera pas pour les autres participants.',
+                'confirmation_message' => 'Êtes-vous sûr de vouloir supprimer ce chat? Cela ne supprimera le chat que de votre côté et ne le supprimera pas pour les autres participants.',
             ],
         ],
         'messages' => [
-            'invalid_conversation_type_error' =>
-                'Seules les conversations privées et avec soi-même sont autorisées',
+            'invalid_conversation_type_error' =>'Seules les conversations privées et avec soi-même sont autorisées',
         ],
     ],
 
@@ -143,8 +138,7 @@ return [
                 'delete_group' => [
                     'label' => 'Supprimer le groupe',
                     'confirmation_message' => 'Êtes-vous sûr de vouloir supprimer ce groupe?',
-                    'helper_text' =>
-                        'Avant de pouvoir supprimer le groupe, vous devez retirer tous les membres du groupe.',
+                    'helper_text' => 'Avant de pouvoir supprimer le groupe, vous devez retirer tous les membres du groupe.',
                 ],
                 'add_members' => [
                     'label' => 'Ajouter des membres',
@@ -187,8 +181,7 @@ return [
                 ],
                 'dismiss_admin' => [
                     'label' => "Révoquer le statut d'administrateur",
-                    'confirmation_message' =>
-                        'Êtes-vous sûr de vouloir révoquer le statut d\'administrateur de :member?',
+                    'confirmation_message' => 'Êtes-vous sûr de vouloir révoquer le statut d\'administrateur de :member?',
                 ],
                 'make_admin' => [
                     'label' => 'Nommer administrateur',

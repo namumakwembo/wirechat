@@ -13,9 +13,6 @@ class {{ className }} extends PanelProvider
              ->id('{{ panelId }}')
              ->path('{{ panelId }}')
              ->middleware(['web','auth'])
-             ->emojiPicker()
-             ->createChatAction()
-             ->attachments()
              ->default();
     }
 }

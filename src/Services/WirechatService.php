@@ -201,10 +201,30 @@ class WirechatService
     }
 
     /**
-     * Check if application preferes to use UUID instead of incremental primary ID for conversation table
+     * Determine if the application prefers to use UUIDs instead of
+     * auto-incrementing IDs for the conversations table.
+     *
+     * This method first checks the new configuration key:
+     * `wirechat.uses_uuid_for_conversations`.
+     *
+     * For backwards compatibility, it will fall back to the old key:
+     * `wirechat.uuids` if the new one is not set.
+     */
+    public static function usesUuidForConversations(): bool
+    {
+        return (bool) config('wirechat.uses_uuid_for_conversations',
+            config('wirechat.uuids', false) // legacy fallback
+        );
+    }
+
+    /**
+     * Legacy method: Check if the application prefers to use UUIDs
+     * for the conversations table.
+     *
+     * @deprecated since 0.4.0 Use {@see usesUuidForConversations()} instead.
      */
     public static function usesUuid(): bool
     {
-        return (bool) config('wirechat.uuids', false);
+        return static::usesUuidForConversations();
     }
 }

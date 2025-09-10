@@ -47,10 +47,7 @@ class {{ className }} extends PanelProvider
         return $panel
              ->id(\'{{ panelId }}\')
              ->path(\'{{ panelId }}\')
-             ->middleware([\'web\',\'auth\'])
-             ->emojiPicker()
-             ->createChatAction()
-             ->attachments();
+             ->middleware([\'web\',\'auth\']);
     }
 }
 ';
@@ -80,9 +77,6 @@ class {{ className }} extends PanelProvider
              ->id(\'{{ panelId }}\')
              ->path(\'{{ panelId }}\')
              ->middleware([\'web\',\'auth\'])
-             ->emojiPicker()
-             ->createChatAction()
-             ->attachments()
              ->default();
     }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Wirechat\Wirechat\Facades\Wirechat;
 use Wirechat\Wirechat\Models\Attachment;
 
 return new class extends Migration
@@ -12,10 +13,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-
-        Schema::create((new Attachment)->getTable(), function (Blueprint $table) {
+        $usesUuid = Wirechat::usesUuid();
+        Schema::create((new Attachment)->getTable(), function (Blueprint $table) use ($usesUuid) {
             $table->id();
-            $table->morphs('attachable');
+            if ($usesUuid) {
+                $table->uuidMorphs('attachable');
+            } else {
+                $table->morphs('attachable');
+            }
             $table->string('file_path');
             $table->string('file_name');
             $table->string('original_name');

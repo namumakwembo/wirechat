@@ -11,6 +11,19 @@ use Wirechat\Wirechat\Models\Message;
 use Workbench\App\Models\Admin;
 use Workbench\App\Models\User;
 
+
+
+//beforeEach(function(){
+//
+//
+//config(['wirechat.uses_uuid_for_conversations' => true]);
+//config(['wirechat.uuids' => true]);
+//
+//    \Illuminate\Support\Facades\Config::set('wirechat.uses_uuid_for_conversations',true);
+//    \Illuminate\Support\Facades\Config::set('wirechat.uuids',true);
+//
+//});
+
 describe('MarkAsRead()', function () {
     it('marks messages as read', function () {
 
@@ -1832,3 +1845,53 @@ describe('getReciever()', function () {
     });
 
 });
+
+describe('UUID()', function () {
+
+
+    beforeEach(function(){
+
+
+        \Illuminate\Support\Facades\Config::set('wirechat.uses_uuid_for_conversations',true);
+        \Illuminate\Support\Facades\Config::set('wirechat.uuids',true);
+
+    });
+
+    it('it can attachmetn conversation to attachments when using uuids ', function () {
+// Fake the test disk
+        Storage::fake('test_disk');
+        $auth = User::factory()->create();
+
+       // $this->artisan('config:clear');
+
+
+        config(['wirechat.uses_uuid_for_conversations' => true]);
+
+       // config(['wirechat.uuids' => true]);
+// remove this
+
+
+        $this->artisan('config:clear');
+
+        $conversation = $auth->createConversationWith($auth);
+
+        // log in as $auth
+        $this->actingAs($auth);
+
+        // Create an attachment for the message on the "test_disk"
+        $attachmentPath = 'test-attachment.txt';
+        Storage::disk('test_disk')->put($attachmentPath, 'test content');
+
+        // Associate the attachment with the message
+        $createdAttachment = \Wirechat\Wirechat\Models\Action::factory()->for($conversation, 'actionable')->create([
+            'data' => 'text/plain',
+            'actor_id' => $auth->id,
+            'type'=>Actions::ARCHIVE,
+            'actor_type' => $auth->getMorphClass(),
+        ]);
+
+        $this->assertDatabaseHas((new \Wirechat\Wirechat\Models\Action())->getTable(),['id'=>$createdAttachment->id]);
+
+     //   dd($createdAttachment);
+    });
+})->skip();

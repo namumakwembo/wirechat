@@ -12,8 +12,7 @@ use Wirechat\Wirechat\Tests\TestCase;
 | need to change it using the "uses()" function to bind a different classes or traits.
 |
 */
-uses(TestCase::class)->in('Feature');
-uses(TestCase::class)->in('Unit');
+uses(TestCase::class,\Illuminate\Foundation\Testing\RefreshDatabase::class)->in('Unit', 'Feature');
 /*
 |--------------------------------------------------------------------------
 | Expectations

@@ -2287,7 +2287,7 @@ describe('Deleting Conversation', function () {
         // assert conversation will be null
         expect($auth->conversations()->first())->not->toBe(null);
 
-        $route = testPanelProvider()->chatRoute($conversation);
+        $route = testPanelProvider()->chatRoute($conversation->id);
         // dd($route);
         // also assert that user receives 403 forbidden
         $response = $this->actingAs($auth)->get($route)->assertStatus(200);

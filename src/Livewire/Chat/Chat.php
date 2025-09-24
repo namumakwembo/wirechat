@@ -246,7 +246,7 @@ class Chat extends Component
         $this->conversation->deleteFor($this->auth);
 
         $this->handleComponentTermination(
-            redirectRoute: $this->panel()->route('chats'),
+            redirectRoute: $this->panel()->chatsRoute(),
             events: [
                 'close-chat',
                 Chats::class => ['chat-deleted',  [$this->conversation->id]],
@@ -268,7 +268,7 @@ class Chat extends Component
         // Dispatach event instead if isWidget
 
         $this->handleComponentTermination(
-            redirectRoute: $this->panel()->route('chats'),
+            redirectRoute: $this->panel()->chatsRoute(),
             events: [
                 'close-chat',
                 Chats::class => 'refresh',
@@ -311,7 +311,7 @@ class Chat extends Component
             $this->dispatch('close-chat');
         } else {
             // redirect to chats page
-            $this->redirect($this->panel()->route('chats'));
+            $this->redirect($this->panel()->chatsRoute());
         }
     }
 

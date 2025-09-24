@@ -3,7 +3,6 @@
 namespace Wirechat\Wirechat\Livewire\Concerns;
 
 use Livewire\Attributes\Locked;
-use Wirechat\Wirechat\Facades\Wirechat;
 use Wirechat\Wirechat\Livewire\Chat\Chats;
 
 /**
@@ -38,7 +37,8 @@ trait Widget
 
         // set redirect route
         if ($redirectRoute == null) {
-            $redirectRoute = route(Wirechat::indexRouteName());
+
+            $redirectRoute = route($this->panel()->chatsRoute());
         }
 
         // set events to dispatch on termination

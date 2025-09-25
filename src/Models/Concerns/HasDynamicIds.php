@@ -10,6 +10,8 @@ trait HasDynamicIds
 {
     /**
      * Initialize the trait.
+     *
+     * @return void
      */
     public function initializeHasDynamicIds()
     {
@@ -18,13 +20,14 @@ trait HasDynamicIds
 
     /**
      * Generate a new unique key for the model (only for UUIDs).
+     *
+     * @return string|null
      */
-    public function newUniqueId(): ?string
+    public function newUniqueId()
     {
         if (Wirechat::usesUuidForConversations()) {
-            // Prefer UUIDv7 if supported
-            // @phpstan-innore-next-line
-            if (method_exists(Str::class, 'uuid7')) {
+            /** @phpstan-ignore-next-line */
+            if (method_exists(\Illuminate\Support\Str::class, 'uuid7')) {
                 return (string) Str::uuid7();
             }
 
@@ -36,6 +39,8 @@ trait HasDynamicIds
 
     /**
      * Determine if the given key is valid.
+     *
+     * @param  mixed  $value
      */
     protected function isValidUniqueId($value): bool
     {
@@ -49,79 +54,63 @@ trait HasDynamicIds
 
     /**
      * Get the columns that should receive a unique identifier.
+     *
+     * @return array
      */
-    public function uniqueIds(): array
+    public function uniqueIds()
     {
         return $this->usesUniqueIds ? [$this->getKeyName()] : [];
     }
 
     /**
-     * Get the name of the route key column.
-     *
-     * - Old installs (UUID as PK): "id"
-     * - New installs (int PK + uuid): "uuid"
-     */
-    public function getRouteKeyName(): string
-    {
-        return Wirechat::usesUuidForConversations()
-            ? $this->getKeyName() // "id" (may be UUID in old installs)
-            : 'uuid';             // new installs prefer uuid for cleaner URLs
-    }
-
-    /**
-     * Get the actual route key value for the model.
-     */
-    public function getRouteKey(): mixed
-    {
-        return $this->getAttribute($this->getRouteKeyName());
-    }
-
-    /**
      * Retrieve the model for a bound value.
      *
-     * Falls back between "uuid" and "id" for backwards compatibility.
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation  $query
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Contracts\Database\Eloquent\Builder
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function resolveRouteBindingQuery($query, $value, $field = null)
     {
-        // If a field is explicitly requested, validate it
         if ($field && in_array($field, $this->uniqueIds()) && ! $this->isValidUniqueId($value)) {
             $this->handleInvalidUniqueId($value, $field);
         }
 
-        // Determine which field to bind against
-        $routeKey = $field ?? $this->getRouteKeyName();
-
-        // Try primary binding first
-        $result = $query->where($routeKey, $value);
-
-        // For new installs, allow fallback: /conversations/{id}
-        if (! Wirechat::usesUuidForConversations() && $routeKey === 'uuid') {
-            $result->orWhere($this->getKeyName(), $value);
+        if (! $field && in_array($this->getRouteKeyName(), $this->uniqueIds()) && ! $this->isValidUniqueId($value)) {
+            $this->handleInvalidUniqueId($value, $field);
         }
 
-        return $result;
+        return $query->where($field ?? $this->getRouteKeyName(), $value);
     }
 
     /**
      * Get the auto-incrementing key type.
+     *
+     * @return string
      */
-    public function getKeyType(): string
+    public function getKeyType()
     {
         return Wirechat::usesUuidForConversations() ? 'string' : 'int';
     }
 
     /**
      * Get the value indicating whether the IDs are incrementing.
+     *
+     * @return bool
      */
-    public function getIncrementing(): bool
+    public function getIncrementing()
     {
         return ! Wirechat::usesUuidForConversations();
     }
 
     /**
      * Throw an exception for the given invalid unique ID.
+     *
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return never
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */

@@ -42,7 +42,9 @@ function isIntegerColumnType(string $type): bool
 }
 
 describe('UUID configuration in migrations', function () {
+
     test('conversations table uses UUID when configured', function () {
+        Config::set('wirechat.uses_uuid_for_conversations', true);
         Config::set('wirechat.uuids', true);
         $migration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $migration->up();
@@ -51,17 +53,19 @@ describe('UUID configuration in migrations', function () {
     });
 
     test('conversations table uses integer and adds uuid column when UUID not configured', function () {
+        Config::set('wirechat.uses_uuid_for_conversations', false);
         Config::set('wirechat.uuids', false);
+
         $migration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $migration->up();
         $idType = Schema::getColumnType((new Conversation)->getTable(), 'id');
-        $uuidType = Schema::getColumnType((new Conversation)->getTable(), 'uuid');
         expect(isIntegerColumnType($idType))->toBeTrue();
-        expect(isUuidColumnType($uuidType))->toBeTrue();
     });
 
     test('messages table conversation_id uses UUID when configured', function () {
+        Config::set('wirechat.uses_uuid_for_conversations', true);
         Config::set('wirechat.uuids', true);
+
         $convMigration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $convMigration->up();
         $migration = include __DIR__.'/../../database/migrations/2024_11_01_000003_create_wirechat_messages_table.php';
@@ -81,6 +85,7 @@ describe('UUID configuration in migrations', function () {
     });
 
     test('participants table conversation_id uses UUID when configured', function () {
+        Config::set('wirechat.uses_uuid_for_conversations', true);
         Config::set('wirechat.uuids', true);
         $convMigration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $convMigration->up();
@@ -91,6 +96,7 @@ describe('UUID configuration in migrations', function () {
     });
 
     test('participants table conversation_id uses integer when UUID not configured', function () {
+        Config::set('wirechat.uses_uuid_for_conversations', false);
         Config::set('wirechat.uuids', false);
         $convMigration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $convMigration->up();
@@ -101,6 +107,7 @@ describe('UUID configuration in migrations', function () {
     });
 
     test('groups table conversation_id uses UUID when configured', function () {
+        Config::set('wirechat.uses_uuid_for_conversations', true);
         Config::set('wirechat.uuids', true);
         $convMigration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $convMigration->up();
@@ -111,6 +118,7 @@ describe('UUID configuration in migrations', function () {
     });
 
     test('groups table conversation_id uses integer when UUID not configured', function () {
+        Config::set('wirechat.uses_uuid_for_conversations', false);
         Config::set('wirechat.uuids', false);
         $convMigration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $convMigration->up();

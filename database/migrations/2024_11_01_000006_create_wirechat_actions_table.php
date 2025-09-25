@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Wirechat\Wirechat\Facades\Wirechat;
 use Wirechat\Wirechat\Models\Action;
 
 return new class extends Migration
@@ -12,17 +13,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-
-        Schema::create((new Action)->getTable(), function (Blueprint $table) {
+        $usesUuid = Wirechat::usesUuid();
+        Schema::create((new Action)->getTable(), function (Blueprint $table) use ($usesUuid) {
             $table->id();
 
+            //Always string for UUID or integer-as-string
             // Actionable (the entity being acted upon)
-            $table->unsignedBigInteger('actionable_id');
-            $table->string('actionable_type');
+           $table->string('actionable_id'); 
+           $table->string('actionable_type');
 
             // Actor (the one performing the action
-            $table->unsignedBigInteger('actor_id');
-            $table->string('actor_type');
+           $table->string('actor_id'); 
+           $table->string('actor_type');
+
 
             // Type of action (e.g., delete, archive)
             $table->string('type');

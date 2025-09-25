@@ -13,14 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $usesUuid = Wirechat::usesUuid();
-        Schema::create((new Attachment)->getTable(), function (Blueprint $table) use ($usesUuid) {
+        Schema::create((new Attachment)->getTable(), function (Blueprint $table){
             $table->id();
-            if ($usesUuid) {
-                $table->uuidMorphs('attachable');
-            } else {
-                $table->morphs('attachable');
-            }
+            $table->string('attachable_id');
+            $table->string('attachable_type');
             $table->string('file_path');
             $table->string('file_name');
             $table->string('original_name');

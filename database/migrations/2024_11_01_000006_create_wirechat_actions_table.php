@@ -17,21 +17,15 @@ return new class extends Migration
         Schema::create((new Action)->getTable(), function (Blueprint $table) use ($usesUuid) {
             $table->id();
 
+            //Always string for UUID or integer-as-string
             // Actionable (the entity being acted upon)
-            if ($usesUuid) {
-                $table->uuid('actionable_id');
-            } else {
-                $table->unsignedBigInteger('actionable_id');
-            }
-            $table->string('actionable_type');
+           $table->string('actionable_id'); 
+           $table->string('actionable_type');
 
             // Actor (the one performing the action
-            if ($usesUuid) {
-                $table->uuid('actor_id');
-            } else {
-                $table->unsignedBigInteger('actor_id');
-            }
-            $table->string('actor_type');
+           $table->string('actor_id'); 
+           $table->string('actor_type');
+
 
             // Type of action (e.g., delete, archive)
             $table->string('type');

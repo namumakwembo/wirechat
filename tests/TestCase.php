@@ -7,7 +7,6 @@ use Illuminate\Config\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\ServiceProvider;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Wirechat\Wirechat\WirechatServiceProvider;
@@ -22,14 +21,14 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     //  use DatabaseTruncation; // Ensures migrations are run and database is refreshed for each test
     //  use WithLaravelMigrations;
     // use InteractsWithViews;
-   //  use RefreshDatabase;
+    //  use RefreshDatabase;
     protected function getPackageProviders($app): array
     {
         return [
             LivewireServiceProvider::class,
             WirechatServiceProvider::class,
             MissingLivewireAssertionsServiceProvider::class,
-            TestPanelProvider::class
+            TestPanelProvider::class,
         ];
     }
 
@@ -56,8 +55,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
             $config->set('filesystems.default', 'public');
             $config->set('livewire.temporary_file_upload.disk', 'public');
-  //            $config->set('wirechat.uses_uuid_for_conversations',true);
-//              $config->set('wirechat.uuids',true);
+            //            $config->set('wirechat.uses_uuid_for_conversations',true);
+            //              $config->set('wirechat.uuids',true);
         });
 
         if (! app()->runningInConsole()) {

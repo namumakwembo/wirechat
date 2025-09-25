@@ -20,7 +20,7 @@ beforeEach(function () {
 });
 
 /**
- * Helper to check if a column type matches expected UUID type across different databases
+ * Helper to check if a column type matches expected string/UUID type across databases
  */
 function isUuidColumnType(string $type): bool
 {
@@ -31,156 +31,110 @@ function isUuidColumnType(string $type): bool
 }
 
 /**
- * Helper to check if a column type matches expected integer type across different databases
+ * Helper to check if a column type matches expected integer type across databases
  */
 function isIntegerColumnType(string $type): bool
 {
     return match (true) {
-        str_contains(strtolower($type), 'int') => true, // matches int, bigint, integer, etc.
+        str_contains(strtolower($type), 'int') => true,
         default => false,
     };
 }
 
 describe('UUID configuration in migrations', function () {
-
     test('conversations table uses UUID when configured', function () {
-        // Set UUID configuration
         Config::set('wirechat.uuids', true);
-
-        // Run the migration
         $migration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $migration->up();
-
-        // Check if id column is UUID type
         $columnType = Schema::getColumnType((new Conversation)->getTable(), 'id');
         expect(isUuidColumnType($columnType))->toBeTrue();
     });
 
-    test('conversations table uses integer when UUID not configured', function () {
-        // Set UUID configuration
+    test('conversations table uses integer and adds uuid column when UUID not configured', function () {
         Config::set('wirechat.uuids', false);
-
-        // Run the migration
         $migration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $migration->up();
-
-        // Check if id column is integer type
-        $columnType = Schema::getColumnType((new Conversation)->getTable(), 'id');
-        expect(isIntegerColumnType($columnType))->toBeTrue();
+        $idType = Schema::getColumnType((new Conversation)->getTable(), 'id');
+        $uuidType = Schema::getColumnType((new Conversation)->getTable(), 'uuid');
+        expect(isIntegerColumnType($idType))->toBeTrue();
+        expect(isUuidColumnType($uuidType))->toBeTrue();
     });
 
     test('messages table conversation_id uses UUID when configured', function () {
-        // Set UUID configuration
         Config::set('wirechat.uuids', true);
-
-        // Run conversations migration first
         $convMigration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $convMigration->up();
-
-        // Run messages migration
         $migration = include __DIR__.'/../../database/migrations/2024_11_01_000003_create_wirechat_messages_table.php';
         $migration->up();
-
-        // Check if conversation_id column is UUID type
         $columnType = Schema::getColumnType((new Message)->getTable(), 'conversation_id');
         expect(isUuidColumnType($columnType))->toBeTrue();
     });
 
-    test('participants table conversation_id uses UUID when configured', function () {
-        // Set UUID configuration
-        Config::set('wirechat.uuids', true);
-
-        // Run conversations migration first
+    test('messages table conversation_id uses integer when UUID not configured', function () {
+        Config::set('wirechat.uuids', false);
         $convMigration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $convMigration->up();
+        $migration = include __DIR__.'/../../database/migrations/2024_11_01_000003_create_wirechat_messages_table.php';
+        $migration->up();
+        $columnType = Schema::getColumnType((new Message)->getTable(), 'conversation_id');
+        expect(isIntegerColumnType($columnType))->toBeTrue();
+    });
 
-        // Run participants migration
+    test('participants table conversation_id uses UUID when configured', function () {
+        Config::set('wirechat.uuids', true);
+        $convMigration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
+        $convMigration->up();
         $migration = include __DIR__.'/../../database/migrations/2024_11_01_000004_create_wirechat_participants_table.php';
         $migration->up();
-
-        // Check if conversation_id column is UUID type
         $columnType = Schema::getColumnType((new Participant)->getTable(), 'conversation_id');
         expect(isUuidColumnType($columnType))->toBeTrue();
     });
 
-    test('groups table conversation_id uses UUID when configured', function () {
-        // Set UUID configuration
-        Config::set('wirechat.uuids', true);
-
-        // Run conversations migration first (not needed for schema check but good for foreign key)
+    test('participants table conversation_id uses integer when UUID not configured', function () {
+        Config::set('wirechat.uuids', false);
         $convMigration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
         $convMigration->up();
+        $migration = include __DIR__.'/../../database/migrations/2024_11_01_000004_create_wirechat_participants_table.php';
+        $migration->up();
+        $columnType = Schema::getColumnType((new Participant)->getTable(), 'conversation_id');
+        expect(isIntegerColumnType($columnType))->toBeTrue();
+    });
 
-        // Run groups migration
+    test('groups table conversation_id uses UUID when configured', function () {
+        Config::set('wirechat.uuids', true);
+        $convMigration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
+        $convMigration->up();
         $migration = include __DIR__.'/../../database/migrations/2024_11_01_000007_create_wirechat_groups_table.php';
         $migration->up();
-
-        // Check if conversation_id column is UUID type
         $columnType = Schema::getColumnType((new Group)->getTable(), 'conversation_id');
         expect(isUuidColumnType($columnType))->toBeTrue();
     });
 
-    test('attachments table should handle polymorphic UUID references when configured', function () {
-        // Set UUID configuration
-        Config::set('wirechat.uuids', true);
-
-        // Run attachments migration
-        $migration = include __DIR__.'/../../database/migrations/2024_11_01_000002_create_wirechat_attachments_table.php';
-        $migration->up();
-
-        // For polymorphic relationships that could reference UUID models,
-        // the attachable_id should be UUID type
-        $columnType = Schema::getColumnType((new Attachment)->getTable(), 'attachable_id');
-
-        expect(isUuidColumnType($columnType))->toBeTrue();
-    });
-
-    test('actions table should handle polymorphic UUID references when configured', function () {
-        // Set UUID configuration
-        Config::set('wirechat.uuids', true);
-
-        // Run actions migration
-        $migration = include __DIR__.'/../../database/migrations/2024_11_01_000006_create_wirechat_actions_table.php';
-        $migration->up();
-
-        // For polymorphic relationships that could reference UUID models (like conversations),
-        // the actionable_id and actor_id should be UUID type
-        $actionableType = Schema::getColumnType((new Action)->getTable(), 'actionable_id');
-        $actorType = Schema::getColumnType((new Action)->getTable(), 'actor_id');
-
-        expect(isUuidColumnType($actionableType))->toBeTrue();
-        expect(isUuidColumnType($actorType))->toBeTrue();
-    });
-});
-
-describe('UUID configuration in migrations with integer IDs', function () {
-
-    test('attachments table uses integer for polymorphic ids when UUID not configured', function () {
-        // Set UUID configuration to false
+    test('groups table conversation_id uses integer when UUID not configured', function () {
         Config::set('wirechat.uuids', false);
-
-        // Run attachments migration
-        $migration = include __DIR__.'/../../database/migrations/2024_11_01_000002_create_wirechat_attachments_table.php';
+        $convMigration = include __DIR__.'/../../database/migrations/2024_11_01_000001_create_wirechat_conversations_table.php';
+        $convMigration->up();
+        $migration = include __DIR__.'/../../database/migrations/2024_11_01_000007_create_wirechat_groups_table.php';
         $migration->up();
-
-        // Check if attachable_id column is integer type
-        $columnType = Schema::getColumnType((new Attachment)->getTable(), 'attachable_id');
+        $columnType = Schema::getColumnType((new Group)->getTable(), 'conversation_id');
         expect(isIntegerColumnType($columnType))->toBeTrue();
     });
 
-    test('actions table uses integer for polymorphic ids when UUID not configured', function () {
-        // Set UUID configuration to false
+    test('attachments table uses string for polymorphic ids', function () {
         Config::set('wirechat.uuids', false);
+        $migration = include __DIR__.'/../../database/migrations/2024_11_01_000002_create_wirechat_attachments_table.php';
+        $migration->up();
+        $columnType = Schema::getColumnType((new Attachment)->getTable(), 'attachable_id');
+        expect(isUuidColumnType($columnType))->toBeTrue();
+    });
 
-        // Run actions migration
+    test('actions table uses string for polymorphic ids', function () {
+        Config::set('wirechat.uuids', false);
         $migration = include __DIR__.'/../../database/migrations/2024_11_01_000006_create_wirechat_actions_table.php';
         $migration->up();
-
-        // Check if actionable_id and actor_id columns are integer type
         $actionableType = Schema::getColumnType((new Action)->getTable(), 'actionable_id');
         $actorType = Schema::getColumnType((new Action)->getTable(), 'actor_id');
-
-        expect(isIntegerColumnType($actionableType))->toBeTrue();
-        expect(isIntegerColumnType($actorType))->toBeTrue();
+        expect(isUuidColumnType($actionableType))->toBeTrue();
+        expect(isUuidColumnType($actorType))->toBeTrue();
     });
 });

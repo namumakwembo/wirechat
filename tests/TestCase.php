@@ -19,7 +19,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     //  use DatabaseTruncation; // Ensures migrations are run and database is refreshed for each test
     //  use WithLaravelMigrations;
     // use InteractsWithViews;
-    use RefreshDatabase;
+    //  use RefreshDatabase;
 
     use WithWorkbench;
 
@@ -52,7 +52,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
             $config->set('queue.batching.database', 'testbench');
             $config->set('queue.failed.database', 'testbench');
-            $config->set(['queue.default', 'sync']);
+            $config->set('queue.default', 'sync');
 
             $config->set('filesystems.default', 'public');
             $config->set('livewire.temporary_file_upload.disk', 'public');

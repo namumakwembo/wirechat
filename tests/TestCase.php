@@ -16,12 +16,13 @@ use function Orchestra\Testbench\workbench_path;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
-    use WithWorkbench;
-
     //  use DatabaseTruncation; // Ensures migrations are run and database is refreshed for each test
     //  use WithLaravelMigrations;
     // use InteractsWithViews;
-    //  use RefreshDatabase;
+    use RefreshDatabase;
+
+    use WithWorkbench;
+
     protected function getPackageProviders($app): array
     {
         return [

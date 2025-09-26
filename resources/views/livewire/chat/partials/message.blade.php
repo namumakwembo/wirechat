@@ -52,7 +52,7 @@
 ])
 >
 @if (!$belongsToAuth && $isGroup)
-<div    
+<div
     @class([
         'shrink-0 font-medium text-purple-500',
         // Hide avatar if the next message is from the same user
@@ -62,7 +62,7 @@
 </div>
 @endif
 
-<pre class="whitespace-pre-line tracking-normal text-sm md:text-base dark:text-white lg:tracking-normal"
+<pre class="whitespace-pre-line break-all tracking-normal text-sm md:text-base dark:text-white lg:tracking-normal"
     style="font-family: inherit;">
     {{$message?->body}}
 </pre>

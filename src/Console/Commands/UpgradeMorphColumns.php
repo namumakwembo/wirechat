@@ -11,7 +11,7 @@ use Wirechat\Wirechat\Models\Attachment;
 
 class UpgradeMorphColumns extends Command
 {
-    protected $signature = 'wirechat:upgrade-morph-columns {--dry : Show what would change without applying}';
+    protected $signature = 'wirechat:upgrade-morph-columns {--dry-run : Show what would change without applying}';
 
     protected $description = 'Convert Wirechat polymorphic *_id/*_type columns to strings (UUID/int/ULID-safe).';
 
@@ -22,7 +22,7 @@ class UpgradeMorphColumns extends Command
 
     public function handle(): int
     {
-        $dry = (bool) $this->option('dry');
+        $dry = (bool) $this->option('dry-run');
         $driver = Schema::getConnection()->getDriverName();
 
         $this->line("<info>Driver:</info> {$driver}");

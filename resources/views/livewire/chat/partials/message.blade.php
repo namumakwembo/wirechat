@@ -62,7 +62,7 @@
 </div>
 @endif
 
-<pre class="whitespace-pre-line tracking-normal text-sm md:text-base dark:text-white lg:tracking-normal"
+<pre class="whitespace-pre-line tracking-normal break-all text-sm md:text-base dark:text-white lg:tracking-normal"
     style="font-family: inherit;">
     {{$message?->body}}
 </pre>

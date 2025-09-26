@@ -176,7 +176,7 @@
                                         ' border-l-4 mr-auto ' => !$belongsToAuth,
                                     ])>
                                         <p
-                                            class=" bg-[var(--wc-light-secondary)] dark:text-white  dark:bg-[var(--wc-dark-secondary)] text-black line-clamp-1 text-sm  rounded-full max-w-fit   px-3 py-1 ">
+                                            class=" bg-[var(--wc-light-secondary)] dark:text-white break-all  dark:bg-[var(--wc-dark-secondary)] text-black line-clamp-1 text-sm  rounded-full max-w-fit   px-3 py-1 ">
                                             {{ $parent?->body != '' ? $parent?->body : ($parent->hasAttachment() ?  __('wirechat::chat.labels.attachment') : '') }}
                                         </p>
                                     </div>
